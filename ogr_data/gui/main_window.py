@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QPushButton,
     QScrollArea,
     QSplitter,
     QVBoxLayout,
@@ -117,7 +118,31 @@ class MainWindow(QMainWindow):
                     widget.setSuffix(" kPa")
                 widget.valueChanged.connect(self.refresh)
             self._widgets[field.key] = widget
-            self._form_layout.addRow(field.label, widget)
+
+            editor: QWidget = widget
+            if field.pick:
+                editor = QWidget()
+                row = QHBoxLayout(editor)
+                row.setContentsMargins(0, 0, 0, 0)
+                row.addWidget(widget, stretch=1)
+                pick_button = QPushButton("Pick…")
+                pick_button.clicked.connect(lambda _=False, f=field, w=widget: self._pick(f, w))
+                row.addWidget(pick_button)
+            self._form_layout.addRow(field.label, editor)
+
+    def _pick(self, field, widget: QDoubleSpinBox) -> None:
+        from . import pickers
+
+        picker = {
+            "sigci_grades": pickers.sigci_picker,
+            "mi_values": pickers.mi_picker,
+            "gsi_chart": pickers.gsi_picker,
+        }.get(field.pick)
+        if picker is None:
+            return
+        value = picker(self)
+        if value is not None:
+            widget.setValue(value)
 
     def _params(self) -> dict:
         params = defaults(self._criterion_combo.currentData())

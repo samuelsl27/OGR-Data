@@ -20,6 +20,7 @@ class Field:
     unit: str = ""
     kind: str = "float"  # "float" | "bool" | "enum"
     options: tuple[str, ...] = ()
+    pick: str = ""  # picker key: "sigci_grades" | "mi_values" | "gsi_chart"
 
     def __post_init__(self) -> None:
         if self.kind not in ("float", "bool", "enum"):
@@ -66,7 +67,7 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("material_type", "Material Type", "Plastic", kind="enum", options=("Plastic",)),
-            Field("compressive_strength", "Compressive Strength", 100000.0, "kPa"),
+            Field("compressive_strength", "Compressive Strength", 100000.0, "kPa", pick="sigci_grades"),
             Field("mb", "mb Parameter", 1.0),
             Field("s", "s Parameter", 0.001),
             Field("set_residual_to_peak", "Set Residual to Peak", True, kind="bool"),
@@ -96,9 +97,9 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("define_by", "Define by", "GSI", kind="enum", options=("GSI",)),
-            Field("sigci", "UCS of intact rock", 100000.0, "kPa"),
-            Field("gsi", "GSI", 50.0),
-            Field("mi", "mi", 10.0),
+            Field("sigci", "UCS of intact rock", 100000.0, "kPa", pick="sigci_grades"),
+            Field("gsi", "GSI", 50.0, pick="gsi_chart"),
+            Field("mi", "mi", 10.0, pick="mi_values"),
             Field("d", "D", 0.0),
             Field("set_residual_to_peak", "Set Residual to Peak", True, kind="bool"),
             Field("gsi_residual", "GSI Residual", 50.0),

@@ -1,0 +1,76 @@
+{
+  "source": "Hoek, Practical Rock Engineering, Chapter 11 'Rock mass properties', Table 2: Field estimates of uniaxial compressive strength (grade after Brown 1981). PDF in the suite bibliography (Rocas/Hoek_Practical-Rock-Engineering_Ch11_Rock-Mass-Properties.pdf).",
+  "note": "Point load index is not reliable below 25 MPa uniaxial strength (note ** of the source table). Open-ended grade R6 uses its printed lower bound (250 MPa) as the pick value.",
+  "grades": [
+    {
+      "grade": "R6",
+      "term": "Extremely strong",
+      "ucs_lo_mpa": 250.0,
+      "ucs_hi_mpa": null,
+      "ucs_pick_mpa": 250.0,
+      "point_load_mpa": ">10",
+      "field_estimate": "Specimen can only be chipped with a geological hammer",
+      "examples": "Fresh basalt, chert, diabase, gneiss, granite, quartzite"
+    },
+    {
+      "grade": "R5",
+      "term": "Very strong",
+      "ucs_lo_mpa": 100.0,
+      "ucs_hi_mpa": 250.0,
+      "ucs_pick_mpa": 175.0,
+      "point_load_mpa": "4-10",
+      "field_estimate": "Specimen requires many blows of a geological hammer to fracture it",
+      "examples": "Amphibolite, sandstone, basalt, gabbro, gneiss, granodiorite, limestone, marble, rhyolite, tuff"
+    },
+    {
+      "grade": "R4",
+      "term": "Strong",
+      "ucs_lo_mpa": 50.0,
+      "ucs_hi_mpa": 100.0,
+      "ucs_pick_mpa": 75.0,
+      "point_load_mpa": "2-4",
+      "field_estimate": "Specimen requires more than one blow of a geological hammer to fracture it",
+      "examples": "Limestone, marble, phyllite, sandstone, schist, shale"
+    },
+    {
+      "grade": "R3",
+      "term": "Medium strong",
+      "ucs_lo_mpa": 25.0,
+      "ucs_hi_mpa": 50.0,
+      "ucs_pick_mpa": 37.5,
+      "point_load_mpa": "1-2",
+      "field_estimate": "Cannot be scraped or peeled with a pocket knife, specimen can be fractured with a single blow from a geological hammer",
+      "examples": "Claystone, coal, concrete, schist, shale, siltstone"
+    },
+    {
+      "grade": "R2",
+      "term": "Weak",
+      "ucs_lo_mpa": 5.0,
+      "ucs_hi_mpa": 25.0,
+      "ucs_pick_mpa": 15.0,
+      "point_load_mpa": null,
+      "field_estimate": "Can be peeled with a pocket knife with difficulty, shallow indentation made by firm blow with point of a geological hammer",
+      "examples": "Chalk, rocksalt, potash"
+    },
+    {
+      "grade": "R1",
+      "term": "Very weak",
+      "ucs_lo_mpa": 1.0,
+      "ucs_hi_mpa": 5.0,
+      "ucs_pick_mpa": 3.0,
+      "point_load_mpa": null,
+      "field_estimate": "Crumbles under firm blows with point of a geological hammer, can be peeled by a pocket knife",
+      "examples": "Highly weathered or altered rock"
+    },
+    {
+      "grade": "R0",
+      "term": "Extremely weak",
+      "ucs_lo_mpa": 0.25,
+      "ucs_hi_mpa": 1.0,
+      "ucs_pick_mpa": 0.625,
+      "point_load_mpa": null,
+      "field_estimate": "Indented by thumbnail",
+      "examples": "Stiff fault gouge"
+    }
+  ]
+}

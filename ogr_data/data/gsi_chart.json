@@ -1,0 +1,80 @@
+{
+  "source": "Hoek & Marinos (2000), 'GSI: A Geologically Friendly Tool for Rock Mass Strength Estimation', Table 5: 'Geological Strength Index for jointed rocks' (the general GSI chart). PDF in the suite bibliography (Rocas/Marinos_Hoek_2000_GSI_Geologically-Friendly-Tool.pdf).",
+  "note": "Cell ranges are an approximate reading of the GSI contour lines printed on the published chart; they are indicative, not precise ('quoting a range from 33 to 37 is more realistic than stating that GSI = 35', same source). Combinations not present on the chart are null.",
+  "warning": "The chart does not apply to structurally controlled failures; weak planar structural planes with unfavourable orientation dominate the rock mass behaviour in those cases.",
+  "structures": [
+    {
+      "key": "intact_massive",
+      "label": "INTACT OR MASSIVE",
+      "description": "Intact rock specimens or massive in situ rock with few widely spaced discontinuities"
+    },
+    {
+      "key": "blocky",
+      "label": "BLOCKY",
+      "description": "Well interlocked undisturbed rock mass consisting of cubical blocks formed by three intersecting discontinuity sets"
+    },
+    {
+      "key": "very_blocky",
+      "label": "VERY BLOCKY",
+      "description": "Interlocked, partially disturbed mass with multi-faceted angular blocks formed by 4 or more joint sets"
+    },
+    {
+      "key": "blocky_disturbed_seamy",
+      "label": "BLOCKY/DISTURBED/SEAMY",
+      "description": "Folded with angular blocks formed by many intersecting discontinuity sets. Persistence of bedding planes or schistosity"
+    },
+    {
+      "key": "disintegrated",
+      "label": "DISINTEGRATED",
+      "description": "Poorly interlocked, heavily broken rock mass with mixture of angular and rounded rock pieces"
+    },
+    {
+      "key": "laminated_sheared",
+      "label": "LAMINATED/SHEARED",
+      "description": "Lack of blockiness due to close spacing of weak schistosity or shear planes"
+    }
+  ],
+  "surfaces": [
+    {
+      "key": "very_good",
+      "label": "VERY GOOD",
+      "description": "Very rough, fresh unweathered surfaces"
+    },
+    {
+      "key": "good",
+      "label": "GOOD",
+      "description": "Rough, slightly weathered, iron stained surfaces"
+    },
+    {
+      "key": "fair",
+      "label": "FAIR",
+      "description": "Smooth, moderately weathered and altered surfaces"
+    },
+    {
+      "key": "poor",
+      "label": "POOR",
+      "description": "Slickensided, highly weathered surfaces with compact coatings or fillings or angular fragments"
+    },
+    {
+      "key": "very_poor",
+      "label": "VERY POOR",
+      "description": "Slickensided, highly weathered surfaces with soft clay coatings or fillings"
+    }
+  ],
+  "cells": {
+    "intact_massive|very_good": [80, 100],
+    "blocky|very_good": [70, 90],
+    "blocky|good": [50, 70],
+    "very_blocky|very_good": [50, 70],
+    "very_blocky|good": [40, 60],
+    "very_blocky|fair": [30, 50],
+    "blocky_disturbed_seamy|good": [40, 60],
+    "blocky_disturbed_seamy|fair": [30, 50],
+    "blocky_disturbed_seamy|poor": [20, 40],
+    "disintegrated|fair": [20, 40],
+    "disintegrated|poor": [10, 30],
+    "disintegrated|very_poor": [5, 15],
+    "laminated_sheared|poor": [10, 20],
+    "laminated_sheared|very_poor": [5, 15]
+  }
+}
