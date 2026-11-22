@@ -80,6 +80,17 @@ class MainWindow(QMainWindow):
         copy_row.addWidget(copy_data)
         copy_row.addWidget(copy_image)
         sidebar.addLayout(copy_row)
+        file_row = QHBoxLayout()
+        save_button = QPushButton("Save…")
+        save_button.clicked.connect(self._save_project)
+        load_button = QPushButton("Load…")
+        load_button.clicked.connect(self._load_project)
+        import_button = QPushButton("Import .roc…")
+        import_button.clicked.connect(self._import_roc)
+        file_row.addWidget(save_button)
+        file_row.addWidget(load_button)
+        file_row.addWidget(import_button)
+        sidebar.addLayout(file_row)
         sidebar.addWidget(QLabel("sig3max (envelope range)"))
         sidebar.addWidget(self._sig3max)
         sidebar.addWidget(self._form_box)
@@ -219,6 +230,66 @@ class MainWindow(QMainWindow):
         from PySide6.QtWidgets import QApplication
 
         QApplication.clipboard().setPixmap(self._principal.grab())
+
+    # ------------------------------------------------------------ projects
+
+    def _save_project(self) -> None:
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        from ..core import project
+
+        path, _ = QFileDialog.getSaveFileName(self, "Save project", "", "OGR Data project (*.ogrdata)")
+        if not path:
+            return
+        if not path.endswith(".ogrdata"):
+            path += ".ogrdata"
+        try:
+            project.save_project(path, self._material_name(), self._criterion_combo.currentData(), self._params(), self._sig3max.value())
+        except ValueError as exc:
+            QMessageBox.warning(self, "Save failed", str(exc))
+
+    def _load_project(self) -> None:
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        from ..core import project
+
+        path, _ = QFileDialog.getOpenFileName(self, "Load project", "", "OGR Data project (*.ogrdata)")
+        if not path:
+            return
+        try:
+            data = project.load_project(path)
+        except (ValueError, OSError) as exc:
+            QMessageBox.warning(self, "Load failed", str(exc))
+            return
+        self._apply_project(data["criterion"], data["parameters"], data.get("sig3max_mpa"))
+        self._name_edit.setText(data.get("name", ""))
+
+    def _import_roc(self) -> None:
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        from ..core import roc_import
+
+        path, _ = QFileDialog.getOpenFileName(self, "Import RocData file", "", "RocData (*.roc)")
+        if not path:
+            return
+        try:
+            roc = roc_import.parse_roc(path)
+        except (ValueError, OSError) as exc:
+            QMessageBox.warning(self, "Import failed", str(exc))
+            return
+        self._apply_project(roc.criterion, roc.parameters, roc.sig3max_mpa)
+        self._name_edit.setText(roc.title)
+
+    def _apply_project(self, criterion: str, parameters: dict, sig3max_mpa: float | None) -> None:
+        idx = self._criterion_combo.findData(criterion)
+        if idx >= 0:
+            self._criterion_combo.setCurrentIndex(idx)
+        self._rebuild_form()
+        for key, value in parameters.items():
+            if key in self._widgets and isinstance(self._widgets[key], QDoubleSpinBox):
+                self._widgets[key].setValue(float(value))
+        if sig3max_mpa is not None:
+            self._sig3max.setValue(float(sig3max_mpa))
 
     # ------------------------------------------------------------------ form
 
