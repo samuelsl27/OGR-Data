@@ -37,3 +37,7 @@ Métodos por ajuste:
   documenta la formulación exacta en espacio principal; se aplaza).
 - GHB macizo: aquí se ajustan mb/s/a con σci y D fijos (análisis de datos
   de macizo), no σci/mi.
+- **Mejora registrada** (tercera pasada por RSData): el "Define by" del
+  GHB admite modo directo **mb, s, a** además de "GSI, mi, D"; cuando el
+  registro de OGR-Data lo soporte, el "Apply" de este diálogo podrá
+  rellenar el GHB sin el mapeo al HB clásico (hoy anotado como caveat).

@@ -8,6 +8,14 @@ las gráficas actuales y generarlo.
 
 ## Alcance v1
 
+Modelo de contenido observado en RSData (captura `41_*`): el informe es
+un documento por secciones con visibilidad configurable — Cover Page,
+Table of Contents, Title, Project Summary, Project Settings, Samples,
+Defined Material Models, Defined Failure States, Defined Test
+Simulations, Defined Stress Paths. OGR-Data v1 genera HTML con ese
+mismo índice de secciones (las vacías se omiten), con Save/Print desde
+el navegador.
+
 - "Add View To Report": captura la(s) gráfica(s) activas con su título
   y los parámetros del material en una lista ordenada.
 - "Manage Report View": reordenar/quitar vistas.

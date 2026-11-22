@@ -19,6 +19,11 @@ contra los dos casos ORMAS** anotados arriba antes de implementar.
 Si la fórmula del paper no reproduce ORMAS, la spec documentará ambas
 variantes y se preguntará al propietario cuál adoptar (no inventar).
 
+**Opciones confirmadas en RSData** (tercera pasada, captura `40_*`):
+Application = **Custom | General | Tunnels | Slopes** ("General" = σci/4
+del viejo RocData; Custom pide σ3max manual; Tunnels/Slopes piden peso
+unitario y profundidad/altura).
+
 ## Criterios de aceptación
 
 - Los dos casos ORMAS reproducidos con tolerancia 0,5 %.
