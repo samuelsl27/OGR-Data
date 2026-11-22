@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ogr-data"
+version = "0.1.0"
+description = "Rock and soil material properties for the OpenGeoRock suite"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "AGPL-3.0-or-later" }
+dependencies = [
+    "PySide6>=6.6",
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "scipy>=1.11",
+]
+
+[project.scripts]
+ogr-data = "ogr_data.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["ogr_data*"]
+
+[tool.setuptools.package-data]
+ogr_data = ["py.typed"]
