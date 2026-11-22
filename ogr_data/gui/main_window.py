@@ -63,6 +63,9 @@ class MainWindow(QMainWindow):
         self._classifier_button = QPushButton("Soil classifier (USCS)…")
         self._classifier_button.clicked.connect(self._open_classifier)
         sidebar.addWidget(self._classifier_button)
+        self._fit_button = QPushButton("Fit lab data…")
+        self._fit_button.clicked.connect(self._open_fit_dialog)
+        sidebar.addWidget(self._fit_button)
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText("Material name")
         sidebar.addWidget(self._name_edit)
@@ -111,6 +114,54 @@ class MainWindow(QMainWindow):
         from .soil_classifier import SoilClassifierDialog
 
         SoilClassifierDialog(self).exec()
+
+    def _open_fit_dialog(self) -> None:
+        from .fit_dialog import FitDialog
+
+        FitDialog(self).exec()
+
+    def apply_fit_parameters(self, result) -> None:
+        """Fill the parameter form from a FitResult (spec 006)."""
+
+        from ..core.fitting import DIRECT, TRIAXIAL
+
+        mapping: dict[str, tuple[str, dict[str, float]]] = {
+            # criterion to select -> {fit parameter: form field}
+            "mohr_coulomb": (
+                "mohr_coulomb",
+                {"cohesion_mpa": ("peak_cohesion", 1000.0), "friction_deg": ("peak_friction", 1.0)},
+            ),
+            "hoek_brown": (
+                "hoek_brown",
+                {"sigci_mpa": ("compressive_strength", 1000.0), "mi": ("mb", 1.0)},
+            ),
+            "generalized_hoek_brown": (
+                "hoek_brown",
+                {"mb": ("mb", 1.0), "s": ("s", 1.0)},
+            ),
+            "barton_bandis": (
+                "barton_bandis",
+                {"jrc": ("jrc", 1.0), "jcs_mpa": ("jcs", 1000.0)},
+            ),
+            "power_curve": (
+                "power_curve",
+                {"a": ("a", 1.0), "b": ("b", 1.0), "d_mpa": ("d", 1000.0)},
+            ),
+        }
+        target, fields = mapping[result.criterion]
+        idx = self._criterion_combo.findData(target)
+        if idx >= 0:
+            self._criterion_combo.setCurrentIndex(idx)
+        self._rebuild_form()
+        for fit_key, (field_key, scale) in fields.items():
+            if fit_key in result.parameters and field_key in self._widgets:
+                self._widgets[field_key].setValue(result.parameters[fit_key] * scale)
+        if target == "hoek_brown" and result.criterion == "hoek_brown":
+            if "s" in self._widgets:
+                self._widgets["s"].setValue(1.0)
+        if target == "barton_bandis" and "phi_r" in self._widgets and result.fixed:
+            if "phi_b_deg" in result.fixed:
+                self._widgets["phi_r"].setValue(result.fixed["phi_b_deg"])
 
     # ------------------------------------------------------------- clipboard
 
