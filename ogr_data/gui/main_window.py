@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -16,6 +16,9 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSplitter,
@@ -27,6 +30,7 @@ from ..core import criteria_envelopes as ce
 from ..core.hoek_brown import HbInput, compute
 from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas
+from .themes import THEMES, apply_theme
 
 
 class MainWindow(QMainWindow):
@@ -34,6 +38,15 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("OGR Data")
         self.resize(1150, 640)
+
+        self._settings = QSettings("OpenGeoRock", "OGR-Data")
+        self._theme = str(self._settings.value("theme", "light"))
+        if self._theme not in THEMES:
+            self._theme = "light"
+        from PySide6.QtWidgets import QApplication
+
+        apply_theme(QApplication.instance(), self._theme)
+        self._create_menus()
 
         self._criterion_combo = QComboBox()
         for key, crit in CRITERIA.items():
@@ -105,8 +118,8 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setMaximumWidth(380)
 
-        self._principal = EnvelopeCanvas("Principal Stresses", "sigma3 (MPa)", "sigma1 (MPa)")
-        self._shear = EnvelopeCanvas("Shear - Normal Stresses", "normal stress (MPa)", "shear stress (MPa)")
+        self._principal = EnvelopeCanvas("Principal Stresses", "sigma3 (MPa)", "sigma1 (MPa)", self._theme)
+        self._shear = EnvelopeCanvas("Shear - Normal Stresses", "normal stress (MPa)", "shear stress (MPa)", self._theme)
 
         plots = QSplitter(Qt.Orientation.Horizontal)
         plots.addWidget(self._principal)
@@ -120,6 +133,52 @@ class MainWindow(QMainWindow):
 
         self._rebuild_form()
         self.refresh()
+
+    # ----------------------------------------------------------------- menus
+
+    def _create_menus(self) -> None:
+        bar = QMenuBar(self)
+        self.setMenuBar(bar)
+
+        file_menu = bar.addMenu("File")
+        file_menu.addAction("Save…", self._save_project)
+        file_menu.addAction("Load…", self._load_project)
+        file_menu.addAction("Import .roc…", self._import_roc)
+        file_menu.addSeparator()
+        file_menu.addAction("Exit", self.close)
+
+        edit_menu = bar.addMenu("Edit")
+        edit_menu.addAction("Copy material", self._copy_material)
+        edit_menu.addAction("Copy data", self._copy_data)
+
+        view_menu = bar.addMenu("View")
+        theme_menu = view_menu.addMenu("Theme")
+        for name in THEMES:
+            theme_menu.addAction(name.capitalize(), lambda _=False, n=name: self._set_theme(n))
+
+        help_menu = bar.addMenu("Help")
+        help_menu.addAction("About OGR Data", self._about)
+
+    def _set_theme(self, name: str) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        self._theme = name
+        self._settings.setValue("theme", name)
+        apply_theme(QApplication.instance(), name)
+        for canvas in (self._principal, self._shear):
+            canvas.apply_theme(name)
+
+    def _about(self) -> None:
+        from .. import __version__
+
+        QMessageBox.about(
+            self,
+            "About OGR Data",
+            f"<b>OGR Data</b> {__version__}<br/>"
+            "Rock and soil material properties for the OpenGeoRock suite.<br/>"
+            "Design language: OGR-Slip2D (QGIS-inspired).",
+        )
+
 
     def _open_classifier(self) -> None:
         from .soil_classifier import SoilClassifierDialog
