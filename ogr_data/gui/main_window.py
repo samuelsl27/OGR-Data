@@ -59,6 +59,9 @@ class MainWindow(QMainWindow):
         sidebar = QVBoxLayout()
         sidebar.addWidget(QLabel("Failure criterion"))
         sidebar.addWidget(self._criterion_combo)
+        self._classifier_button = QPushButton("Soil classifier (USCS)…")
+        self._classifier_button.clicked.connect(self._open_classifier)
+        sidebar.addWidget(self._classifier_button)
         sidebar.addWidget(QLabel("sig3max (envelope range)"))
         sidebar.addWidget(self._sig3max)
         sidebar.addWidget(self._form_box)
@@ -88,6 +91,11 @@ class MainWindow(QMainWindow):
 
         self._rebuild_form()
         self.refresh()
+
+    def _open_classifier(self) -> None:
+        from .soil_classifier import SoilClassifierDialog
+
+        SoilClassifierDialog(self).exec()
 
     # ------------------------------------------------------------------ form
 

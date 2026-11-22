@@ -1,0 +1,111 @@
+{
+  "source": "USDA NRCS, National Engineering Handbook Part 631, Chapter 3 'Engineering Classification of Earth Materials', Figure 3-22 'Engineering properties of USCS soil classes' (210-631-H, 2nd Ed., Jun 2022). PDF in the suite bibliography (Suelos/NRCS_NEH-631_Ch3_Engineering-Classification-of-Earth-Materials_USCS.pdf).",
+  "note": "Shear strength, compressibility and workability are qualitative in the source table. Permeability is given as ranges. There are no numeric c/phi values in this official source; numeric parameter proposals are a separate spec with its own source.",
+  "classes": {
+    "GW": {
+      "typical_names": "Well-graded gravels, gravel-sand mixtures, little or no fines",
+      "shear_strength": "Excellent",
+      "compressibility": "Negligible",
+      "workability": "Excellent",
+      "permeability": "Pervious (K > 10^-2 cm/s, > 30 ft/day)"
+    },
+    "GP": {
+      "typical_names": "Poorly graded gravels, gravel-sand mixtures, little or no fines",
+      "shear_strength": "Good",
+      "compressibility": "Negligible",
+      "workability": "Good",
+      "permeability": "Very pervious (K > 10^-2 cm/s, > 30 ft/day)"
+    },
+    "GM": {
+      "typical_names": "Silty gravels, gravel-sand-silt mixtures",
+      "shear_strength": "Good to fair",
+      "compressibility": "Negligible",
+      "workability": "Good",
+      "permeability": "Semi-pervious to impervious (K = 10^-3 to 10^-6 cm/s)"
+    },
+    "GC": {
+      "typical_names": "Clayey gravels, gravel-sand-clay mixtures",
+      "shear_strength": "Good",
+      "compressibility": "Very low",
+      "workability": "Good",
+      "permeability": "Impervious (K = 10^-3 to 10^-6 cm/s)"
+    },
+    "SW": {
+      "typical_names": "Well-graded sands, gravelly sands, little or no fines",
+      "shear_strength": "Excellent",
+      "compressibility": "Negligible",
+      "workability": "Excellent",
+      "permeability": "Pervious (K > 10^-3 cm/s, > 3 ft/day)"
+    },
+    "SP": {
+      "typical_names": "Poorly graded sands, gravelly sands, little or no fines",
+      "shear_strength": "Good",
+      "compressibility": "Very low",
+      "workability": "Fair",
+      "permeability": "Pervious (K > 10^-3 cm/s, > 3 ft/day)"
+    },
+    "SM": {
+      "typical_names": "Silty sands, sand-silt mixtures",
+      "shear_strength": "Good to fair",
+      "compressibility": "Low",
+      "workability": "Fair",
+      "permeability": "Semi-pervious to impervious (K = 10^-3 to 10^-6 cm/s)"
+    },
+    "SC": {
+      "typical_names": "Clayey sands, sand-clay mixtures",
+      "shear_strength": "Good to fair",
+      "compressibility": "Low",
+      "workability": "Good",
+      "permeability": "Impervious (K = 10^-6 to 10^-8 cm/s)"
+    },
+    "ML": {
+      "typical_names": "Inorganic silts and very fine sands, rock flour, silty or clayey fine sands, or clayey silts with slight plasticity",
+      "shear_strength": "Fair",
+      "compressibility": "Medium to high",
+      "workability": "Fair",
+      "permeability": "Semi-pervious to impervious (K = 10^-3 to 10^-6 cm/s)"
+    },
+    "CL": {
+      "typical_names": "Inorganic clays of low to medium plasticity, gravelly clays, sandy clays, silty clays, and lean clays",
+      "shear_strength": "Fair",
+      "compressibility": "Medium",
+      "workability": "Good to fair",
+      "permeability": "Impervious (K = 10^-6 to 10^-8 cm/s)"
+    },
+    "OL": {
+      "typical_names": "Organic silts and organic silty clays of low plasticity",
+      "shear_strength": "Poor",
+      "compressibility": "Medium",
+      "workability": "Fair",
+      "permeability": "Semi-pervious to impervious (K = 10^-4 to 10^-6 cm/s)"
+    },
+    "MH": {
+      "typical_names": "Inorganic silts, micaceous or diatomaceous fine sandy or silty soils, elastic silts",
+      "shear_strength": "Fair to poor",
+      "compressibility": "High",
+      "workability": "Poor",
+      "permeability": "Semi-pervious to impervious (K = 10^-4 to 10^-6 cm/s)"
+    },
+    "CH": {
+      "typical_names": "Inorganic clays of high plasticity, fat clays",
+      "shear_strength": "Poor",
+      "compressibility": "High to very high",
+      "workability": "Poor",
+      "permeability": "Impervious (K = 10^-6 to 10^-8 cm/s)"
+    },
+    "OH": {
+      "typical_names": "Organic clays of medium to high plasticity, organic silts",
+      "shear_strength": "Poor",
+      "compressibility": "High",
+      "workability": "Poor",
+      "permeability": "Impervious (K = 10^-6 to 10^-8 cm/s)"
+    },
+    "PT": {
+      "typical_names": "Peat and other highly organic soils",
+      "shear_strength": "NOT SUITABLE FOR CONSTRUCTION",
+      "compressibility": "NOT SUITABLE FOR CONSTRUCTION",
+      "workability": "NOT SUITABLE FOR CONSTRUCTION",
+      "permeability": "NOT SUITABLE FOR CONSTRUCTION"
+    }
+  }
+}
