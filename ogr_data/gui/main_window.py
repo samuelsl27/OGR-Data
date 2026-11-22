@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QPushButton,
     QScrollArea,
@@ -62,6 +63,20 @@ class MainWindow(QMainWindow):
         self._classifier_button = QPushButton("Soil classifier (USCS)…")
         self._classifier_button.clicked.connect(self._open_classifier)
         sidebar.addWidget(self._classifier_button)
+        self._name_edit = QLineEdit()
+        self._name_edit.setPlaceholderText("Material name")
+        sidebar.addWidget(self._name_edit)
+        copy_row = QHBoxLayout()
+        copy_material = QPushButton("Copy material")
+        copy_material.clicked.connect(self._copy_material)
+        copy_data = QPushButton("Copy data")
+        copy_data.clicked.connect(self._copy_data)
+        copy_image = QPushButton("Copy plot")
+        copy_image.clicked.connect(self._copy_plot_image)
+        copy_row.addWidget(copy_material)
+        copy_row.addWidget(copy_data)
+        copy_row.addWidget(copy_image)
+        sidebar.addLayout(copy_row)
         sidebar.addWidget(QLabel("sig3max (envelope range)"))
         sidebar.addWidget(self._sig3max)
         sidebar.addWidget(self._form_box)
@@ -96,6 +111,63 @@ class MainWindow(QMainWindow):
         from .soil_classifier import SoilClassifierDialog
 
         SoilClassifierDialog(self).exec()
+
+    # ------------------------------------------------------------- clipboard
+
+    def _material_name(self) -> str:
+        name = self._name_edit.text().strip()
+        return name or self._criterion().label
+
+    def _ghb_computed(self) -> dict[str, float]:
+        key = self._criterion_combo.currentData()
+        if key != "generalized_hoek_brown":
+            return {}
+        params = self._params()
+        inp = HbInput(
+            sigci=float(params["sigci"]) / 1000.0,
+            gsi=float(params["gsi"]),
+            mi=float(params["mi"]),
+            disturbance=float(params["d"]),
+            sig3max=self._sig3max.value(),
+        )
+        result = compute(inp)
+        return {
+            "mb": result.mb,
+            "s": result.s,
+            "a": result.a,
+            "sigt_mpa": result.sigt,
+            "sigc_mpa": result.sigc,
+            "sigcm_mpa": result.sigcm,
+            "c_mpa": result.mc.cohesion,
+            "phi_deg": result.mc.friction_deg,
+            "erm_mpa": result.erm,
+        }
+
+    def _copy_material(self) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        from ..core import clipboard
+
+        key = self._criterion_combo.currentData()
+        text = clipboard.material_text(
+            self._material_name(), key, self._params(), self._ghb_computed()
+        )
+        QApplication.clipboard().setText(text)
+
+    def _copy_data(self) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        from ..core import clipboard
+
+        key = self._criterion_combo.currentData()
+        QApplication.clipboard().setText(
+            clipboard.tabular_data(key, self._params(), self._ghb_computed())
+        )
+
+    def _copy_plot_image(self) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        QApplication.clipboard().setPixmap(self._principal.grab())
 
     # ------------------------------------------------------------------ form
 
