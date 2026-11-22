@@ -10,14 +10,17 @@ from ogr_data.core.envelope import shear_normal_envelope
 from ogr_data.core.hoek_brown import HbInput, hoek_brown_constants
 
 
-def test_tangent_envelope_starts_at_sigt() -> None:
+def test_tangent_envelope_first_circle() -> None:
     inp = HbInput()
     mb, s, a = hoek_brown_constants(inp)
     env = shear_normal_envelope(inp, mb, s, a, points=200)
-    # First tangent point of the shear-normal envelope sits at the tensile
-    # intercept: normal = sigt, shear = 0.
-    assert abs(env.normal[0] - (-0.0692)) < 5e-3
-    assert abs(env.shear[0]) < 1e-6
+    # Tangent point on the uniaxial circle (sigma3 = 0): the envelope
+    # construction touches it at centre - R sin(phi0), R cos(phi0).
+    sigc0 = inp.sigci * s**a
+    d1 = 1.0 + mb * a * s ** (a - 1.0)
+    sin_phi0 = (d1 - 1.0) / (d1 + 1.0)
+    assert abs(env.normal[0] - sigc0 / 2.0 * (1.0 - sin_phi0)) < 1e-9
+    assert abs(env.shear[0] - sigc0 / 2.0 * math.sqrt(1.0 - sin_phi0**2)) < 1e-9
 
 
 def test_shear_stays_positive_and_monotonic_envelope() -> None:

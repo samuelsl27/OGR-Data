@@ -115,15 +115,22 @@ def global_strength(inp: HbInput, mb: float, s: float, a: float) -> float:
 def equivalent_mc(inp: HbInput, mb: float, s: float, a: float, points: int = 200) -> McEquivalent:
     """Best-fit Mohr-Coulomb parameters over [0, sig3max].
 
-    Least squares of sigma1 = k * sigma3 + n, then
-    phi = asin((k - 1) / (k + 1)) and c = n / (2 * sqrt(k)).
+    Rocscience formulation (Hoek 2002 closed form evaluated at
+    sigma3n = sig3max / sigci, anchored on the global strength sigcm):
+
+        X = 6 a mb (s + mb sigma3n)^(a-1)
+        sin(phi') = X / (2(1+a)(2+a) + X)
+        c' = sigcm (1 - sin(phi')) / (2 cos(phi'))
+
+    Validated against ORMAS V2.0 (spec 001).
     """
 
-    sig3 = np.linspace(0.0, inp.sig3max, points)
-    sig1 = major_principal_stress(inp, mb, s, a, sig3)
-    k, n = np.polyfit(sig3, sig1, 1)
-    friction = math.degrees(math.asin((k - 1.0) / (k + 1.0)))
-    cohesion = n / (2.0 * math.sqrt(k))
+    sig3n = inp.sig3max / inp.sigci
+    x_term = 6.0 * a * mb * (s + mb * sig3n) ** (a - 1.0)
+    sin_phi = x_term / (2.0 * (1.0 + a) * (2.0 + a) + x_term)
+    friction = math.degrees(math.asin(sin_phi))
+    sigcm = global_strength(inp, mb, s, a)
+    cohesion = sigcm * (1.0 - sin_phi) / (2.0 * math.cos(math.radians(friction)))
     return McEquivalent(cohesion=cohesion, friction_deg=friction)
 
 
