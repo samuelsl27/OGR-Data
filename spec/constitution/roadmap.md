@@ -1,22 +1,34 @@
 # Roadmap de OGR-Data
 
-Orden propuesto (cada entrada será una spec en `../features/`):
+Hecho (specs 001–007, desarrolladas): calculadora GHB validada contra
+ORMAS · los 10 criterios de RSData · pick dialogs Hoek/GSI · clasificador
+USCS · contrato de portapapeles · ajuste a datos de ensayo · proyectos
+e importación `.roc`.
 
-1. **001 — Calculadora GHB/Hoek-Brown** (núcleo): entrada σci, mi, GSI, D,
-   Ei; salida mb/s/a, sigt, sigc, sigcm, MC equivalente (c, φ) por rango
-   (custom/túnel/talud), Em (Hoek-Diederichs 2006 y Hoek 2002). Equivalente
-   ORMAS validado contra sus resultados. Con gráficas σ1–σ3 y τ–σn.
-2. **002 — Criterios MC, Barton-Bandis y Power Curve** con parámetros
-   interactivos y envolventes, como el viejo RocData.
-3. **003 — Pick dialogs bibliográficos**: tablas por tipo de roca (Hoek ch.11)
-   y carta GSI (Marinos-Hoek 2000, incl. flysch).
-4. **004 — Clasificador de suelos USCS** (ASTM D2487 vía NRCS 631-3) con
-   ficha de propiedades típicas y creación de material.
-5. **005 — Portapapeles**: contrato `OGR-DATA-MATERIAL/1` (copiar/pegar con
-   OGR-Slip2D y OGR-FEM2D) + copia tabulada para Excel + imagen de gráficas.
-6. **006 — Ajuste a datos de ensayo**: triaxial y corte directo,
-   Levenberg-Marquardt/Simplex/regresión; residuals; equivalencia MC.
-7. **007 — Base de datos de materiales** persistida (proyectos OGR-Data,
-   importación de .roc del viejo RocData).
-8. Posibles fases 2: muestreadores (stress / instantaneous MC), línea de
-   Mogi, export Excel, informes.
+Backlog de specs (spec.md redactadas; plan y tasks se hacen al
+desarrollar cada una). Orden propuesto tras la evaluación en profundidad
+de RSData 1.009 y ORMAS V2.0 (`../../Referencias/Ejemplos/RSData_analisis/05_profundizacion.md`):
+
+1. **008 — Muestreadores y superposiciones**: stress sampler,
+   instantaneous MC sampler, overlay MC, línea de Mogi. (Chico, alto
+   valor, completa la paridad con el viejo RocData.)
+2. **009 — σ3max por aplicación** (túnel/talud): extraer fórmulas de
+   Hoek 2002 §6 / Marinos-Hoek §2.2 y validar contra ORMAS.
+3. **017 — Unidades y settings** (kPa/MPa en toda la UI).
+4. **016 — Opciones de gráfica y exportación** (graph editor, guardar
+   imagen, export CSV para Excel, zoom extents).
+5. **011 — Proyectos multi-material** (contenedor de las siguientes).
+6. **012 — Failure states y stress paths** (puntos pico/residual, rutas).
+7. **014 — Calibración** multi-estado (sobre 006 + 011 + 012).
+8. **010 — Base de datos de materiales** (equivalente RocProp, datos
+   propios de bibliografía oficial).
+9. **018 — Pick dialogs avanzados** (Barton, c/φ USCS numéricos con
+   fuente oficial, factor D).
+10. **015 — Informes** (HTML autocontenido).
+11. **013 — Simulación de ensayos** (faseada 13a elastoplástica básica,
+    13b modelos avanzados, 13c cíclicos/animación). La más grande.
+12. **019 — API de operaciones y servidor MCP** (patrón de la suite).
+
+Otras ideas registradas sin spec aún: undo/redo, i18n (la suite programa
+en inglés; decidir idioma de UI), export PDF nativo, unidades
+imperiales, σ3max "General" = σci/4 como opción más del selector.
