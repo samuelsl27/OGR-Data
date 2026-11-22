@@ -86,11 +86,30 @@ def test_gui_copy_buttons_offscreen():
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("generalized_hoek_brown"))
     app.processEvents()
     w._name_edit.setText("Test granite")
-    w._copy_material()
-    text = QApplication.clipboard().text()
+    # The first clipboard write after earlier GUI tests can be lost on
+    # Windows (previous owner window destroyed); rewrite until it lands.
+    import time
+
+    text = ""
+    for _ in range(40):
+        w._copy_material()
+        app.processEvents()
+        text = QApplication.clipboard().text()
+        if text:
+            break
+        time.sleep(0.025)
     payload = clipboard.parse_material(text)
     assert payload is not None and payload.name == "Test granite"
     w._copy_data()
     assert "sigci" in QApplication.clipboard().text()
     w._copy_plot_image()
-    assert not QApplication.clipboard().pixmap().isNull()
+    # Same Windows clipboard race for the image write.
+    pm = QApplication.clipboard().pixmap()
+    for _ in range(40):
+        if not pm.isNull():
+            break
+        w._copy_plot_image()
+        app.processEvents()
+        pm = QApplication.clipboard().pixmap()
+        time.sleep(0.025)
+    assert not pm.isNull()

@@ -115,7 +115,16 @@ def test_fit_dialog_offscreen():
     sin = math.sin(math.radians(30.0))
     sig3 = [0.0, 1.0, 2.0, 4.0]
     rows = "\n".join(f"{x}\t{0.02 * math.cos(math.radians(30.0)) * 2 / (1 - sin) + (1 + sin) / (1 - sin) * x}" for x in sig3)
-    QApplication.clipboard().setText(rows)
+    # The first clipboard write after earlier GUI tests can be lost on
+    # Windows (previous owner window destroyed); rewrite until it lands.
+    import time
+
+    for _ in range(40):
+        QApplication.clipboard().setText(rows)
+        app.processEvents()
+        if QApplication.clipboard().text() == rows:
+            break
+        time.sleep(0.025)
     dlg._paste()
     dlg._method.setCurrentIndex(dlg._method.findData(LINEAR))
     dlg._run_fit()
