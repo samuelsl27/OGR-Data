@@ -13,3 +13,6 @@ dist/
 .vscode/
 .idea/
 Thumbs.db
+
+# Matplotlib cache (created if MPLCONFIGDIR is not set)
+matplotlib-*/
