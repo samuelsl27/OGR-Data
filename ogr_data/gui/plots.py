@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 from ..core.graph_options import PlotOptions
@@ -27,6 +28,14 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self.options = PlotOptions()
         self.sampler_handler = None  # set by MainWindow: fn(space, kind, x)
         self.menu_handler = None  # set by MainWindow: fn(canvas, kind)
+        # spec 011: the selected material's color ("" = theme envelope),
+        # its visibility and the curves of the other visible materials
+        self.material_color = ""
+        self.primary_label = ""
+        self._primary_visible = True
+        self._others: list = []  # Line2D of the other materials
+        # spec 017: data stay in internal MPa; ticks show the display unit
+        self.display_scale = 1.0
         self.figure = Figure(figsize=(4.0, 4.0), tight_layout=True)
         super().__init__(self.figure)
         self.axes = self.figure.add_subplot(111)
@@ -137,12 +146,18 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
             "tangent": colors["point"],
             "mogi": colors["mogi"],
         }
+        if self.material_color:
+            default_colors["envelope"] = self.material_color
         for key, artist in self._series_artists().items():
             style = self.options.styles[key]
-            artist.set_visible(style.visible)
+            artist.set_visible(style.visible and self._primary_visible)
             artist.set_color(style.color or default_colors[key])
             artist.set_linewidth(self.options.linewidth(key))
             artist.set_linestyle(self.options.linestyle(key))
+        for line in self._others:
+            line.set_color(getattr(line, "ogr_color", "") or colors["envelope"])
+            line.set_linewidth(self.options.linewidth("envelope"))
+        self._update_legend()
 
     def zoom_extents(self) -> None:
         """Scale back to the natural envelope limits (RocData)."""
@@ -150,11 +165,72 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self.options.x_range = None
         self.options.y_range = None
         self.axes.set_autoscale_on(True)
-        self.axes.relim()
+        self.axes.relim(visible_only=True)
         self.axes.autoscale_view()
         self.draw_idle()
 
+    # ----------------------------------------------------------- materials
+
+    def set_primary(self, color: str, visible: bool = True, label: str = "") -> None:
+        """Color, visibility and legend label of the selected material (spec 011)."""
+
+        self.material_color = color
+        self._primary_visible = visible
+        self.primary_label = label
+        self._apply_style()
+
+    def set_others(self, curves) -> None:
+        """Draw the other visible materials: iterable of (label, x, y, color)."""
+
+        for line in self._others:
+            line.remove()
+        self._others = []
+        for label, x, y, color in curves:
+            # below the selected material (default line zorder is 2)
+            (line,) = self.axes.plot(x, y, linestyle="-", zorder=1.8)
+            line.ogr_label = label
+            line.ogr_color = color
+            self._others.append(line)
+        self._apply_style()
+        self._rescale()
+
+    def _update_legend(self) -> None:
+        """Legend of material names when more than one material is drawn."""
+
+        legend = self.axes.get_legend()
+        if legend is not None:
+            legend.remove()
+        handles = []
+        if self._primary_visible and self.options.styles["envelope"].visible and len(self._line.get_xdata()):
+            handles.append((self._line, self.primary_label or "Material"))
+        handles += [(line, line.ogr_label) for line in self._others]
+        if len(handles) < 2:
+            return
+        colors = mpl_colors(self._theme)
+        legend = self.axes.legend([h for h, _ in handles], [t for _, t in handles], fontsize="small")
+        legend.get_frame().set_facecolor(colors["figure"])
+        legend.get_frame().set_edgecolor(colors["grid"])
+        for text in legend.get_texts():
+            text.set_color(colors["axes"])
+
+    def _rescale(self) -> None:
+        self.axes.relim(visible_only=True)
+        self.axes.autoscale_view()
+        if self.options.x_range:
+            self.axes.set_xlim(*self.options.x_range)
+        if self.options.y_range:
+            self.axes.set_ylim(*self.options.y_range)
+        self.draw_idle()
+
     # ------------------------------------------------------------ overlays
+
+    def set_display_scale(self, scale: float) -> None:
+        """Tick labels in the display unit (display = MPa * scale)."""
+
+        self.display_scale = scale
+        for axis in (self.axes.xaxis, self.axes.yaxis):
+            axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: f"{v * k:g}"))
+        self.draw_idle()
 
     def set_axes_labels(self, xlabel: str, ylabel: str) -> None:
         """Relabel the axes (spec 017: display units)."""
@@ -166,13 +242,8 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
     def redraw(self, x, y, x_mc=None, y_mc=None) -> None:
         self._line.set_data(x, y)
         self._mc_line.set_data(x_mc if x_mc is not None else [], y_mc if y_mc is not None else [])
-        self.axes.relim()
-        self.axes.autoscale_view()
-        if self.options.x_range:
-            self.axes.set_xlim(*self.options.x_range)
-        if self.options.y_range:
-            self.axes.set_ylim(*self.options.y_range)
-        self.draw_idle()
+        self._update_legend()
+        self._rescale()
 
     def show_mogi(self, x, y) -> None:
         self._mogi_line.set_data(x, y)
@@ -220,9 +291,18 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         data = {}
         for key, artist in self._series_artists().items():
             x, y = artist.get_data()
-            if len(x):
+            if len(x) and artist.get_visible():
                 data[key] = (np.asarray(x, dtype=float), np.asarray(y, dtype=float))
         return data
+
+    def other_series(self) -> list[tuple[str, np.ndarray, np.ndarray]]:
+        """(material name, x, y) of the other materials drawn (spec 011)."""
+
+        out = []
+        for line in self._others:
+            x, y = line.get_data()
+            out.append((line.ogr_label, np.asarray(x, dtype=float), np.asarray(y, dtype=float)))
+        return out
 
     def save_image(self, path: str) -> None:
         self.figure.savefig(path)

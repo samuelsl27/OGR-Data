@@ -154,12 +154,16 @@ def test_graph_editor_dialog_offscreen() -> None:
     try:
         dlg._title_edit.setText("Portal section")
         assert w._principal.axes.get_title() == "Portal section"
+        # editing does not freeze the default (theme / material) color
+        assert w._principal.options.styles["envelope"].color == ""
         dlg._series_controls["envelope"]["width"].setValue(3.0)
         assert w._principal._line.get_linewidth() == 3.0
         dlg._default_range.setChecked(False)
+        # ranges are typed in the display unit (kPa) and kept in MPa
         dlg._range_edits["x_lo"].setText("0")
-        dlg._range_edits["x_hi"].setText("4")
+        dlg._range_edits["x_hi"].setText("4000")
         assert w._principal.axes.get_xlim() == (0.0, 4.0)
+        assert w._principal.options.x_range == (0.0, 4.0)
         dlg._square_axis.setChecked(True)
         assert w._principal.axes.get_aspect() == 1.0
         dlg._grid.setChecked(False)
@@ -184,15 +188,11 @@ def test_graph_options_project_round_trip() -> None:
 
     w = _window()
     w._principal.apply_options(PlotOptions(title="Persisted", x_range=(0.0, 3.0)))
-    graph_options = {
-        "principal": w._principal.options.to_dict(),
-        "shear": w._shear.options.to_dict(),
-    }
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "case.ogrdata"
-        project.save_project(path, "Rock", "generalized_hoek_brown", w._params(), w._sig3max_mpa(), graph_options=graph_options)
+        project.save_project(path, w._project_for_save())
         data = project.load_project(path)
-        restored = PlotOptions.from_dict(data["graph_options"]["principal"])
+        restored = PlotOptions.from_dict(data.graph_options["principal"])
         assert restored.title == "Persisted"
         assert restored.x_range == (0.0, 3.0)
     w.deleteLater()

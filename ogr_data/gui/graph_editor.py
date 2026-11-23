@@ -189,14 +189,16 @@ class GraphEditorDialog(QDialog):
             self._title_edit.setText(options.title)
             self._label_position.setCurrentText("Inside" if options.labels_inside else "Outside")
             self._default_range.setChecked(options.x_range is None and options.y_range is None)
+            # ranges are stored in internal MPa and edited in the display unit
+            k = getattr(canvas, "display_scale", 1.0)
             for axis, rng in (("x", options.x_range), ("y", options.y_range)):
-                self._range_edits[f"{axis}_lo"].setText("" if rng is None else f"{rng[0]:g}")
-                self._range_edits[f"{axis}_hi"].setText("" if rng is None else f"{rng[1]:g}")
+                self._range_edits[f"{axis}_lo"].setText("" if rng is None else f"{rng[0] * k:g}")
+                self._range_edits[f"{axis}_hi"].setText("" if rng is None else f"{rng[1] * k:g}")
             self._square_axis.setChecked(options.square_axis)
             self._grid.setChecked(options.grid)
             theme_colors = mpl_colors(canvas._theme)
             default_colors = {
-                "envelope": theme_colors["envelope"],
+                "envelope": getattr(canvas, "material_color", "") or theme_colors["envelope"],
                 "mc": theme_colors["mc"],
                 "tangent": theme_colors["point"],
                 "mogi": theme_colors["mogi"],
@@ -208,20 +210,23 @@ class GraphEditorDialog(QDialog):
                 controls["style"].setCurrentText(
                     _STYLE_NAMES[LINE_STYLES.index(style.linestyle)] if style.linestyle else "default"
                 )
-                self._set_color_button(controls["color"], style.color or default_colors[key])
+                self._set_color_button(controls["color"], style.color or default_colors[key], style.color)
         finally:
             self._loading = False
 
-    def _set_color_button(self, button: QPushButton, color: str) -> None:
-        button.setStyleSheet(f"background-color: {color};")
-        button.setProperty("color_value", color)
+    def _set_color_button(self, button: QPushButton, shown: str, value: str) -> None:
+        """Show `shown`; store `value` ("" keeps the theme / material default)."""
+
+        button.setStyleSheet(f"background-color: {shown};")
+        button.setProperty("color_value", value)
+        button.setProperty("color_shown", shown)
 
     def _pick_color(self, key: str) -> None:
         controls = self._series_controls[key]
-        current = controls["color"].property("color_value") or "#4a90d9"
+        current = controls["color"].property("color_shown") or "#4a90d9"
         chosen = QColorDialog.getColor(QColor(current), self, f"{_STYLE_LABELS[key]} color")
         if chosen.isValid():
-            self._set_color_button(controls["color"], chosen.name())
+            self._set_color_button(controls["color"], chosen.name(), chosen.name())
             self._apply()
 
     def _range_from(self, axis: str):
@@ -232,6 +237,8 @@ class GraphEditorDialog(QDialog):
             hi = float(self._range_edits[f"{axis}_hi"].text())
         except ValueError:
             return None
+        k = getattr(self._canvas(), "display_scale", 1.0)
+        lo, hi = lo / k, hi / k
         return (lo, hi) if lo < hi else None
 
     def _apply(self) -> None:

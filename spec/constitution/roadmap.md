@@ -3,7 +3,8 @@
 Hecho (specs 001–007, desarrolladas): calculadora GHB validada contra
 ORMAS · los 10 criterios de RSData · pick dialogs Hoek/GSI · clasificador
 USCS · contrato de portapapeles · ajuste a datos de ensayo · proyectos
-e importación `.roc`.
+e importación `.roc`. Después: 020 (línea de diseño), 008, 009, 017, 016
+y 011 (proyectos multi-material, formato `.ogrdata` v2).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

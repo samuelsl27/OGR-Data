@@ -17,12 +17,13 @@ def test_project_round_trip(tmp_path=None):
         path = Path(tmp) / "m.ogrdata"
         params = defaults("generalized_hoek_brown")
         params["sigci"] = 50000.0
-        project.save_project(path, "Granite", "generalized_hoek_brown", params, 7.5)
-        data = project.load_project(path)
-        assert data["name"] == "Granite"
-        assert data["criterion"] == "generalized_hoek_brown"
-        assert data["parameters"]["sigci"] == 50000.0
-        assert data["sig3max_mpa"] == 7.5
+        material = project.Material("Granite", "generalized_hoek_brown", params, 7.5)
+        project.save_project(path, project.Project(materials=[material]))
+        data = project.load_project(path).materials[0]
+        assert data.name == "Granite"
+        assert data.criterion == "generalized_hoek_brown"
+        assert data.parameters["sigci"] == 50000.0
+        assert data.sig3max_mpa == 7.5
 
 
 def test_project_rejects_bad_format(tmp_path=None):

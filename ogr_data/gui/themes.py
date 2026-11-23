@@ -58,6 +58,17 @@ QTreeView, QListView, QTableView {
     selection-color: #000000;
     gridline-color: #dedede;
 }
+QTreeView::indicator, QListView::indicator {
+    width: 11px;
+    height: 11px;
+    border: 1px solid #b0b0b0;
+    border-radius: 2px;
+    background-color: #ffffff;
+}
+QTreeView::indicator:checked, QListView::indicator:checked {
+    background-color: #4a90d9;
+    border-color: #4a90d9;
+}
 QHeaderView::section {
     background-color: #ececec;
     padding: 4px 6px;
@@ -166,10 +177,22 @@ QStatusBar { background-color: #3a3a3a; color: #e0e0e0; border-top: 1px solid #1
 QDockWidget::title { background: #404040; padding: 4px; border-bottom: 1px solid #505050; }
 QTreeView, QListView, QTableView {
     background-color: #353535;
+    color: #e0e0e0;
     alternate-background-color: #3d3d3d;
     selection-background-color: #4a5a75;
     selection-color: #ffffff;
     gridline-color: #505050;
+}
+QTreeView::indicator, QListView::indicator {
+    width: 11px;
+    height: 11px;
+    border: 1px solid #555;
+    border-radius: 2px;
+    background-color: #353535;
+}
+QTreeView::indicator:checked, QListView::indicator:checked {
+    background-color: #6aa3d5;
+    border-color: #6aa3d5;
 }
 QHeaderView::section {
     background-color: #404040;

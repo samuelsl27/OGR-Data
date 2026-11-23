@@ -6,9 +6,11 @@ import math
 
 import numpy as np
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtGui import QAction, QActionGroup
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QPixmap
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QCheckBox,
+    QColorDialog,
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
@@ -22,13 +24,18 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QSplitter,
+    QToolButton,
+    QTreeWidget,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
 
 from ..core import application
 from ..core import criteria_envelopes as ce
+from ..core import project as projects
 from ..core import samplers
 from ..core import units
 from ..core.graph_options import PlotOptions
@@ -59,6 +66,13 @@ class MainWindow(QMainWindow):
         self._curves: dict[str, tuple | None] = {"principal": None, "shear": None}
         self._d1_func = None
         self._overlay_inst: samplers.InstantaneousMC | None = None
+        # Spec 011: multi-material project. The sidebar form edits the
+        # selected material; _loading blocks write-back while a material
+        # is being loaded into the form.
+        self._project = projects.Project.new()
+        self._current = 0
+        self._loading = True
+        self._tree_updating = False
         from PySide6.QtWidgets import QApplication
 
         apply_theme(QApplication.instance(), self._theme)
@@ -114,6 +128,7 @@ class MainWindow(QMainWindow):
         self._outputs.setStyleSheet("font-family: Consolas, monospace;")
 
         sidebar = QVBoxLayout()
+        sidebar.addWidget(self._build_material_panel())
         sidebar.addWidget(QLabel("Failure criterion"))
         sidebar.addWidget(self._criterion_combo)
         self._classifier_button = QPushButton("Soil classifier (USCS)…")
@@ -124,6 +139,9 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(self._fit_button)
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText("Material name")
+        self._name_edit.setText(self._project.materials[0].name)
+        self._name_edit.textChanged.connect(self._name_edited)
+        self._name_edit.editingFinished.connect(self._name_edit_finished)
         sidebar.addWidget(self._name_edit)
         # spec 017: display stress unit and project title
         unit_row = QHBoxLayout()
@@ -183,6 +201,7 @@ class MainWindow(QMainWindow):
         for canvas in (self._principal, self._shear):
             canvas.sampler_handler = self._on_plot_event
             canvas.menu_handler = self._on_canvas_menu
+            canvas.set_display_scale(self._scale())
 
         plots = QSplitter(Qt.Orientation.Horizontal)
         plots.addWidget(self._principal)
@@ -192,12 +211,16 @@ class MainWindow(QMainWindow):
         splitter.addWidget(scroll)
         splitter.addWidget(plots)
         splitter.setStretchFactor(1, 1)
+        # the sidebar opens at its full width (no clipped buttons)
+        splitter.setSizes([380, 770])
         self.setCentralWidget(splitter)
         self.statusBar()
 
         self._rebuild_form()
         self._overlay_mc_act.setChecked(True)
         self._unit_combo.currentTextChanged.connect(self._set_stress_unit)
+        self._loading = False
+        self._populate_tree()
         self.refresh()
 
     # ----------------------------------------------------------------- menus
@@ -207,6 +230,7 @@ class MainWindow(QMainWindow):
         self.setMenuBar(bar)
 
         file_menu = bar.addMenu("File")
+        file_menu.addAction("New Project", self._new_project)
         file_menu.addAction("Save…", self._save_project)
         file_menu.addAction("Load…", self._load_project)
         file_menu.addAction("Import .roc…", self._import_roc)
@@ -216,6 +240,15 @@ class MainWindow(QMainWindow):
         edit_menu = bar.addMenu("Edit")
         edit_menu.addAction("Copy material", self._copy_material)
         edit_menu.addAction("Copy data", self._copy_data)
+
+        materials_menu = bar.addMenu("Materials")
+        materials_menu.addAction("Add Material", lambda: self._add_material("material"))
+        materials_menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
+        materials_menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        materials_menu.addSeparator()
+        materials_menu.addAction("Duplicate Material", self._duplicate_material)
+        materials_menu.addAction("Rename Material", self._rename_material)
+        materials_menu.addAction("Delete Material", self._delete_material)
 
         analysis_menu = bar.addMenu("Analysis")
         self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
@@ -246,6 +279,258 @@ class MainWindow(QMainWindow):
         help_menu = bar.addMenu("Help")
         help_menu.addAction("About OGR Data", self._about)
 
+    # ------------------------------------------------- spec 011: materials
+
+    def _build_material_panel(self) -> QWidget:
+        """Materials tree (RSData's Visibility panel) with its buttons."""
+
+        box = QGroupBox("Materials")
+        layout = QVBoxLayout(box)
+        self._tree = QTreeWidget()
+        self._tree.setHeaderHidden(True)
+        self._tree.setRootIsDecorated(False)
+        self._tree.setMinimumHeight(96)
+        self._tree.setMaximumHeight(130)
+        self._tree.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._tree.setEditTriggers(
+            QAbstractItemView.EditTrigger.DoubleClicked | QAbstractItemView.EditTrigger.EditKeyPressed
+        )
+        self._tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._tree.customContextMenuRequested.connect(self._tree_menu)
+        self._tree.currentItemChanged.connect(self._tree_current_changed)
+        self._tree.itemChanged.connect(self._tree_item_changed)
+        layout.addWidget(self._tree)
+
+        buttons = QHBoxLayout()
+        self._add_button = QToolButton()
+        self._add_button.setText("Add Material")
+        self._add_button.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup)
+        add_menu = QMenu(self._add_button)
+        add_menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
+        add_menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        self._add_button.setMenu(add_menu)
+        self._add_button.clicked.connect(lambda: self._add_material("material"))
+        self._duplicate_button = QPushButton("Duplicate")
+        self._duplicate_button.clicked.connect(self._duplicate_material)
+        self._delete_button = QPushButton("Delete")
+        self._delete_button.clicked.connect(lambda: self._delete_material())
+        self._add_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        buttons.addWidget(self._add_button)
+        buttons.addWidget(self._duplicate_button)
+        buttons.addWidget(self._delete_button)
+        layout.addLayout(buttons)
+        return box
+
+    def _material_color(self, material: projects.Material) -> str:
+        return material.color or self._principal.line_color("envelope")
+
+    def _swatch(self, color: str) -> QIcon:
+        pixmap = QPixmap(12, 12)
+        pixmap.fill(QColor(color))
+        return QIcon(pixmap)
+
+    def _populate_tree(self) -> None:
+        """Rebuild the tree from the project and select the current material."""
+
+        self._tree_updating = True
+        try:
+            self._tree.clear()
+            for material in self._project.materials:
+                item = QTreeWidgetItem([material.name])
+                item.setFlags(
+                    item.flags()
+                    | Qt.ItemFlag.ItemIsEditable
+                    | Qt.ItemFlag.ItemIsUserCheckable
+                    | Qt.ItemFlag.ItemIsSelectable
+                    | Qt.ItemFlag.ItemIsEnabled
+                )
+                item.setCheckState(0, Qt.CheckState.Checked if material.visible else Qt.CheckState.Unchecked)
+                item.setIcon(0, self._swatch(self._material_color(material)))
+                item.setToolTip(0, f"{material.name} ({CRITERIA[material.criterion].label})")
+                self._tree.addTopLevelItem(item)
+            self._tree.setCurrentItem(self._tree.topLevelItem(self._current))
+        finally:
+            self._tree_updating = False
+        self._delete_button.setEnabled(len(self._project.materials) > 1)
+
+    def _current_material(self) -> projects.Material:
+        return self._project.materials[self._current]
+
+    def _store_current(self) -> None:
+        """Write the form state back into the selected material."""
+
+        if self._loading or not self._widgets:
+            return
+        material = self._current_material()
+        material.criterion = self._criterion_combo.currentData()
+        material.parameters = self._params()
+        material.sig3max_mpa = self._sig3max_mpa()
+        material.application = projects.Application(
+            self._application_combo.currentData(), self._unit_weight.value(), self._app_depth.value()
+        )
+        item = self._tree.topLevelItem(self._current)
+        if item is not None:
+            self._tree_updating = True
+            item.setToolTip(0, f"{material.name} ({CRITERIA[material.criterion].label})")
+            self._tree_updating = False
+
+    def _load_material(self, index: int) -> None:
+        """Show material `index` in the form and plots."""
+
+        self._current = index
+        material = self._current_material()
+        self._loading = True
+        try:
+            app = material.application
+            for widget, value in ((self._unit_weight, app.unit_weight), (self._app_depth, app.depth)):
+                widget.blockSignals(True)
+                widget.setValue(value)
+                widget.blockSignals(False)
+            self._application_combo.blockSignals(True)
+            self._application_combo.setCurrentIndex(max(0, self._application_combo.findData(app.mode)))
+            self._application_combo.blockSignals(False)
+            self._apply_project(material.criterion, dict(material.parameters), material.sig3max_mpa)
+            self._update_application()
+            self._name_edit.setText(material.name)
+        finally:
+            self._loading = False
+        self.refresh()
+
+    def _tree_current_changed(self, current, _previous) -> None:
+        if self._tree_updating or current is None:
+            return
+        index = self._tree.indexOfTopLevelItem(current)
+        if index >= 0 and index != self._current:
+            self._store_current()
+            self._load_material(index)
+
+    def _tree_item_changed(self, item, _column) -> None:
+        if self._tree_updating:
+            return
+        index = self._tree.indexOfTopLevelItem(item)
+        if index < 0:
+            return
+        material = self._project.materials[index]
+        text = item.text(0)
+        if text != material.name:
+            try:
+                name = self._project.rename(index, text)
+            except ValueError:
+                name = material.name
+            self._tree_updating = True
+            item.setText(0, name)
+            item.setToolTip(0, f"{name} ({CRITERIA[material.criterion].label})")
+            self._tree_updating = False
+            if index == self._current:
+                self._name_edit.setText(name)
+        material.visible = item.checkState(0) == Qt.CheckState.Checked
+        self.refresh()
+
+    def _name_edited(self, text: str) -> None:
+        """The Properties name field renames the selected material live."""
+
+        if self._loading or not text.strip():
+            return
+        name = self._project.rename(self._current, text)
+        item = self._tree.topLevelItem(self._current)
+        if item is not None:
+            self._tree_updating = True
+            item.setText(0, name)
+            self._tree_updating = False
+        self.refresh()
+
+    def _name_edit_finished(self) -> None:
+        # an emptied or clashing name shows the stored (unique) one again
+        name = self._current_material().name
+        if self._name_edit.text() != name:
+            self._name_edit.setText(name)
+
+    def _add_material(self, template: str) -> None:
+        self._store_current()
+        index = self._project.add(template)
+        self._load_material(index)
+        self._populate_tree()
+
+    def _duplicate_material(self) -> None:
+        self._store_current()
+        index = self._project.duplicate(self._current)
+        self._load_material(index)
+        self._populate_tree()
+
+    def _rename_material(self) -> None:
+        item = self._tree.topLevelItem(self._current)
+        if item is not None:
+            self._tree.editItem(item, 0)
+
+    def _delete_material(self, confirm: bool = True) -> None:
+        if len(self._project.materials) <= 1:
+            return
+        name = self._current_material().name
+        if confirm:
+            answer = QMessageBox.question(self, "Delete material", f"Delete material '{name}'?")
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+        index = self._project.remove(self._current)
+        self._load_material(index)
+        self._populate_tree()
+
+    def _set_material_color(self, color: str) -> None:
+        self._current_material().color = color
+        self._populate_tree()
+        self.refresh()
+
+    def _choose_material_color(self) -> None:
+        initial = QColor(self._material_color(self._current_material()))
+        color = QColorDialog.getColor(initial, self, "Material color")
+        if color.isValid():
+            self._set_material_color(color.name())
+
+    def _set_material_symbol(self, symbol: str) -> None:
+        if symbol in projects.SYMBOLS:
+            self._current_material().symbol = symbol
+
+    def _tree_menu(self, pos) -> None:
+        item = self._tree.itemAt(pos)
+        if item is not None:
+            self._tree.setCurrentItem(item)
+        menu = QMenu(self)
+        menu.addAction("Add Material", lambda: self._add_material("material"))
+        menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
+        menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        if item is not None:
+            menu.addSeparator()
+            menu.addAction("Duplicate Material", self._duplicate_material)
+            menu.addAction("Rename", self._rename_material)
+            menu.addAction("Color…", self._choose_material_color)
+            menu.addAction("Automatic color", lambda: self._set_material_color(""))
+            symbol_menu = menu.addMenu("Symbol")
+            current = self._current_material().symbol
+            for symbol, label in projects.SYMBOLS.items():
+                act = symbol_menu.addAction(label, lambda s=symbol: self._set_material_symbol(s))
+                act.setCheckable(True)
+                act.setChecked(symbol == current)
+            menu.addAction("Copy material", self._copy_material)
+            menu.addSeparator()
+            delete = menu.addAction("Delete Material", lambda: self._delete_material())
+            delete.setEnabled(len(self._project.materials) > 1)
+        menu.exec(self._tree.viewport().mapToGlobal(pos))
+
+    def _draw_other_materials(self) -> None:
+        """The other visible materials, in their colors, on both plots."""
+
+        principal, shear = [], []
+        for index, material in enumerate(self._project.materials):
+            if index == self._current or not material.visible:
+                continue
+            p_curve, s_curve = ce.envelopes(material.criterion, material.parameters, material.sig3max_mpa)
+            color = self._material_color(material)
+            if p_curve is not None:
+                principal.append((material.name, p_curve[0], p_curve[1], color))
+            if s_curve is not None:
+                shear.append((material.name, s_curve[0], s_curve[1], color))
+        self._principal.set_others(principal)
+        self._shear.set_others(shear)
+
     def _set_theme(self, name: str) -> None:
         from PySide6.QtWidgets import QApplication
 
@@ -254,6 +539,8 @@ class MainWindow(QMainWindow):
         apply_theme(QApplication.instance(), name)
         for canvas in (self._principal, self._shear):
             canvas.apply_theme(name)
+        self._populate_tree()  # automatic-color swatches follow the theme
+        self.refresh()
 
     # ---------------------------------------------------------- spec 017: display units
 
@@ -280,6 +567,8 @@ class MainWindow(QMainWindow):
         u = self._stress_unit
         self._principal.set_axes_labels(f"sigma3 ({u})", f"sigma1 ({u})")
         self._shear.set_axes_labels(f"normal stress ({u})", f"shear stress ({u})")
+        for canvas in (self._principal, self._shear):
+            canvas.set_display_scale(self._scale())
 
     def _set_stress_unit(self, unit: str) -> None:
         """Switch the display unit, rescaling widgets in place (spec 017).
@@ -363,6 +652,10 @@ class MainWindow(QMainWindow):
             data = series.get(key)
             if data is not None:
                 columns.append((x_label, y_label, data[0] * scale, data[1] * scale))
+        # spec 011: the other visible materials, labelled by name
+        x_name, y_name = labels["envelope"]
+        for name, x, y in canvas.other_series():
+            columns.append((f"{name} {x_name}", f"{name} {y_name}", x * scale, y * scale))
         if not columns:
             QMessageBox.information(self, "Export", "There is no series to export on this plot.")
             return
@@ -436,7 +729,7 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------- clipboard
 
     def _material_name(self) -> str:
-        name = self._name_edit.text().strip()
+        name = self._current_material().name.strip()
         return name or self._criterion().label
 
     def _ghb_computed(self) -> dict[str, float]:
@@ -492,10 +785,21 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------ projects
 
-    def _save_project(self) -> None:
-        from PySide6.QtWidgets import QFileDialog, QMessageBox
+    def _project_for_save(self) -> projects.Project:
+        """The project with the form state and window settings stored."""
 
-        from ..core import project
+        self._store_current()
+        self._project.selected = self._current
+        self._project.title = self._title_edit.text()
+        self._project.stress_unit = self._stress_unit
+        self._project.graph_options = {
+            "principal": self._principal.options.to_dict(),
+            "shear": self._shear.options.to_dict(),
+        }
+        return self._project
+
+    def _save_project(self) -> None:
+        from PySide6.QtWidgets import QFileDialog
 
         path, _ = QFileDialog.getSaveFileName(self, "Save project", "", "OGR Data project (*.ogrdata)")
         if not path:
@@ -503,43 +807,43 @@ class MainWindow(QMainWindow):
         if not path.endswith(".ogrdata"):
             path += ".ogrdata"
         try:
-            project.save_project(
-                path,
-                self._material_name(),
-                self._criterion_combo.currentData(),
-                self._params(),
-                self._sig3max_mpa(),
-                stress_unit=self._stress_unit,
-                title=self._title_edit.text(),
-                graph_options={
-                    "principal": self._principal.options.to_dict(),
-                    "shear": self._shear.options.to_dict(),
-                },
-            )
-        except ValueError as exc:
+            projects.save_project(path, self._project_for_save())
+        except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Save failed", str(exc))
 
     def _load_project(self) -> None:
-        from PySide6.QtWidgets import QFileDialog, QMessageBox
-
-        from ..core import project
+        from PySide6.QtWidgets import QFileDialog
 
         path, _ = QFileDialog.getOpenFileName(self, "Load project", "", "OGR Data project (*.ogrdata)")
         if not path:
             return
         try:
-            data = project.load_project(path)
+            loaded = projects.load_project(path)
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Load failed", str(exc))
             return
-        self._load_settings_into_window(data)
-        self._apply_project(data["criterion"], data["parameters"], data.get("sig3max_mpa"))
-        self._name_edit.setText(data.get("name", ""))
-        self._title_edit.setText(data.get("title", ""))
+        self.open_project(loaded)
+
+    def open_project(self, loaded: projects.Project) -> None:
+        """Replace the window's project (spec 011; v1 files arrive migrated)."""
+
+        self._load_settings_into_window({"stress_unit": loaded.stress_unit})
+        self._project = loaded
+        self._title_edit.setText(loaded.title)
         for name, canvas in (("principal", self._principal), ("shear", self._shear)):
-            raw = data.get("graph_options", {}).get(name)
-            if raw:
-                canvas.apply_options(PlotOptions.from_dict(raw))
+            raw = loaded.graph_options.get(name)
+            canvas.apply_options(PlotOptions.from_dict(raw) if raw else PlotOptions())
+        self._load_material(loaded.selected)
+        self._populate_tree()
+
+    def _new_project(self, confirm: bool = True) -> None:
+        if confirm:
+            answer = QMessageBox.question(self, "New project", "Discard the current project and start a new one?")
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+        fresh = projects.Project.new()
+        fresh.stress_unit = self._stress_unit  # the display unit is a user setting
+        self.open_project(fresh)
 
     def _load_settings_into_window(self, data: dict) -> None:
         """Apply the display unit saved in the project (spec 017)."""
@@ -552,7 +856,7 @@ class MainWindow(QMainWindow):
             self._set_stress_unit(stress_unit)
 
     def _import_roc(self) -> None:
-        from PySide6.QtWidgets import QFileDialog, QMessageBox
+        from PySide6.QtWidgets import QFileDialog
 
         from ..core import roc_import
 
@@ -564,8 +868,21 @@ class MainWindow(QMainWindow):
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Import failed", str(exc))
             return
-        self._apply_project(roc.criterion, roc.parameters, roc.sig3max_mpa)
-        self._name_edit.setText(roc.title)
+        self.import_material(roc.title, roc.criterion, roc.parameters, roc.sig3max_mpa)
+
+    def import_material(self, name: str, criterion: str, parameters: dict, sig3max_mpa: float | None) -> None:
+        """Add an imported material (.roc) to the project and select it (spec 011)."""
+
+        self._store_current()
+        material = projects.Material(
+            name=name or "Imported",
+            criterion=criterion,
+            parameters=dict(parameters),
+            sig3max_mpa=sig3max_mpa if sig3max_mpa is not None else projects.DEFAULT_SIG3MAX_MPA,
+        )
+        index = self._project.append(material)
+        self._load_material(index)
+        self._populate_tree()
 
     def _apply_project(self, criterion: str, parameters: dict, sig3max_mpa: float | None) -> None:
         idx = self._criterion_combo.findData(criterion)
@@ -574,9 +891,16 @@ class MainWindow(QMainWindow):
         self._rebuild_form()
         field_units = {f.key: f.unit for f in CRITERIA[criterion].fields}
         for key, value in parameters.items():
-            if key in self._widgets and isinstance(self._widgets[key], QDoubleSpinBox):
+            widget = self._widgets.get(key)
+            if isinstance(widget, QDoubleSpinBox):
                 scale = self._kpa_scale() if field_units.get(key) == "kPa" else 1.0
-                self._widgets[key].setValue(float(value) * scale)
+                widget.setValue(float(value) * scale)
+            elif isinstance(widget, QCheckBox):
+                widget.setChecked(bool(value))
+            elif isinstance(widget, QComboBox):
+                index = widget.findText(str(value))
+                if index >= 0:
+                    widget.setCurrentIndex(index)
         if sig3max_mpa is not None:
             self._sig3max.setValue(float(sig3max_mpa) * self._scale())
 
@@ -850,11 +1174,17 @@ class MainWindow(QMainWindow):
         self._apply_application()
         sig3max = self._sig3max_mpa()
         crit = CRITERIA[key]
+        self._store_current()
 
         self._clear_sampler_marks()
         self._curves = {"principal": None, "shear": None}
         self._d1_func = None
         self._overlay_inst = None
+        # spec 011: selected material's color/visibility, other materials
+        material = self._current_material()
+        for canvas in (self._principal, self._shear):
+            canvas.set_primary(material.color, material.visible, material.name)
+        self._draw_other_materials()
 
         if crit.envelope == "none":
             self._principal.redraw([], [])
@@ -931,3 +1261,7 @@ class MainWindow(QMainWindow):
             self._principal.show_mogi(*samplers.mogi_line(sig3max))
         else:
             self._principal.clear_mogi()
+        if not material.visible:
+            # a hidden material is still edited, but neither drawn nor sampled
+            self._curves = {"principal": None, "shear": None}
+            self._overlay_inst = None

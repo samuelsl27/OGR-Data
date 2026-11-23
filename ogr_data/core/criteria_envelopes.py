@@ -151,3 +151,22 @@ def mc_line(cohesion_mpa: float, friction_deg: float, sig3max_mpa: float) -> tup
     normal = sig3
     shear = cohesion_mpa + normal * math.tan(phi)
     return (sig3, sig1), (normal, shear)
+
+
+def envelopes(key: str, params: Params, sig3max_mpa: float) -> tuple[tuple | None, tuple | None]:
+    """Envelope of a material in both plots: ((sig3, sig1) | None, (sigma_n, tau) | None).
+
+    Principal-space criteria give both (the shear one by the tangent Mohr
+    construction); shear-space criteria only the shear one; criteria with
+    no envelope give neither (spec 011: other materials of the project).
+    """
+
+    crit = CRITERIA[key]
+    if crit.envelope == "principal":
+        curve = principal_curve(key, params, sig3max_mpa)
+        if curve is None:
+            return None, None
+        return curve, tangent_shear(*curve)
+    if crit.envelope == "shear":
+        return None, shear_curve(key, params, sig3max_mpa)
+    return None, None
