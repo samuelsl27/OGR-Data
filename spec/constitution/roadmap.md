@@ -63,6 +63,13 @@ de RSData 1.009 y ORMAS V2.0 (`../../Referencias/Ejemplos/RSData_analisis/05_pro
     13b modelos avanzados, 13c cíclicos/animación). La más grande.
 12. **019 — API de operaciones y servidor MCP** (patrón de la suite).
 
-Otras ideas registradas sin spec aún: undo/redo, i18n (la suite programa
-en inglés; decidir idioma de UI), export PDF nativo, unidades
+Siguientes (spec.md redactadas el 23-11-2026; plan y tasks al desarrollarlas):
+
+13. **023 — Deshacer y rehacer**: historial de ediciones del proyecto
+    (núcleo sin Qt), Edit > Undo/Redo con atajos y aviso de cambios sin
+    guardar. Requisito del modo `--attach` del servidor MCP.
+14. **024 — Interfaz en inglés y español**: selector de idioma, ventana e
+    informe traducidos; código, API y ficheros siguen en inglés.
+
+Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.
