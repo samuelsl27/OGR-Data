@@ -27,9 +27,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ..core import application
 from ..core import criteria_envelopes as ce
 from ..core import samplers
-from ..core.hoek_brown import HbInput, compute, equivalent_mc, hoek_brown_constants
+from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
 from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas
 from .themes import THEMES, apply_theme
@@ -61,14 +62,41 @@ class MainWindow(QMainWindow):
         for key, crit in CRITERIA.items():
             self._criterion_combo.addItem(crit.label, key)
         self._criterion_combo.currentIndexChanged.connect(self._rebuild_form)
+        self._criterion_combo.currentIndexChanged.connect(self._update_application)
         self._criterion_combo.currentIndexChanged.connect(self.refresh)
 
         self._sig3max = QDoubleSpinBox()
         self._sig3max.setRange(0.01, 1000000.0)
+        self._sig3max.setDecimals(4)
         self._sig3max.setValue(7.5)
         self._sig3max.setSingleStep(0.5)
         self._sig3max.setSuffix(" MPa")
         self._sig3max.valueChanged.connect(self.refresh)
+
+        # spec 009: sigma3max by application (tunnel / slope)
+        self._application_combo = QComboBox()
+        for label, app_key in (("Custom", "custom"), ("Tunnel", "tunnel"), ("Slope", "slope")):
+            self._application_combo.addItem(label, app_key)
+        self._application_combo.currentIndexChanged.connect(self._update_application)
+        self._unit_weight = QDoubleSpinBox()
+        self._unit_weight.setRange(0.0001, 1.0)
+        self._unit_weight.setDecimals(4)
+        self._unit_weight.setValue(0.026)
+        self._unit_weight.setSingleStep(0.001)
+        self._unit_weight.setSuffix(" MN/m3")
+        self._unit_weight.valueChanged.connect(self.refresh)
+        self._app_depth = QDoubleSpinBox()
+        self._app_depth.setRange(0.1, 10000.0)
+        self._app_depth.setValue(50.0)
+        self._app_depth.setSuffix(" m")
+        self._app_depth.valueChanged.connect(self.refresh)
+        self._app_fields = QWidget()
+        app_form = QFormLayout(self._app_fields)
+        app_form.setContentsMargins(0, 0, 0, 0)
+        self._depth_label = QLabel("Tunnel depth")
+        app_form.addRow("Unit weight", self._unit_weight)
+        app_form.addRow(self._depth_label, self._app_depth)
+        self._app_fields.setVisible(False)
 
         self._form_box = QGroupBox("Parameters")
         self._form_layout = QFormLayout(self._form_box)
@@ -113,8 +141,12 @@ class MainWindow(QMainWindow):
         file_row.addWidget(load_button)
         file_row.addWidget(import_button)
         sidebar.addLayout(file_row)
-        sidebar.addWidget(QLabel("sig3max (envelope range)"))
+        sidebar.addWidget(QLabel("Application (sigma3max range)"))
+        sidebar.addWidget(self._application_combo)
+        self._sig3max_label = QLabel("sig3max (envelope range)")
+        sidebar.addWidget(self._sig3max_label)
         sidebar.addWidget(self._sig3max)
+        sidebar.addWidget(self._app_fields)
         sidebar.addWidget(self._form_box)
         sidebar.addWidget(QLabel("Computed"))
         sidebar.addWidget(self._outputs, stretch=1)
@@ -449,6 +481,66 @@ class MainWindow(QMainWindow):
                 params[field.key] = widget.value()
         return params
 
+    # ---------------------------------------------------------- spec 009: sig3max by application
+
+    def _rock_mass_strength_mpa(self, key: str, params: dict) -> float | None:
+        """Global rock mass strength sigcm (MPa), for HB-family criteria only."""
+
+        if key == "generalized_hoek_brown":
+            inp = HbInput(
+                sigci=float(params["sigci"]) / 1000.0,
+                gsi=float(params["gsi"]),
+                mi=float(params["mi"]),
+                disturbance=float(params["d"]),
+                sig3max=self._sig3max.value(),
+            )
+            return compute(inp).sigcm
+        if key == "hoek_brown":
+            sigci_mpa, mb, s, a = self._hb_terms(key, params, self._sig3max.value())
+            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=self._sig3max.value())
+            return global_strength(inp, mb, s, a)
+        return None
+
+    def _application_sig3max(self) -> float | None:
+        """sigma3max from the application mode, or None for manual (custom)."""
+
+        mode = self._application_combo.currentData()
+        if mode == "custom":
+            return None
+        key = self._criterion_combo.currentData()
+        sigcm = self._rock_mass_strength_mpa(key, self._params())
+        if sigcm is None or sigcm <= 0.0:
+            return None
+        if mode == "tunnel":
+            return application.sig3max_tunnel(sigcm, self._unit_weight.value(), self._app_depth.value())
+        return application.sig3max_slope(sigcm, self._unit_weight.value(), self._app_depth.value())
+
+    def _update_application(self) -> None:
+        key = self._criterion_combo.currentData()
+        mode = self._application_combo.currentData()
+        if mode != "custom" and key not in ("generalized_hoek_brown", "hoek_brown"):
+            # sig3max by application needs sigcm (HB family only, as ORMAS)
+            self._application_combo.blockSignals(True)
+            self._application_combo.setCurrentIndex(0)
+            self._application_combo.blockSignals(False)
+            mode = "custom"
+        custom = mode == "custom"
+        self._sig3max.setEnabled(custom)
+        self._sig3max_label.setVisible(custom)
+        self._app_fields.setVisible(not custom)
+        self._depth_label.setText("Tunnel depth" if mode == "tunnel" else "Slope height")
+        self._apply_application()
+        self.refresh()
+
+    def _apply_application(self) -> None:
+        value = self._application_sig3max()
+        if value is None:
+            return
+        if abs(value - self._sig3max.value()) > 1e-12:
+            self._sig3max.blockSignals(True)
+            self._sig3max.setValue(value)
+            self._sig3max.blockSignals(False)
+
     # ---------------------------------------------------------- spec 008: overlays and samplers
 
     def _hb_terms(self, key: str, params: dict, sig3max: float) -> tuple[float, float, float, float]:
@@ -583,6 +675,7 @@ class MainWindow(QMainWindow):
         if key is None or not self._widgets:
             return
         params = self._params()
+        self._apply_application()
         sig3max = self._sig3max.value()
         crit = CRITERIA[key]
 
