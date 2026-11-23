@@ -135,31 +135,14 @@ class MainWindow(QMainWindow):
         self._form_layout = QFormLayout(self._form_box)
         self._widgets: dict[str, object] = {}
 
-        # spec 013: Stiffness (RSData tab, Linear Isotropic)
-        self._stiffness_box = QGroupBox("Stiffness (Linear Isotropic)")
-        stiff_form = QFormLayout(self._stiffness_box)
-        self._poisson = QDoubleSpinBox()
-        self._poisson.setRange(-0.99, 0.4999)
-        self._poisson.setDecimals(4)
-        self._poisson.setSingleStep(0.01)
-        self._poisson.setValue(sm.DEFAULT_STIFFNESS["poisson"])
-        self._young = QDoubleSpinBox()
-        self._young.setRange(1e-9, 1e15)
-        self._young.setDecimals(4)
-        self._young.setValue(sm.DEFAULT_STIFFNESS["young"] * self._kpa_scale())
-        self._young.setSuffix(f" {self._stress_unit}")
-        for widget in (self._poisson, self._young):
-            widget.valueChanged.connect(self.refresh)
-        self._use_erm = QPushButton("Erm")
-        self._use_erm.setToolTip("Young's modulus = rock mass modulus Erm (Generalized Hoek-Brown)")
-        self._use_erm.clicked.connect(self.use_erm_as_young)
-        young_row = QWidget()
-        young_layout = QHBoxLayout(young_row)
-        young_layout.setContentsMargins(0, 0, 0, 0)
-        young_layout.addWidget(self._young, stretch=1)
-        young_layout.addWidget(self._use_erm)
-        stiff_form.addRow("Poisson's Ratio", self._poisson)
-        stiff_form.addRow("Young's Modulus", young_row)
+        # spec 013: Stiffness (RSData tab; rows per material model)
+        from .stiffness_panel import StiffnessPanel
+
+        self._stiffness_box = StiffnessPanel(self._kpa_scale(), self._stress_unit, self.use_erm_as_young)
+        self._stiffness_box.changed.connect(self.refresh)
+        self._poisson = self._stiffness_box.spins["poisson"]
+        self._young = self._stiffness_box.spins["young"]
+        self._use_erm = self._stiffness_box.use_erm
 
         self._outputs = QLabel()
         self._outputs.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -261,6 +244,11 @@ class MainWindow(QMainWindow):
             canvas.menu_handler = self._on_path_canvas_menu
             canvas.set_display(self._scale(), self._stress_unit)
             path_grid.addWidget(canvas, index // 2, index % 2)
+        # spec 013c: Animation (RSData's Animation tab)
+        from .animation_panel import AnimationPanel
+
+        self._animation = AnimationPanel(self)
+        path_grid.addWidget(self._animation, 2, 0, 1, 2)
         self._graph_tabs = QTabWidget()
         self._graph_tabs.addTab(plots, "Strength Graphs")
         self._graph_tabs.addTab(path_page, "Stress Path Graphs")
@@ -482,11 +470,7 @@ class MainWindow(QMainWindow):
                 widget.blockSignals(True)
                 widget.setValue(value)
                 widget.blockSignals(False)
-            stiffness = sm.stiffness_from(material.stiffness)
-            for widget, value in ((self._poisson, stiffness["poisson"]), (self._young, stiffness["young"] * self._kpa_scale())):
-                widget.blockSignals(True)
-                widget.setValue(value)
-                widget.blockSignals(False)
+            self._stiffness_box.set_values(material.stiffness)
             self._application_combo.blockSignals(True)
             self._application_combo.setCurrentIndex(max(0, self._application_combo.findData(app.mode)))
             self._application_combo.blockSignals(False)
@@ -929,6 +913,8 @@ class MainWindow(QMainWindow):
                 series["pq"].append((label, result.p / kpa, result.q / kpa, test.color, style))
         for key, canvas in self._path_canvases.items():
             canvas.set_series(series[key])
+        if hasattr(self, "_animation"):
+            self._animation.refresh_items()
 
     def _on_path_canvas_menu(self, canvas, kind: str) -> None:
         from PySide6.QtWidgets import QApplication, QFileDialog
@@ -1046,10 +1032,7 @@ class MainWindow(QMainWindow):
         self._sig3max.setValue(self._sig3max.value() * ratio)
         self._sig3max.setSuffix(f" {unit}")
         self._sig3max.blockSignals(False)
-        self._young.blockSignals(True)
-        self._young.setValue(self._young.value() * ratio)
-        self._young.setSuffix(f" {unit}")
-        self._young.blockSignals(False)
+        self._stiffness_box.rescale(self._kpa_scale(), unit)
         self._set_plot_labels()
         self.refresh()
 
@@ -1123,11 +1106,37 @@ class MainWindow(QMainWindow):
     # ---------------------------------------------------------- spec 013: test simulations
 
     def _stiffness(self) -> dict:
-        return {
-            "type": "Linear Isotropic",
-            "poisson": self._poisson.value(),
-            "young": self._young.value() / self._kpa_scale(),
-        }
+        return self._stiffness_box.values()
+
+    def animation_targets(self):
+        """(label, result, color) of the visible simulated tests (spec 013c)."""
+
+        for material in self._project.materials:
+            if not material.visible:
+                continue
+            for test in material.test_simulations:
+                if not test.visible:
+                    continue
+                result = self.simulation_result(material, test)
+                if isinstance(result, sm.SimulationResult):
+                    yield f"{material.name} - {test.name}", result, test.color
+
+    def show_animation_step(self, result, step: int) -> None:
+        """Mark a step of an animated test on the Stress Path Graphs (+ yield surface in q-p)."""
+
+        canvases = self._path_canvases
+        if result is None:
+            for canvas in canvases.values():
+                canvas.show_animation()
+            return
+        kpa = 1000.0
+        i = step
+        canvases["axial"].show_animation((result.axial_strain[i], result.axial_stress[i] / kpa))
+        canvases["volumetric"].show_animation((result.axial_strain[i], result.eps_v[i]))
+        canvases["deviatoric"].show_animation((result.eps_q[i], result.q[i] / kpa))
+        p_s, q_s = sm.yield_surface_pq(result, i)
+        surface = (p_s / kpa, q_s / kpa) if len(p_s) else None
+        canvases["pq"].show_animation((result.p[i] / kpa, result.q[i] / kpa), surface)
 
     def use_erm_as_young(self) -> None:
         """Young's modulus = Erm of the Generalized Hoek-Brown material (as RSData fills it)."""
@@ -1493,6 +1502,8 @@ class MainWindow(QMainWindow):
                 index = widget.findText(str(value))
                 if index >= 0:
                     widget.setCurrentIndex(index)
+            elif hasattr(widget, "value") and isinstance(value, (list, tuple)):
+                widget.setValue(value)  # table field
         if sig3max_mpa is not None:
             self._sig3max.setValue(float(sig3max_mpa) * self._scale())
 
@@ -1502,6 +1513,7 @@ class MainWindow(QMainWindow):
         return CRITERIA[self._criterion_combo.currentData()]
 
     def _rebuild_form(self) -> None:
+        self._stiffness_box.set_criterion(self._criterion_combo.currentData())
         while self._form_layout.rowCount():
             self._form_layout.removeRow(0)
         self._widgets = {}
@@ -1514,6 +1526,14 @@ class MainWindow(QMainWindow):
                 widget = QComboBox()
                 widget.addItems(field.options)
                 widget.currentIndexChanged.connect(self.refresh)
+            elif field.kind == "table":  # spec 013b: tabular hardening laws
+                from .table_field import TableField
+
+                widget = TableField(
+                    field.label, field.options, field.stress_columns, field.default,
+                    lambda: (self._kpa_scale(), self._stress_unit),
+                )
+                widget.changed.connect(self.refresh)
             else:
                 widget = QDoubleSpinBox()
                 widget.setDecimals(6)
@@ -1603,6 +1623,8 @@ class MainWindow(QMainWindow):
                 params[field.key] = widget.isChecked()
             elif field.kind == "enum":
                 params[field.key] = widget.currentText()
+            elif field.kind == "table":
+                params[field.key] = widget.value()
             elif field.unit == "kPa":
                 # spinbox shows the display unit; the registry stays in kPa
                 params[field.key] = widget.value() / self._kpa_scale()

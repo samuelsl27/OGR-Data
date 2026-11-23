@@ -47,24 +47,28 @@ and Modified Cam-Clay, Softening-Hardening):
 - Cam-Clay / Modified Cam-Clay (manual §8): yield q + M p ln(p/pc) = 0 and
   q^2 + M^2 p (p - pc) = 0 (compression positive), associated flow,
   hardening pc_{n+1} = pc_n exp(v de_v^p / (lambda - kappa)) (eq. 8.8),
-  isotropic start p0 = confining, pc0 = OCR p0, v0 on the swelling line
+  start on the surface (OCR = 1) times OCR, or at Po, v0 on the swelling line
   through pc0 on the virgin line v = N - lambda ln p (N = Specific Volume at
   Unit Pressure, kPa). Implicit return in (p, q, pc, dlambda) with the
   exact integration of K = v p / kappa over the step; radial in the
   deviatoric plane (the surfaces do not depend on Lode's angle).
-- NorSand: no public theory manual (spec 002); not simulated.
+- NorSand: see NorSandModel (FLAC3D formulation with Nova's coupling,
+  checked against RSData's Fraser River sand tutorial).
 
 Tests (mixed control; one imposed strain component per step):
 - Uniaxial: lateral stresses zero.
-- Triaxial: lateral effective stresses = confining (drained); undrained:
+- Triaxial: lateral effective stresses = initial lateral (drained); undrained:
   no volume change, e_r = -e_a/2, u = s_c - s'_r (cell pressure constant,
   initial u = 0).
-- Biaxial (plane strain): e_y = 0; s'_x = confining (drained) or
+- Biaxial (plane strain): e_y = 0; s'_x = initial lateral (drained) or
   e_x = -e_a, u = s_c - s'_x (undrained).
 - Simple Shear: imposed shear strain gamma_ax, no lateral strains, vertical
-  effective stress = confining (drained) or no vertical strain and
+  effective stress = initial vertical (drained) or no vertical strain and
   u = s_c - s'_a (undrained); isotropic start.
-- General: RSData's inputs for it are not documented; not simulated.
+- General (OGR design, RSData does not document its inputs): proportional
+  strain path in a given direction; undrained keeps the volume.
+- Initial state: Initial Effective Lateral Stress and Initial Effective K0
+  (RSData test dialog): axial (vertical) = lateral / K0.
 
 Loading Direction Tension imposes negative strains (extension / reverse
 shear). Cyclic loading (basic): 0 -> max -> 0 per cycle, Number of Steps
@@ -89,10 +93,14 @@ TEST_TYPES: dict[str, str] = {
     "simple_shear": "Simple Shear Test",
     "general": "General Test",
 }
-SIMULATED_TYPES = ("uniaxial", "triaxial", "biaxial", "simple_shear")
+SIMULATED_TYPES = ("uniaxial", "triaxial", "biaxial", "simple_shear", "general")
+# General Test (OGR design, RSData does not document its inputs): proportional
+# strain path with these components, Maximum Strain on the largest one.
+STRAIN_COMPONENTS = ("EpsilonZZ", "EpsilonXX", "EpsilonYY", "GammaZX", "GammaXY", "GammaZY")
 SEEPAGE = ("Drained", "Undrained")
 LOADING = ("Compression", "Tension")
 SIMULATED_CRITERIA = (
+    "norsand",
     "mohr_coulomb",
     "hoek_brown",
     "generalized_hoek_brown",
@@ -104,9 +112,28 @@ SIMULATED_CRITERIA = (
 
 DEFAULT_COLOR = "#800000"  # RSData default color of a new object
 
-# RSData Stiffness tab, Linear Isotropic (capture 12)
+# RSData Stiffness tab (capture 12; tutorials): Linear Isotropic for most
+# models, "CamClay Isotropic" (Elastic Parameter: Constant Poisson Ratio /
+# Constant Shear Modulus) for Cam-Clay and MCC, and the NorSand stiffness
+# (Shear modulus at reference, Reference pressure, Modulus exponent,
+# Poisson's ratio, Minimum Shear Modulus). Stresses in kPa. NorSand defaults:
+# G_ref and p_ref of the RSData Fraser River sand tutorial are 40000 / 395 kPa;
+# OGR uses G_ref = 40000 kPa at p_ref = 100 kPa, m = 0.5 and nu = 0.2 (FLAC3D
+# default), G_min = 1 kPa (tutorial).
 STIFFNESS_TYPES = ("Linear Isotropic",)
-DEFAULT_STIFFNESS = {"type": "Linear Isotropic", "poisson": 0.3, "young": 20000.0}  # young in kPa
+CAM_CLAY_ELASTIC = ("Constant Poisson Ratio", "Constant Shear Modulus")
+DEFAULT_STIFFNESS = {
+    "type": "Linear Isotropic",
+    "poisson": 0.3,
+    "young": 20000.0,
+    "elastic_parameter": CAM_CLAY_ELASTIC[0],
+    "shear_modulus": 10000.0,
+    "g_ref": 40000.0,
+    "p_ref": 100.0,
+    "g_exp": 0.5,
+    "ns_poisson": 0.2,
+    "g_min": 1.0,
+}
 
 # Softening-Hardening options (manual §11; labels of OGR Data)
 CONE_DILATION_TYPES = ("Mohr-Coulomb", "Compaction-Dilation")
@@ -121,9 +148,11 @@ def stiffness_from(data: Mapping | None) -> dict:
     out = dict(DEFAULT_STIFFNESS)
     if data.get("type") in STIFFNESS_TYPES:
         out["type"] = data["type"]
-    for key in ("poisson", "young"):
-        if key in data:
-            out[key] = float(data[key])
+    for key, value in DEFAULT_STIFFNESS.items():
+        if key in data and key != "type":
+            out[key] = str(data[key]) if isinstance(value, str) else float(data[key])
+    if out["elastic_parameter"] not in CAM_CLAY_ELASTIC:
+        out["elastic_parameter"] = CAM_CLAY_ELASTIC[0]
     return out
 
 
@@ -142,10 +171,14 @@ class TestSimulation:
     steps: int = 100
     cyclic: bool = False
     cycles: int = 1
-    # OGR Data: confining (cell / vertical) stress of triaxial, biaxial and
-    # simple shear tests, kPa. RSData's field for it is not documented; the
-    # default matches the Initial Effective Lateral Stress of its paths.
+    # RSData "Initial Effective Lateral Stress (kPa)" and "Initial Effective K0"
+    # (tutorials: NorSand Fraser River sand, Modified Cam Clay); the initial
+    # axial (vertical) effective stress is lateral / K0. Key kept as "confining".
     confining: float = 100.0
+    k0: float = 1.0
+    # General Test (OGR): strain direction (EpsilonZZ, EpsilonXX, EpsilonYY,
+    # GammaZX, GammaXY, GammaZY); default isotropic compression
+    strain_ratio: tuple = (1.0, 1.0, 1.0, 0.0, 0.0, 0.0)
     visible: bool = True
 
     def __post_init__(self) -> None:
@@ -159,6 +192,9 @@ class TestSimulation:
         self.steps = max(1, int(self.steps))
         self.cycles = max(1, int(self.cycles))
         self.confining = float(self.confining)
+        self.k0 = float(self.k0)
+        ratio = [float(v) for v in list(self.strain_ratio)[:6]]
+        self.strain_ratio = tuple(ratio + [0.0] * (6 - len(ratio)))
 
     @property
     def simulated(self) -> bool:
@@ -166,7 +202,16 @@ class TestSimulation:
 
     @property
     def confined(self) -> bool:
-        return self.test_type in ("triaxial", "biaxial", "simple_shear")
+        return self.test_type in ("triaxial", "biaxial", "simple_shear", "general")
+
+    def initial_stress(self) -> np.ndarray:
+        """Initial effective stress tensor (kPa): lateral, and lateral / K0 axially."""
+
+        if not self.confined:
+            return np.zeros((3, 3))
+        if self.k0 <= 0.0:
+            raise SimulationError("Initial Effective K0 must be positive")
+        return np.diag([self.confining / self.k0, self.confining, self.confining])
 
     def validate(self) -> None:
         if not self.max_strain > 0.0:
@@ -175,6 +220,8 @@ class TestSimulation:
             raise SimulationError("Maximum Strain must not exceed 1")
         if self.steps > 100000:
             raise SimulationError("too many steps (max 100000)")
+        if self.test_type == "general" and max(abs(v) for v in self.strain_ratio) == 0.0:
+            raise SimulationError("General Test: the strain direction is zero")
 
     def history(self) -> np.ndarray:
         """Imposed (axial or shear) strain at the end of each step (start 0 excluded)."""
@@ -202,6 +249,8 @@ class TestSimulation:
             "cyclic": self.cyclic,
             "cycles": self.cycles,
             "confining": self.confining,
+            "k0": self.k0,
+            "strain_ratio": list(self.strain_ratio),
             "visible": self.visible,
         }
 
@@ -219,6 +268,8 @@ class TestSimulation:
             cyclic=bool(data.get("cyclic", False)),
             cycles=int(data.get("cycles", 1)),
             confining=float(data.get("confining", 100.0)),
+            k0=float(data.get("k0", 1.0)),
+            strain_ratio=tuple(data.get("strain_ratio", (1.0, 1.0, 1.0, 0.0, 0.0, 0.0))),
             visible=bool(data.get("visible", True)),
         )
 
@@ -592,7 +643,7 @@ class PerfectBrittleModel:
     def initial_state(self, S0: np.ndarray) -> dict:
         w = np.linalg.eigvalsh(S0)
         if max(s.f(w) for s in self.peak.surfaces) > 1e-9 * max(1.0, self.peak.scale, float(np.max(np.abs(w)))):
-            raise SimulationError("the initial (confining) stress state is outside the yield surface")
+            raise SimulationError("the initial stress state (Initial Effective Lateral Stress and K0) is outside the yield surface")
         return {"failed": False}
 
     def update(self, S: np.ndarray, state: dict, dE: np.ndarray):
@@ -612,8 +663,92 @@ class PerfectBrittleModel:
         return max(s.f(w) for s in self.peak.surfaces) > tol
 
 
+class VerticalCap:
+    """Vertical cap p <= pc (RS2 manual eq. 11.8), associated."""
+
+    deviatoric = False
+
+    def __init__(self, pc: float) -> None:
+        self.pc = pc
+
+    def f(self, s: np.ndarray) -> float:
+        return float(s.mean()) - self.pc
+
+    def n(self, s: np.ndarray) -> np.ndarray:
+        return np.full(3, 1.0 / 3.0)
+
+    m = n
+
+    def dm(self, s: np.ndarray) -> np.ndarray:
+        return np.zeros((3, 3))
+
+
+class EllipticalCap:
+    """Elliptical cap (RS2 manual eq. 11.9), associated, compression positive:
+    (q / M_f)^2 + (p + c / tan phi_f) (p - pc) <= 0 for p above the top of the
+    ellipse, which touches the ultimate cone q = M_f (p + c / tan phi_f); left
+    of the top the cap continues as q <= its maximum (never active before the
+    cone). M_f of triaxial compression (Lode dependence not modelled)."""
+
+    deviatoric = False
+
+    def __init__(self, pc: float, m_f: float, offset: float) -> None:
+        self.pc, self.M, self.a = pc, m_f, offset
+        self.top = 0.5 * (pc - offset)
+
+    def _pq(self, s):
+        p = float(s.mean())
+        dev = s - p
+        return p, dev, math.sqrt(1.5 * float(dev @ dev))
+
+    def f(self, s: np.ndarray) -> float:
+        p, _, q = self._pq(s)
+        if p >= self.top:
+            return (q / self.M) ** 2 + (p + self.a) * (p - self.pc)
+        return (q / self.M) ** 2 - (0.5 * (self.pc + self.a)) ** 2
+
+    def n(self, s: np.ndarray) -> np.ndarray:
+        p, dev, _ = self._pq(s)
+        dp = (2.0 * p + self.a - self.pc) if p >= self.top else 0.0
+        return 3.0 / self.M**2 * dev + dp / 3.0
+
+    m = n
+
+    def dm(self, s: np.ndarray) -> np.ndarray:
+        p = float(s.mean())
+        out = 3.0 / self.M**2 * _PDEV
+        if p >= self.top:
+            out = out + 2.0 / 9.0 * np.ones((3, 3))
+        return out
+
+
+def _interp_table(rows, x: float, column: int) -> float:
+    xs = [float(r[0]) for r in rows]
+    ys = [float(r[column]) for r in rows]
+    return float(np.interp(x, xs, ys))
+
+
+def _table(rows, columns: int, name: str) -> list:
+    out = sorted((tuple(float(v) for v in list(r)[:columns]) for r in (rows or [])), key=lambda r: r[0])
+    if len(out) < 1 or any(len(r) < columns for r in out):
+        raise SimulationError(f"Softening-Hardening: the {name} needs at least one row of {columns} values")
+    return out
+
+
 class SofteningHardeningModel:
-    """Deviatoric mechanism of the RS2 Softening-Hardening model (manual §11.1)."""
+    """RS2 Softening-Hardening model (manual §11): cone, cap and tension cut-off.
+
+    Cone (§11.1): Mohr-Coulomb surface with the mobilized friction angle and
+    cohesion as functions of the deviatoric plastic strain of the cone,
+    "Hyperbolic" (eq. 11.4, cohesion keeping the apex at c / tan phi_f) or
+    "Tabular" (piecewise linear (e_q^p, phi, c) table, which can soften).
+    Cap (§11.2): "Vertical" p <= pc or "Elliptical" (eq. 11.9), associated,
+    pc0 = Initial Mean Stress (raised to the initial mean stress if below);
+    hardening "Cam-Clay" pc_{n+1} = pc_n exp(de_v^p / (lambda - kappa))
+    (eq. 11.10, Lambda Kappa = 0: rigid cap) or "Tabular" (e_v^p, pc). The
+    cone hardening is implicit (bracketed root); the cap hardening is
+    updated at the end of each step (explicit, small steps).
+    """
 
     def __init__(self, elastic: _Elastic, params: Mapping) -> None:
         self.el = elastic
@@ -623,23 +758,47 @@ class SofteningHardeningModel:
         self.A = float(params.get("hardening_property", 0.005))
         self.tensile = float(params.get("peak_tensile", 0.0))
         self.dilation = str(params.get("cone_dilation_type", CONE_DILATION_TYPES[0]))
+        self.tabular = str(params.get("cone_hardening_type", "Hyperbolic")) == "Tabular"
+        self.cap = str(params.get("cap_type", "None"))
+        if self.cap not in ("Vertical", "Elliptical"):
+            self.cap = "None"
+        self.cap_tabular = str(params.get("cap_hardening_type", "Cam-Clay")) == "Tabular"
+        self.pc0 = float(params.get("initial_mean_stress", 1000.0))
+        self.lk = float(params.get("lambda_kappa", 0.0))
         if not 0.0 < self.phi_f < 90.0:
             raise SimulationError("Softening-Hardening needs a failure friction angle in (0, 90) degrees")
-        if self.A <= 0.0:
+        if not self.tabular and self.A <= 0.0:
             raise SimulationError("Softening-Hardening needs a positive Hardening Property (A)")
         self.tan_f = math.tan(math.radians(self.phi_f))
+        if self.tabular:
+            self.cone_table = _table(params.get("cone_hardening_table"), 3, "cone hardening table")
+        if self.cap != "None" and self.cap_tabular:
+            self.cap_table = _table(params.get("cap_hardening_table"), 2, "cap hardening table")
+        sin = math.sin(math.radians(self.phi_f))
+        self.m_f = 6.0 * sin / (3.0 - sin)
 
     def mobilized(self, kappa: float) -> float:
-        """Mobilized friction angle (deg) at deviatoric plastic strain kappa (eq. 11.4)."""
+        """Mobilized friction angle (deg) at deviatoric plastic strain kappa (eq. 11.4 or table)."""
 
+        if self.tabular:
+            return _interp_table(self.cone_table, kappa, 1)
         return math.degrees(math.atan(self.tan_f * kappa / (kappa + self.A)))
 
-    def _set(self, kappa: float, n_psi: float | None) -> PlasticSet:
-        phi = max(self.mobilized(kappa), 1e-9)
-        c_m = self.c * math.tan(math.radians(phi)) / self.tan_f  # apex stays at c / tan(phi_f)
+    def cohesion(self, kappa: float, phi: float) -> float:
+        if self.tabular:
+            return max(_interp_table(self.cone_table, kappa, 2), 0.0)
+        return self.c * math.tan(math.radians(phi)) / self.tan_f  # apex stays at c / tan(phi_f)
+
+    def _set(self, kappa: float, n_psi: float | None, pc: float | None) -> PlasticSet:
+        phi = min(max(self.mobilized(kappa), 1e-9), 89.0)
+        c_m = self.cohesion(kappa, phi)
         psi = self.psi_f * phi / self.phi_f
         st = Strength.mohr_coulomb(c_m, phi, psi, n_psi=n_psi)
-        return _pyramid_set(st, self.tensile, ("sh", kappa))
+        ps = _pyramid_set(st, self.tensile, ("sh", kappa))
+        if self.cap == "None" or pc is None:
+            return ps
+        cap = VerticalCap(pc) if self.cap == "Vertical" else EllipticalCap(pc, self.m_f, self.c / self.tan_f)
+        return PlasticSet(ps.surfaces + (cap,), ps.apex, max(ps.scale, pc), ps.key)
 
     def _n_psi(self, S: np.ndarray) -> float | None:
         if self.dilation != "Compaction-Dilation":
@@ -659,54 +818,94 @@ class SofteningHardeningModel:
         w = np.linalg.eigvalsh(S0)
         if np.min(w) < -max(0.0, self.tensile) - 1e-9:
             raise SimulationError("the initial stress state violates the tension cut-off")
-        return {"kappa": 0.0}
+        state = {"kappa": 0.0}
+        if self.cap != "None":
+            pc = self.cap_table[0][1] if self.cap_tabular else self.pc0
+            p0 = float(w.mean())
+            state.update({"pc": max(pc, p0), "ev_cap": 0.0})
+        return state
 
     @staticmethod
     def _dev_norm(eps: np.ndarray) -> float:
         e = eps - eps.mean()
         return math.sqrt(2.0 / 3.0 * float(e @ e))
 
-    def _attempt(self, w: np.ndarray, kappa: float, n_psi):
-        ps = self._set(kappa, n_psi)
+    def _attempt(self, w: np.ndarray, kappa: float, n_psi, pc):
+        ps = self._set(kappa, n_psi, pc)
         new, yielded, contrib = return_map_surfaces(ps.surfaces, ps.apex, self.el.D, w, ps.scale)
         deps_p = sum((dl * s.m(new) for s, dl in contrib if s.deviatoric), np.zeros(3))
-        return new, yielded, self._dev_norm(deps_p)
+        dev_cap = sum((dl * float(np.sum(s.m(new))) for s, dl in contrib if isinstance(s, (VerticalCap, EllipticalCap))), 0.0)
+        return new, yielded, self._dev_norm(deps_p), dev_cap
+
+    def _cap_pressure(self, state: dict, dev_cap: float) -> dict:
+        if self.cap == "None":
+            return {}
+        ev = state["ev_cap"] + max(dev_cap, 0.0)
+        if self.cap_tabular:
+            pc = _interp_table(self.cap_table, ev, 1)
+        elif self.lk > 0.0:
+            pc = state["pc"] * math.exp(max(dev_cap, 0.0) / self.lk)
+        else:
+            pc = state["pc"]  # Lambda Kappa = 0: rigid cap
+        return {"pc": pc, "ev_cap": ev}
 
     def update(self, S: np.ndarray, state: dict, dE: np.ndarray):
         trial = self.el.trial(S, dE)
         w, V = _spectral(trial)
         k0 = state["kappa"]
+        pc = state.get("pc")
         n_psi = self._n_psi(S)
-        new, yielded, dk = self._attempt(w, k0, n_psi)
+        new, yielded, dk, dev_cap = self._attempt(w, k0, n_psi, pc)
         if not yielded or dk <= 0.0:
-            return _rebuild(V, new), {"kappa": k0}, yielded
-        # implicit hardening: kappa = k0 + dk(kappa), g increasing in kappa
+            return _rebuild(V, new), {"kappa": k0, **self._cap_pressure(state, dev_cap)}, yielded
+
+        def g(k):
+            return k - k0 - self._attempt(w, k, n_psi, pc)[2]
+
+        # implicit cone hardening: kappa = k0 + dk(kappa); bracket and solve
         lo, hi = k0, k0 + dk
-        g_hi = hi - k0 - self._attempt(w, hi, n_psi)[2]
-        while g_hi < 0.0:
+        g_hi = g(hi)
+        for _ in range(60):
+            if g_hi >= 0.0:
+                break
             hi = k0 + 2.0 * (hi - k0)
-            g_hi = hi - k0 - self._attempt(w, hi, n_psi)[2]
+            g_hi = g(hi)
+        else:
+            raise _StepFailure()
         from scipy.optimize import brentq
 
-        kappa = brentq(lambda k: k - k0 - self._attempt(w, k, n_psi)[2], lo, hi, xtol=1e-15, rtol=1e-12)
-        new, yielded, _ = self._attempt(w, kappa, n_psi)
-        return _rebuild(V, new), {"kappa": kappa}, yielded
+        kappa = brentq(g, lo, hi, xtol=1e-15, rtol=1e-12)
+        new, yielded, _, dev_cap = self._attempt(w, kappa, n_psi, pc)
+        return _rebuild(V, new), {"kappa": kappa, **self._cap_pressure(state, dev_cap)}, yielded
 
 
 class CamClayModel:
     """Cam-Clay / Modified Cam-Clay (RS2 manual §8), drained or undrained strain driven."""
 
-    def __init__(self, params: Mapping, poisson: float, modified: bool) -> None:
+    def __init__(self, params: Mapping, stiffness: Mapping, modified: bool) -> None:
+        st = stiffness_from(stiffness)
         self.M = float(params["critical_state_slope"])
         self.lam = float(params["lambda"])
         self.kap = float(params["kappa"])
-        self.N = float(params["specific_volume_unit_pressure"])
-        self.ocr = float(params["ocr"])
-        self.nu = float(poisson)
         self.modified = modified
+        value = float(params["specific_volume_unit_pressure"])
+        # RSData combo "Specific Volume at Unit Pressure": the value is N (virgin
+        # line) or Gamma (CSL); manual eqs. 8.3-8.4 relate them.
+        if str(params.get("volume_reference", "")).startswith("Critical State Line"):
+            value += (self.lam - self.kap) * (math.log(2.0) if modified else 1.0)
+        self.N = value
+        self.ocr = float(params["ocr"])
+        # RSData "Initial State of Consolidation": OCR or Preconsolidation Pressure (Po)
+        self.po = float(params.get("preconsolidation_stress", 0.0))
+        self.use_po = str(params.get("initial_consolidation", "OCR")).startswith("Preconsolidation")
+        self.nu = float(st["poisson"])
+        self.constant_g = st["elastic_parameter"] == "Constant Shear Modulus"
+        self.G0 = float(st["shear_modulus"])
+        if self.constant_g and self.G0 <= 0.0:
+            raise SimulationError("the shear modulus must be positive")
         if self.M <= 0.0 or self.kap <= 0.0 or self.lam <= self.kap:
             raise SimulationError("Cam-Clay needs M > 0 and lambda > kappa > 0")
-        if self.ocr < 1.0:
+        if not self.use_po and self.ocr < 1.0:
             raise SimulationError("the overconsolidation ratio must be >= 1")
         if not -1.0 < self.nu < 0.5:
             raise SimulationError("Poisson's ratio must be in (-1, 0.5)")
@@ -726,14 +925,24 @@ class CamClayModel:
         return 2.0 * q if self.modified else 1.0
 
     def shear_modulus(self, p: float, v: float) -> float:
+        if self.constant_g:
+            return self.G0
         bulk = v * p / self.kap
         return 3.0 * bulk * (1.0 - 2.0 * self.nu) / (2.0 * (1.0 + self.nu))
 
     def initial_state(self, S0: np.ndarray) -> dict:
         p0 = float(np.trace(S0)) / 3.0
         if p0 <= 0.0:
-            raise SimulationError("Cam-Clay needs a positive initial mean stress (set the confining stress)")
-        pc = self.ocr * p0
+            raise SimulationError("Cam-Clay needs a positive initial mean stress (set the initial lateral stress)")
+        dev = S0 - p0 * np.eye(3)
+        q0 = math.sqrt(1.5 * float(np.sum(dev * dev)))
+        # preconsolidation pressure that puts the initial stress on the surface (OCR = 1)
+        if self.modified:
+            pc_on = p0 + q0 * q0 / (self.M**2 * p0)
+        else:
+            pc_on = p0 * math.exp(q0 / (self.M * p0))
+        # Po below the current state: readjusted to it (RS2 manual §8.5)
+        pc = max(self.po, pc_on) if self.use_po else self.ocr * pc_on
         v0 = self.N - self.lam * math.log(pc) + self.kap * math.log(pc / p0)
         if v0 <= 1.0:
             raise SimulationError("the initial specific volume is not above 1: check N, lambda and the stresses")
@@ -791,6 +1000,221 @@ class _StepFailure(Exception):
     """A constitutive update did not converge (the driver subdivides the step)."""
 
 
+def _invariants(S: np.ndarray) -> tuple[float, np.ndarray, float, float]:
+    """(p, deviator s, q, sin 3theta) of a compression-positive stress; sin 3theta = +1 in TC."""
+
+    p = float(np.trace(S)) / 3.0
+    s = S - p * np.eye(3)
+    j2 = 0.5 * float(np.sum(s * s))
+    q = math.sqrt(3.0 * j2)
+    if j2 <= 1e-30:
+        return p, s, q, 1.0
+    sin3 = 1.5 * math.sqrt(3.0) * float(np.linalg.det(s)) / j2**1.5
+    return p, s, q, max(-1.0, min(1.0, sin3))
+
+
+class NorSandModel:
+    """NorSand (Jefferies 1993; Jefferies and Shuttle 2002, 2005).
+
+    No public theory manual of the RSData implementation exists; the model
+    is assembled from published sources and checked against RSData's NorSand
+    tutorial (Fraser River sand, undrained triaxial, which RSData compares
+    with Jefferies' NorSand spreadsheet):
+    - Elasticity, CSL, state parameters, M_i, chi_i, Lode function g(theta)
+      and the hardening rule as published for FLAC3D 9.2 (Itasca, NorSand
+      model, eqs. 1-19), compression positive, natural logarithms:
+      G = G_ref (p / p_ref)^m (>= G_min), K = 2 (1 + nu) G / (3 (1 - 2 nu));
+      e_c = Gamma - lambda ln p (Gamma at 1 kPa); psi = e - e_c(p),
+      psi_i = e - e_c(p_i); chi_i = chi_tc / (1 - lambda chi_tc / M_tc);
+      M_i = g(theta) (M_tc - N chi_i |psi_i|), g = [2c^4/(c^4+1+(c^4-1) sin3theta)]^(1/4),
+      c = 3 / (3 + M_tc); dp_i / p_i = H g (p/p_i)^2 (exp(-chi_i psi_i / M_i,tc) - p_i/p) de_q^p,
+      H = H0 - Hy psi.
+    - Yield surface and flow with Nova's volumetric coupling N (Jefferies 1993,
+      Jefferies and Shuttle 2002): eta = (M_i / N) [1 - (1 - N) (p / p_i)^(N/(1-N))],
+      associated, D^p = (M_i - eta) / (1 - N); for N = 0 it becomes the
+      FLAC3D form eta / M_i = 1 - ln(p / p_i), D^p = M_i - eta. The Nova form
+      reproduces the tutorial better (onset of instability and pore pressure
+      peak within 3 %; end of the test about 10 % below, see spec 013 plan).
+    - Initial state: e0 = e_c(p0) + psi0; p_i = OCR x the image stress that
+      puts the initial stress on the yield surface.
+    Integration: explicit substeps of at most 1e-4 strain, consistency with the
+    full dF/dp_i (M_i depends on p_i through psi_i) and drift correction of p_i.
+    "Cap Softening" (RSData check box) is stored but not modelled: its
+    formulation is not published (FLAC3D calls its softening term
+    "still in debate" and not supported).
+    """
+
+    SUBSTEP = 1e-4
+
+    def __init__(self, params: Mapping, stiffness: Mapping) -> None:
+        self.Mtc = float(params["m_tc"])
+        self.lam = float(params["lambda"])
+        self.H0 = float(params["h0"])
+        self.Hy = float(params.get("hy", 0.0))
+        self.chi_tc = float(params["chi_tc"])
+        self.Nc = float(params["n"])
+        self.psi0 = float(params["psi0"])
+        self.Gamma = float(params["gamma"])
+        self.ocr = float(params.get("ocr", 1.0))
+        st = stiffness_from(stiffness)
+        self.g_ref, self.p_ref = st["g_ref"], st["p_ref"]
+        self.g_exp, self.g_min, self.nu = st["g_exp"], st["g_min"], st["ns_poisson"]
+        if self.Mtc <= 0.0 or self.lam <= 0.0 or self.chi_tc <= 0.0 or self.H0 <= 0.0:
+            raise SimulationError("NorSand needs positive M_tc, lambda, chi_tc and H0")
+        if not 0.0 <= self.Nc < 1.0:
+            raise SimulationError("NorSand needs 0 <= N < 1")
+        if self.ocr < 1.0:
+            raise SimulationError("the overconsolidation ratio must be >= 1")
+        if self.g_ref <= 0.0 or self.p_ref <= 0.0 or not -1.0 < self.nu < 0.5:
+            raise SimulationError("NorSand stiffness needs G_ref > 0, p_ref > 0 and -1 < nu < 0.5")
+        ratio = self.lam * self.chi_tc / self.Mtc
+        if ratio >= 1.0:
+            raise SimulationError("NorSand: lambda chi_tc / M_tc must be below 1")
+        self.chi_i = self.chi_tc / (1.0 - ratio)
+        self.c = 3.0 / (3.0 + self.Mtc)
+        self.a = self.Nc / (1.0 - self.Nc)  # Nova exponent (0: logarithmic surface)
+
+    def e_c(self, p: float) -> float:
+        return self.Gamma - self.lam * math.log(max(p, _TINY))
+
+    def g(self, sin3: float) -> float:
+        c4 = self.c**4
+        return (2.0 * c4 / (c4 + 1.0 + (c4 - 1.0) * sin3)) ** 0.25
+
+    def moduli(self, p: float) -> tuple[float, float]:
+        G = max(self.g_ref * (max(p, 0.0) / self.p_ref) ** self.g_exp, self.g_min, _TINY)
+        return 2.0 * (1.0 + self.nu) * G / (3.0 * (1.0 - 2.0 * self.nu)), G
+
+    def m_itc(self, e: float, p_i: float) -> float:
+        return self.Mtc - self.Nc * self.chi_i * abs(e - self.e_c(p_i))
+
+    def eta_surface(self, m_i: float, ratio: float) -> float:
+        """Stress ratio of the yield surface at p / p_i = ratio."""
+
+        if self.a == 0.0:
+            return m_i * (1.0 - math.log(ratio))
+        return m_i / self.Nc * (1.0 - (1.0 - self.Nc) * ratio**self.a)
+
+    def F(self, S: np.ndarray, e: float, p_i: float) -> float:
+        p, _, q, sin3 = _invariants(S)
+        if p <= 0.0:
+            return math.inf
+        return q - p * self.eta_surface(self.g(sin3) * self.m_itc(e, p_i), p / p_i)
+
+    def image_on_surface(self, S: np.ndarray, e: float, guess: float) -> float:
+        """p_i putting S on the yield surface (fixed point: M_i depends on psi_i(p_i))."""
+
+        p, _, q, sin3 = _invariants(S)
+        eta = q / p
+        p_i = guess
+        for _ in range(60):
+            m_i = self.g(sin3) * self.m_itc(e, p_i)
+            if m_i <= 0.0:
+                return p_i
+            if self.a == 0.0:
+                new = p * math.exp(eta / m_i - 1.0)
+            else:
+                x = max((1.0 - self.Nc * eta / m_i) / (1.0 - self.Nc), 1e-12)
+                new = p * x ** (-1.0 / self.a)
+            if abs(new - p_i) <= 1e-12 * p_i:
+                return new
+            p_i = new
+        return p_i
+
+    def initial_state(self, S0: np.ndarray) -> dict:
+        p0 = float(np.trace(S0)) / 3.0
+        if p0 <= 0.0:
+            raise SimulationError("NorSand needs a positive initial mean stress (set the initial lateral stress)")
+        e0 = self.e_c(p0) + self.psi0
+        p_i = self.ocr * self.image_on_surface(S0, e0, p0 / 2.0)
+        return {"e": e0, "p_i": p_i}
+
+    def _plastic(self, S, e, p_i, dE, K, G):
+        p, s, q, sin3 = _invariants(S)
+        gth = self.g(sin3)
+        psi_i = e - self.e_c(p_i)
+        m_itc = self.Mtc - self.Nc * self.chi_i * abs(psi_i)
+        m_i = gth * m_itc
+        ratio = p / p_i
+        if self.a == 0.0:
+            dpF = m_i * math.log(ratio)  # = M_i - eta on the surface
+            dF_dpi_m = -p * m_i / p_i
+            dF_dm = -p * (1.0 - math.log(ratio))
+        else:
+            x = ratio**self.a
+            dpF = -(m_i / self.Nc) * (1.0 - x)  # = (M_i - eta) / (1 - N) on the surface
+            dF_dpi_m = -p * m_i * x / p_i
+            dF_dm = -(p / self.Nc) * (1.0 - (1.0 - self.Nc) * x)
+        unit = 1.5 * s / q if q > _TINY else np.zeros((3, 3))
+        n = dpF / 3.0 * np.eye(3) + unit
+        Dn = K * np.trace(n) * np.eye(3) + 2.0 * G * (n - np.trace(n) / 3.0 * np.eye(3))
+        psi = e - self.e_c(p)
+        H = self.H0 - self.Hy * psi
+        h = p_i * H * gth * ratio**2 * (math.exp(-self.chi_i * psi_i / m_itc) - 1.0 / ratio)
+        # dF/dp_i including M_i(psi_i(p_i)): d|psi_i|/dp_i = sign(psi_i) lambda / p_i
+        dm_dpi = -gth * self.Nc * self.chi_i * math.copysign(1.0, psi_i) * self.lam / p_i
+        dF_dpi = dF_dpi_m + dF_dm * dm_dpi
+        denominator = float(np.sum(n * Dn)) - dF_dpi * h
+        loading = float(np.sum(Dn * dE))
+        if denominator <= 0.0 or loading <= 0.0:
+            return None
+        return loading / denominator, n, h
+
+    def update(self, S: np.ndarray, state: dict, dE: np.ndarray):
+        e, p_i = state["e"], state["p_i"]
+        dev = dE - np.trace(dE) / 3.0 * np.eye(3)
+        size = max(math.sqrt(2.0 / 3.0 * float(np.sum(dev * dev))), abs(float(np.trace(dE))))
+        n_sub = max(1, int(math.ceil(size / self.SUBSTEP)))
+        d = dE / n_sub
+        yielded = False
+        for _ in range(n_sub):
+            plastic_step = False
+            p = float(np.trace(S)) / 3.0
+            if p <= 0.0:
+                raise _StepFailure()
+            K, G = self.moduli(p)
+            dS_el = K * np.trace(d) * np.eye(3) + 2.0 * G * (d - np.trace(d) / 3.0 * np.eye(3))
+            on_surface = self.F(S, e, p_i) >= -1e-8 * p
+            plastic = self._plastic(S, e, p_i, d, K, G) if on_surface else None
+            if plastic is None:
+                trial = S + dS_el
+                if self.F(trial, e, p_i) <= 0.0 or on_surface:
+                    S = trial  # elastic (or elastic unloading from the surface)
+                else:
+                    # elastic up to the surface, plastic for the rest (bisection on the fraction)
+                    lo, hi = 0.0, 1.0
+                    for _ in range(40):
+                        mid = 0.5 * (lo + hi)
+                        if self.F(S + mid * dS_el, e, p_i) > 0.0:
+                            hi = mid
+                        else:
+                            lo = mid
+                    S = S + lo * dS_el
+                    rest = (1.0 - lo) * d
+                    K, G = self.moduli(float(np.trace(S)) / 3.0)
+                    plastic = self._plastic(S, e, p_i, rest, K, G)
+                    if plastic is None:
+                        S = S + K * np.trace(rest) * np.eye(3) + 2.0 * G * (rest - np.trace(rest) / 3.0 * np.eye(3))
+                    else:
+                        S, p_i = self._apply(S, p_i, rest, plastic, K, G)
+                        plastic_step = True
+            else:
+                S, p_i = self._apply(S, p_i, d, plastic, K, G)
+                plastic_step = True
+            e = e - (1.0 + e) * float(np.trace(d))
+            if plastic_step:
+                yielded = True
+                p_i = self.image_on_surface(S, e, p_i)  # drift correction onto the surface
+        return S, {"e": e, "p_i": p_i}, yielded
+
+    @staticmethod
+    def _apply(S, p_i, d, plastic, K, G):
+        lam_dot, n, h = plastic
+        dp = d - lam_dot * n
+        S = S + K * np.trace(dp) * np.eye(3) + 2.0 * G * (dp - np.trace(dp) / 3.0 * np.eye(3))
+        return S, max(p_i + h * lam_dot, _TINY)
+
+
 def build_model(criterion: str, params: Mapping, stiffness: Mapping | None):
     """Constitutive model of a material for the test driver."""
 
@@ -798,7 +1222,9 @@ def build_model(criterion: str, params: Mapping, stiffness: Mapping | None):
     residual_is_peak = bool(p.get("set_residual_to_peak", True))
     stiff = stiffness_from(stiffness)
     if criterion in ("cam_clay", "modified_cam_clay"):
-        return CamClayModel(p, stiff["poisson"], criterion == "modified_cam_clay")
+        return CamClayModel(p, stiff, criterion == "modified_cam_clay")
+    if criterion == "norsand":
+        return NorSandModel(p, stiff)
     elastic = _Elastic(stiff)
     if criterion == "softening_hardening":
         return SofteningHardeningModel(elastic, p)
@@ -853,8 +1279,6 @@ def strengths(criterion: str, params: Mapping) -> tuple[Strength, Strength]:
         if residual_is_peak:
             return peak, peak
         return peak, ghb(p["gsi_residual"], p["mi_residual"], p["d_residual"])
-    if criterion == "norsand":
-        raise SimulationError("test simulation of NorSand is not available: there is no public theory manual (spec 002)")
     raise SimulationError(f"test simulation of the {criterion!r} model is not available")
 
 
@@ -945,13 +1369,23 @@ class _Controls:
 
 
 def _controls(test: TestSimulation) -> _Controls:
-    sc = test.confining if test.confined else 0.0
+    S0 = to_voigt(test.initial_stress(), False)
     e = np.eye(6)
     undrained = test.seepage == "Undrained"
+    if test.test_type == "general":
+        # proportional strain path; undrained keeps the volume (normal part made deviatoric)
+        direction = np.array(test.strain_ratio, dtype=float)
+        direction = direction / np.max(np.abs(direction))
+        if undrained:
+            direction[:3] -= direction[:3].mean()
+            if np.max(np.abs(direction)) == 0.0:
+                raise SimulationError("General Test: an undrained test needs a deviatoric strain direction")
+        return _Controls(direction, None, -1, float(S0[:3].mean()), -1)
     if test.test_type == "simple_shear":
         if undrained:
-            return _Controls(e[3], None, 0, sc, 0)
-        return _Controls(e[3], e[0], 0, sc, 0)
+            return _Controls(e[3], None, 0, S0[0], 0)
+        return _Controls(e[3], e[0], 0, S0[0], 0)
+    sc = S0[1]
     if test.test_type == "biaxial":
         if undrained:
             return _Controls(e[0] - e[1], None, 1, sc, 1)
@@ -1017,12 +1451,12 @@ def simulate(criterion: str, params: Mapping, stiffness: Mapping | None, test: T
     test.validate()
     model = build_model(criterion, params, stiffness)
     ctl = _controls(test)
-    sc = test.confining if test.confined else 0.0
 
-    S = np.eye(3) * sc  # isotropic (consolidated) start; uniaxial starts unloaded
+    S = test.initial_stress()  # consolidated start; uniaxial starts unloaded
     state = model.initial_state(S)
     E = np.zeros((3, 3))
     strains, stresses, flags = [to_voigt(E, True)], [to_voigt(S, False)], [False]
+    states = [dict(state)]
     previous = 0.0
     yielded = False
     for target in test.history():
@@ -1048,12 +1482,19 @@ def simulate(criterion: str, params: Mapping, stiffness: Mapping | None, test: T
         strains.append(to_voigt(E, True))
         stresses.append(to_voigt(S, False))
         flags.append(bool(yielded))
+        states.append(dict(state))
     stress = np.array(stresses)
     if test.seepage == "Undrained":
-        u = sc - stress[:, ctl.pore_index]
+        if ctl.pore_index < 0:  # general: total mean stress kept (OGR assumption)
+            u = ctl.target - stress[:, :3].mean(axis=1)
+        else:
+            u = ctl.target - stress[:, ctl.pore_index]
     else:
         u = np.zeros(len(stress))
-    return SimulationResult(test, np.array(strains), stress, u, np.array(flags))
+    result = SimulationResult(test, np.array(strains), stress, u, np.array(flags))
+    result.states = states
+    result.model = model
+    return result
 
 
 def simulate_material(material, test: TestSimulation) -> SimulationResult:
@@ -1072,3 +1513,79 @@ def failure_deviator(criterion: str, params: Mapping, test: TestSimulation) -> f
     peak, _ = strengths(criterion, params)
     sigma3 = test.confining if test.confined else 0.0
     return peak.deviator_at(sigma3)
+
+
+# ------------------------------------------------------- yield surface in q-p (animation)
+
+
+def _pyramid_pq(surfaces, p_max: float, n: int = 80) -> tuple[np.ndarray, np.ndarray]:
+    """Triaxial-compression meridian (sigma2 = sigma3) of a pyramid / cone set, kPa."""
+
+    faces = [s for s in surfaces if isinstance(s, PairFace)]
+    cones = [s for s in surfaces if isinstance(s, DruckerPragerCone)]
+    if cones:
+        cone = cones[0]
+        lo = cone.apex if math.isfinite(cone.apex) else 0.0
+        p = np.linspace(lo, p_max, n)
+        return p, np.maximum(math.sqrt(3.0) * (cone.k + cone.q_phi * p), 0.0)
+    if not faces:
+        return np.zeros(0), np.zeros(0)
+    st = faces[0].st
+    lo = st.apex if math.isfinite(st.apex) else 0.0
+    s3 = np.linspace(lo, p_max, n)
+    s1 = np.array([st.S(float(x)) for x in s3])
+    return (s1 + 2.0 * s3) / 3.0, s1 - s3
+
+
+def yield_surface_pq(result: "SimulationResult", step: int) -> tuple[np.ndarray, np.ndarray]:
+    """Current yield surface of a simulated test in the q-p plane (kPa), at a step.
+
+    Triaxial-compression meridian (Lode angle of TC) for MC / HB / DP and the
+    Softening-Hardening cone; the caps of Cam-Clay, MCC, NorSand and SH with
+    their hardening state at that step. Empty arrays when not available.
+    """
+
+    model = getattr(result, "model", None)
+    states = getattr(result, "states", None)
+    if model is None or not states:
+        return np.zeros(0), np.zeros(0)
+    step = max(0, min(step, len(states) - 1))
+    state = states[step]
+    p_max = max(float(np.max(result.p)) * 1.3, 1.0)
+    if isinstance(model, PerfectBrittleModel):
+        current = model.residual if state.get("failed") else model.peak
+        return _pyramid_pq(current.surfaces, p_max)
+    if isinstance(model, SofteningHardeningModel):
+        ps = model._set(state["kappa"], None, state.get("pc"))
+        p, q = _pyramid_pq(ps.surfaces, p_max)
+        caps = [s for s in ps.surfaces if isinstance(s, (VerticalCap, EllipticalCap))]
+        if caps:
+            cap = caps[0]
+            if isinstance(cap, VerticalCap):
+                keep = p <= cap.pc
+                q_cap = float(np.interp(cap.pc, p, q))
+                p = np.concatenate([p[keep], [cap.pc, cap.pc]])
+                q = np.concatenate([q[keep], [q_cap, 0.0]])
+            else:
+                pc_p = np.linspace(cap.top, cap.pc, 60)
+                q_cap = cap.M * np.sqrt(np.maximum(-(pc_p + cap.a) * (pc_p - cap.pc), 0.0))
+                keep = p <= cap.top
+                p = np.concatenate([p[keep], pc_p])
+                q = np.concatenate([q[keep], q_cap])
+        return p, q
+    if isinstance(model, CamClayModel):
+        pc = state["pc"]
+        p = np.linspace(1e-6 * pc, pc, 120)
+        if model.modified:
+            q = model.M * np.sqrt(np.maximum(p * (pc - p), 0.0))
+        else:
+            q = np.maximum(-model.M * p * np.log(p / pc), 0.0)
+        return p, q
+    if isinstance(model, NorSandModel):
+        e, p_i = state["e"], state["p_i"]
+        m_i = model.m_itc(e, p_i)
+        top = p_i * (math.e if model.a == 0.0 else (1.0 / (1.0 - model.Nc)) ** (1.0 / model.a))
+        p = np.linspace(1e-6 * p_i, top, 120)
+        q = np.array([max(x * model.eta_surface(m_i, x / p_i), 0.0) for x in p])
+        return p, q
+    return np.zeros(0), np.zeros(0)

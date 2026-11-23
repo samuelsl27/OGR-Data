@@ -206,7 +206,8 @@ def test_simple_shear_davis_and_elastic() -> None:
 def test_softening_hardening_enum_options() -> None:
     fields = {f.key: f for f in __import__("ogr_data.core.models", fromlist=["CRITERIA"]).CRITERIA["softening_hardening"].fields}
     assert fields["cone_dilation_type"].options == sm.CONE_DILATION_TYPES
-    assert fields["cap_type"].options == ("None",)
+    assert fields["cap_type"].options == ("None", "Vertical", "Elliptical")
+    assert fields["cone_hardening_type"].options == ("Hyperbolic", "Tabular")
     # files saved before 13b carry "default": read as the Mohr-Coulomb potential
     old = dict(SH, cone_dilation_type="default")
     a = _run("softening_hardening", old, HOSTUN, test_type="triaxial", confining=300.0, max_strain=0.02)

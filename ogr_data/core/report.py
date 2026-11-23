@@ -163,6 +163,14 @@ def parameter_rows(material: Material, unit: str) -> Rows:
             text = "Yes" if value else "No"
         elif f.kind == "enum":
             text = str(value)
+        elif f.kind == "table":
+            scale = units.stress_factor(unit) / 1000.0
+            stress = f.stress_columns or tuple(False for _ in f.options)
+            cells = [
+                "(" + ", ".join(_number(float(v) * (scale if st else 1.0)) for v, st in zip(row, stress)) + ")"
+                for row in (value or [])
+            ]
+            text = f"{len(cells)} rows: " + " ".join(cells)
         elif f.unit == "kPa":
             text = f"{_number(_kpa(value, unit))} {unit}"
         elif f.unit == "deg":
@@ -171,6 +179,28 @@ def parameter_rows(material: Material, unit: str) -> Rows:
             text = _number(float(value))
         rows.append((f.label, text))
     return rows
+
+
+def stiffness_rows(material: Material, unit: str) -> Rows:
+    """Stiffness tab of the material, by model (spec 013)."""
+
+    st = sm.stiffness_from(material.stiffness)
+    stress = lambda key: f"{_number(_kpa(st[key], unit))} {unit}"  # noqa: E731
+    if material.criterion in ("cam_clay", "modified_cam_clay"):
+        rows: Rows = [("Stiffness", "CamClay Isotropic"), ("Elastic Parameter", st["elastic_parameter"])]
+        if st["elastic_parameter"] == "Constant Shear Modulus":
+            return rows + [("Shear Modulus", stress("shear_modulus"))]
+        return rows + [("Poisson's Ratio", _number(st["poisson"]))]
+    if material.criterion == "norsand":
+        return [
+            ("Stiffness", "NorSand"),
+            ("Shear modulus at reference", stress("g_ref")),
+            ("Reference pressure for shear modulus", stress("p_ref")),
+            ("Modulus exponent", _number(st["g_exp"])),
+            ("Poisson's ratio", _number(st["ns_poisson"])),
+            ("Minimum Shear Modulus", stress("g_min")),
+        ]
+    return [("Stiffness", st["type"]), ("Poisson's Ratio", _number(st["poisson"])), ("Young's Modulus", stress("young"))]
 
 
 def range_rows(material: Material, unit: str) -> Rows:
@@ -476,19 +506,17 @@ class _Builder:
         for m in self.project.materials:
             if not m.test_simulations:
                 continue
-            stiff = sm.stiffness_from(m.stiffness)
-            parts.append(
-                f"<h3>{_e(m.name)}</h3>"
-                + _kv_table([("Stiffness", stiff["type"]), ("Poisson's Ratio", _number(stiff["poisson"])),
-                             ("Young's Modulus", f"{_number(_kpa(stiff['young'], u))} {u}")])
-            )
+            parts.append(f"<h3>{_e(m.name)}</h3>" + _kv_table(stiffness_rows(m, u)))
             for t in m.test_simulations:
                 rows: Rows = [("Test Type", sm.TEST_TYPES[t.test_type])]
                 if t.test_type != "uniaxial":
                     rows.append(("Seepage Condition", t.seepage))
                 rows.append(("Loading Direction", t.loading))
                 if t.confined:
-                    rows.append(("Confining Stress", f"{_number(_kpa(t.confining, u))} {u}"))
+                    rows.append(("Initial Effective Lateral Stress", f"{_number(_kpa(t.confining, u))} {u}"))
+                    rows.append(("Initial Effective K0", _number(t.k0)))
+                if t.test_type == "general":
+                    rows.append(("Strain direction", ", ".join(f"{n} {_number(v)}" for n, v in zip(sm.STRAIN_COMPONENTS, t.strain_ratio))))
                 rows += [("Maximum Strain", _number(t.max_strain)), ("Number of Steps", str(t.steps))]
                 if t.cyclic:
                     rows.append(("Cyclic Loading Cycles", str(t.cycles)))

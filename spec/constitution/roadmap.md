@@ -29,8 +29,10 @@ elastoplástico MC/HB/GHB con residual frágil; rigidez lineal isótropa;
 verificado contra soluciones cerradas) y **013b** (Drucker-Prager,
 Cam-Clay/MCC, Softening-Hardening, cortes a tracción y Simple Shear,
 contrastados con los manuales de RS2/RSData; NorSand y General Test
-sin fuente). Siguiente: **019** (API y MCP) o **013c** (cíclicos y
-animación).
+sin fuente), completada después con NorSand (FLAC3D + Nova, contrastado
+con el tutorial de RSData), General Test, casquetes y tablas de
+Softening-Hardening, los campos reales del diálogo (σ'h0, K0) y **013c**
+(animación). Siguiente: **019** (API y MCP).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

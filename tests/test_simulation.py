@@ -106,9 +106,11 @@ def test_hoek_brown_and_generalized() -> None:
 
 def test_errors_and_unsupported() -> None:
     for kwargs, message in (
-        ({"test_type": "general"}, "not documented"),
+        ({"test_type": "general", "strain_ratio": (0, 0, 0, 0, 0, 0)}, "strain direction is zero"),
+        ({"test_type": "general", "seepage": "Undrained"}, "deviatoric strain direction"),
+        ({"test_type": "triaxial", "k0": 0.0}, "K0"),
         ({"max_strain": 0.0}, "Maximum Strain"),
-        ({"test_type": "uniaxial", "params": dict(defaults("modified_cam_clay")), "criterion": "modified_cam_clay"}, "confining"),
+        ({"test_type": "uniaxial", "params": dict(defaults("modified_cam_clay")), "criterion": "modified_cam_clay"}, "initial lateral stress"),
     ):
         try:
             _run(**kwargs)
@@ -116,7 +118,7 @@ def test_errors_and_unsupported() -> None:
             assert message in str(exc), exc
         else:
             raise AssertionError(kwargs)
-    for criterion, message in (("norsand", "no public theory manual"), ("barton_bandis", "not available"), ("power_curve", "not available")):
+    for criterion, message in (("barton_bandis", "not available"), ("power_curve", "not available")):
         try:
             sm.simulate(criterion, defaults(criterion), None, sm.TestSimulation())
         except sm.SimulationError as exc:
@@ -135,7 +137,7 @@ def test_project_round_trip_and_templates() -> None:
     proj = project.Project.new()
     soil = proj.materials[proj.add("soil")]
     assert [t.name for t in soil.test_simulations] == ["Test 1"]  # "Material Model + Test, Stress Path"
-    assert soil.stiffness == {"type": "Linear Isotropic", "poisson": 0.3, "young": 20000.0}
+    assert soil.stiffness == sm.DEFAULT_STIFFNESS and soil.stiffness["young"] == 20000.0 and soil.stiffness["poisson"] == 0.3
     soil.stiffness["young"] = 50000.0
     soil.test_simulations.append(sm.TestSimulation(name="CU", test_type="triaxial", seepage="Undrained", confining=200.0, cyclic=True, cycles=3))
     back = project.Project.from_dict(proj.to_dict())
@@ -174,7 +176,8 @@ def test_window_tests_dialog_compute_and_graphs() -> None:
             dlg._confining.setValue(150.0)
             dlg.add_item()
             dlg._test_type.setCurrentIndex(dlg._test_type.findData("general"))
-            assert "not documented" in dlg._note.text() and not dlg._form.isRowVisible(dlg._confining)
+            assert "OGR Data" in dlg._note.text() and dlg._form.isRowVisible(dlg._ratio_box)
+            dlg._seepage.setCurrentIndex(dlg._seepage.findData("Undrained"))  # isotropic + undrained: not possible
             dlg.store_current()
             items = dlg.items
         finally:

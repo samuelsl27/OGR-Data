@@ -23,9 +23,16 @@
 - [x] Simple Shear (drenado / no drenado)
 - [x] Verificación: soluciones cerradas, integración de referencia MCC, ejemplos de los manuales (comparación documentada)
 - [x] Plan, roadmap; suite en verde; commit
-- [ ] NorSand (sin manual público); General Test (entradas sin documentar)
-- [ ] Softening-Hardening: casquete vertical / elíptico y endurecimiento tabular
+- [x] NorSand (FLAC3D + Nova, contrastado con el tutorial de RSData)
+- [x] General Test (trayectoria proporcional, diseño propio documentado)
+- [x] Softening-Hardening: casquete vertical / elíptico y endurecimiento tabular (cono y casquete)
+- [x] Campos reales del diálogo de ensayos: Initial Effective Lateral Stress / K0
+- [x] Cam-Clay: N o Γ, OCR o Po, G constante o ν constante (tutorial MCC)
+- [ ] Cap Softening de NorSand (sin formulación publicada)
 
-## 13c (pendiente)
+## 13c
 
-- [ ] Modelos cíclicos y pestaña Animation
+- [x] Panel Animation: material - ensayo, boceto de la probeta, deslizador, Play / Pause
+- [x] Punto actual en las cuatro gráficas y superficie de fluencia del paso en q-p
+- [x] Carga cíclica: casilla Cyclic Loading Cycles (RSData no tiene modelos cíclicos aparte)
+- [x] Tests; suite en verde; commit

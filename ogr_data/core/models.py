@@ -16,14 +16,16 @@ from typing import Union
 class Field:
     key: str
     label: str
-    default: Union[float, bool, str]
+    default: Union[float, bool, str, tuple]
     unit: str = ""
-    kind: str = "float"  # "float" | "bool" | "enum"
-    options: tuple[str, ...] = ()
+    kind: str = "float"  # "float" | "bool" | "enum" | "table"
+    options: tuple[str, ...] = ()  # enum options, or the column names of a table
     pick: str = ""  # picker key: "sigci_grades" | "mi_values" | "gsi_chart"
+    # table columns holding stresses (kPa), for display units (spec 013)
+    stress_columns: tuple[bool, ...] = ()
 
     def __post_init__(self) -> None:
-        if self.kind not in ("float", "bool", "enum"):
+        if self.kind not in ("float", "bool", "enum", "table"):
             raise ValueError(f"unknown field kind {self.kind!r}")
 
 
@@ -35,6 +37,10 @@ class Criterion:
     envelope: str  # "principal" | "shear" | "none"
     fields: tuple[Field, ...]
 
+
+# Cam-Clay / MCC combos of RSData (Modified Cam Clay tutorial, spec 013)
+VOLUME_REFERENCES = ("Normal Compression Line (N)", "Critical State Line (Gamma)")
+CONSOLIDATION_STATES = ("OCR", "Preconsolidation Pressure (Po)")
 
 # Rock mass modulus methods (labels as in ORMAS; spec 022), same order as
 # core.hoek_brown.ModulusMethod.
@@ -128,9 +134,13 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("critical_state_slope", "Critical State Slope", 1.3),
+            # spec 013: RSData combo (MCC tutorial): the value is N or Gamma
+            Field("volume_reference", "Specific Volume Reference", VOLUME_REFERENCES[0], kind="enum", options=VOLUME_REFERENCES),
             Field("specific_volume_unit_pressure", "Specific Volume at Unit Pressure", 2.61),
             Field("kappa", "Kappa", 0.025),
+            Field("initial_consolidation", "Initial State of Consolidation", CONSOLIDATION_STATES[0], kind="enum", options=CONSOLIDATION_STATES),
             Field("ocr", "Overconsolidation Ratio", 2.0),
+            Field("preconsolidation_stress", "Preconsolidation Stress", 200.0, "kPa"),
             Field("lambda", "Lambda", 0.15),
         ),
     ),
@@ -141,9 +151,13 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("critical_state_slope", "Critical State Slope", 1.3),
+            # spec 013: RSData combo (MCC tutorial): the value is N or Gamma
+            Field("volume_reference", "Specific Volume Reference", VOLUME_REFERENCES[0], kind="enum", options=VOLUME_REFERENCES),
             Field("specific_volume_unit_pressure", "Specific Volume at Unit Pressure", 2.61),
             Field("kappa", "Kappa", 0.025),
+            Field("initial_consolidation", "Initial State of Consolidation", CONSOLIDATION_STATES[0], kind="enum", options=CONSOLIDATION_STATES),
             Field("ocr", "Overconsolidation Ratio", 2.0),
+            Field("preconsolidation_stress", "Preconsolidation Stress", 200.0, "kPa"),
             Field("lambda", "Lambda", 0.15),
         ),
     ),
@@ -157,14 +171,25 @@ CRITERIA: dict[str, Criterion] = {
             Field("peak_friction", "Peak Friction Angle", 35.0, "deg", pick="compacted_soil"),
             Field("peak_cohesion", "Peak Cohesion", 10.5, "kPa", pick="compacted_soil"),
             # spec 013b: options named after the RS2 manual (§11; RSData combo values not captured)
-            Field("cone_hardening_type", "Cone Hardening Type", "Hyperbolic", kind="enum", options=("Hyperbolic",)),
+            Field("cone_hardening_type", "Cone Hardening Type", "Hyperbolic", kind="enum", options=("Hyperbolic", "Tabular")),
             Field("hardening_property", "Hardening Property", 0.005),
+            # Tabular cone hardening (manual §11.1): mobilized friction angle and
+            # cohesion versus deviatoric plastic strain, piecewise linear
+            Field(
+                "cone_hardening_table", "Cone Hardening Table", ((0.0, 0.0, 0.0), (0.01, 35.0, 10.5)), kind="table",
+                options=("Plastic Deviatoric Strain", "Friction Angle (deg)", "Cohesion"), stress_columns=(False, False, True),
+            ),
             Field("dilation_angle", "Dilation Angle", 0.0, "deg"),
             Field("cone_dilation_type", "Cone Dilation Type", "Mohr-Coulomb", kind="enum", options=("Mohr-Coulomb", "Compaction-Dilation")),
-            Field("cap_type", "Cap Type", "None", kind="enum", options=("None",)),
-            Field("cap_hardening_type", "Cap Hardening Type", "Cam-Clay", kind="enum", options=("Cam-Clay",)),
+            Field("cap_type", "Cap Type", "None", kind="enum", options=("None", "Vertical", "Elliptical")),
+            Field("cap_hardening_type", "Cap Hardening Type", "Cam-Clay", kind="enum", options=("Cam-Clay", "Tabular")),
             Field("initial_mean_stress", "Initial Mean Stress", 1000.0, "kPa"),
             Field("lambda_kappa", "Lambda Kappa", 0.0),
+            # Tabular cap hardening (manual §11.2): pc versus volumetric plastic strain
+            Field(
+                "cap_hardening_table", "Cap Hardening Table", ((0.0, 1000.0), (0.05, 2000.0)), kind="table",
+                options=("Plastic Volumetric Strain", "Cap Pressure pc"), stress_columns=(False, True),
+            ),
         ),
     ),
     "norsand": Criterion(
@@ -181,8 +206,11 @@ CRITERIA: dict[str, Criterion] = {
             Field("hy", "Hy - Change in Hardening Modulus", 0.0),
             Field("psi0", "Psi0 - Initial State Parameter", -0.025),
             Field("gamma", "Gamma - Altitude of CSL at 1 kPa", 1.2),
-            Field("ocr", "OCR", 1.0, "kPa"),
-            Field("cap_softening", "Cap Softening", 0.0),
+            # RSData labels OCR "(kPa)" (tutorial capture); it is a ratio
+            Field("initial_consolidation_condition", "Initial Consolidation Condition", "OCR", kind="enum", options=("OCR",)),
+            Field("ocr", "OCR", 1.0),
+            Field("cap_softening", "Cap Softening", False, kind="bool"),
+            Field("fluid_bulk_modulus", "Fluid Bulk Modulus", 1e9, "kPa"),
         ),
     ),
     "power_curve": Criterion(
@@ -223,4 +251,4 @@ CRITERIA: dict[str, Criterion] = {
 def defaults(key: str) -> dict[str, Union[float, bool, str]]:
     """Default parameter values of a criterion."""
 
-    return {f.key: f.default for f in CRITERIA[key].fields}
+    return {f.key: ([list(row) for row in f.default] if f.kind == "table" else f.default) for f in CRITERIA[key].fields}

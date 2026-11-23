@@ -140,10 +140,80 @@ renderizadas (el texto extraído pierde los símbolos).
   τ = G γ en el tramo elástico.
 - Rendimiento: 100 pasos en 0,02-0,6 s según el modelo (MCC el más lento).
 
-## Pendiente
+## Cierre de pendientes (búsqueda en la web, papers y deducción)
 
-- NorSand: sin manual de teoría público (spec 002).
-- General Test: RSData no documenta sus entradas.
-- Softening-Hardening: casquete (vertical y elíptico) y endurecimiento
-  tabular; Cam-Clay con G constante (el manual lo permite).
-- **13c**: modelos cíclicos y pestaña Animation.
+Fuentes nuevas (2026-11-23): tutoriales de RSData «NorSand - Fraser River
+Sand» y «Modified Cam Clay models» y páginas de ayuda Animation, Compute,
+Stress Path Graphs y Project Settings (rocscience.com; capturas de los
+diálogos descargadas y leídas); documentación de NorSand de FLAC3D 9.2
+(Itasca, ecs. 1-24); Jefferies y Shuttle (2011), *Understanding
+liquefaction through applied mechanics* (descripción y calibración de
+Fraser River sand, sin ecuaciones).
+
+- **Campos del diálogo de ensayos de RSData** (capturas de los dos
+  tutoriales): *Initial Effective Lateral Stress* e *Initial Effective K0*
+  (no el «Confining Stress» supuesto en 13a; se conserva la clave
+  `confining` en el archivo). Deducción: tensión axial inicial = lateral /
+  K0 (K0 = σ'h/σ'v). En simple shear la vertical inicial (lateral/K0) se
+  mantiene en drenado.
+- **NorSand**: elasticidad, CSL, ψ, ψi, χi, Mi, g(θ) y endurecimiento de
+  FLAC3D (ecs. 1-19); superficie y flujo con el acoplamiento de Nova
+  (Jefferies 1993, Jefferies y Shuttle 2002), que para N = 0 es la forma
+  logarítmica de FLAC3D. Elegida por comparación con el tutorial de RSData
+  (que se contrasta con la hoja de Jefferies): con la forma de FLAC3D el
+  mínimo de p' sale en 288/397 kPa y q final 745 kPa; con la de Nova
+  279/389 kPa (figura ≈ 280/380), pico de presión de poros 246 kPa
+  (≈ 250) y q final 778 kPa, p' 532 kPa (figura ≈ 860/590, −10 %). Se
+  probaron y descartaron (no reproducen la figura): término de
+  ablandamiento T_S con ambos signos, H con ψ0, χtc en lugar de χi,
+  límite de dilatancia con ψ y la ley de endurecimiento de 2002
+  (pi,max/pi − 1). Se corrigió la consistencia: Mi depende de pi a través
+  de ψi (dψi/dpi = λ/pi). Integración explícita con subpasos de 1e-4 y
+  corrección de deriva de pi. Rigidez NorSand de RSData (G de referencia,
+  presión de referencia, exponente, ν, G mínimo). *Cap Softening* se
+  guarda pero no se modela: su formulación no está publicada (FLAC3D lo
+  llama «still in debate» y no soportado). El campo OCR, rotulado «(kPa)»
+  en RSData, es un cociente (corregido el escalado de unidades).
+- **Cam-Clay / MCC**, opciones del diálogo de RSData (tutorial MCC):
+  *Specific Volume at Unit Pressure* = N (línea virgen) o Γ (CSL, ecs.
+  8.3-8.4); *Initial State of Consolidation* = OCR o *Preconsolidation
+  Pressure (Po)* (reajustada a la superficie si queda por debajo, §8.5);
+  estado inicial anisótropo (K0) sobre la superficie para OCR = 1;
+  rigidez *CamClay Isotropic*: *Constant Poisson Ratio* o *Constant Shear
+  Modulus*. Contraste con el tutorial MCC, caso HOC (Po = 500, p0 = 100,
+  50 pasos): «sube hasta cerca de 300 kPa y baja a unos 200» → OGR 291 y
+  203 kPa.
+- **Softening-Hardening completo** (§11): endurecimiento tabular del cono
+  (εq^p, φ, c; permite ablandamiento: termina exactamente en la
+  resistencia residual de la tabla), casquete *Vertical* (ec. 11.8) y
+  *Elliptical* (ec. 11.9, con el tramo izquierdo prolongado como q máximo
+  y M_f de compresión triaxial), endurecimiento del casquete Cam-Clay
+  (ec. 11.10, *Lambda Kappa* = λ−κ; 0 = casquete rígido, deducción) o
+  tabular (εv^p, pc); pc0 = *Initial Mean Stress* (deducción: es el único
+  dato de tensión del casquete). El casquete se actualiza al final de cada
+  paso (explícito). Parámetros tabla: nuevo tipo de campo `table` con
+  editor (copiar/pegar/importar/exportar).
+- **General Test** (diseño propio: RSData no documenta sus entradas):
+  trayectoria de deformación proporcional en la dirección dada (εzz, εxx,
+  εyy, γzx, γxy, γzy), Maximum Strain en su mayor componente; no drenado
+  quita la parte volumétrica; u = cambio de la tensión media efectiva.
+  Cubre compresión isótropa, edómetro, etc. (verificado: K = E/3(1−2ν) y
+  K0 elástico = ν/(1−ν)).
+- **13c — Animación** (ayuda «Animation» y captura del tutorial NorSand):
+  panel con *Material* (material - ensayo), boceto de la probeta (contorno
+  inicial a trazos, flecha de carga, deformación exagerada al 30 %),
+  deslizador de paso y Play / Pause; las cuatro Stress Path Graphs marcan
+  el punto actual y q-p dibuja la superficie de fluencia del paso (todas
+  las leyes de material; el punto final cae sobre la superficie dibujada).
+  Los «modelos cíclicos» no existen en RSData como modelos aparte: la
+  carga cíclica es la casilla *Cyclic Loading Cycles* (0 → máx → 0 por
+  ciclo, ya en 13a).
+
+## Pendiente (sin fuente)
+
+- Cap Softening de NorSand; rotación de tensiones principales (Z) y
+  cargas cíclicas específicas de NorSand.
+- Diferencia de ≈ 10 % al final del ensayo del tutorial NorSand.
+- Convergence Settings / Solution Algorithm de Project Settings de RSData
+  (Accelerated Initial Stiffness, Min./Max. Alpha, Maximum Stress Increment
+  Ratio): OGR usa su propio integrador y no los necesita.

@@ -373,8 +373,21 @@ class PathCanvas(FigureCanvasQTAgg):
         super().__init__(self.figure)
         self.axes = self.figure.add_subplot(111)
         self._lines: list = []
+        # spec 013c: animation marker and the current yield surface (q-p graph)
+        (self._anim_marker,) = self.axes.plot([], [], "o", color="#1f4fd8", markersize=7, zorder=6)
+        (self._anim_surface,) = self.axes.plot([], [], "--", color="#1f4fd8", linewidth=1.0, zorder=2)
         self.set_display(1.0, "kPa")
         self.apply_theme(theme)
+
+    def show_animation(self, point=None, surface=None) -> None:
+        """Mark the animated step (x, y) and draw the current yield surface (xs, ys); MPa."""
+
+        self._anim_marker.set_data(*(([point[0]], [point[1]]) if point is not None else ([], [])))
+        self._anim_surface.set_data(*(surface if surface is not None else ([], [])))
+        self.draw_idle()
+
+    def animation_data(self):
+        return self._anim_marker.get_data(), self._anim_surface.get_data()
 
     def set_display(self, scale: float, unit: str) -> None:
         """Display factor and unit of the stress axes."""

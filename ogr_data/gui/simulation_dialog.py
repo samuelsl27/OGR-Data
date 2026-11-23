@@ -1,13 +1,15 @@
-"""Define Test Simulations dialog (spec 013), modelled on RSData's (capture 20).
+"""Define Test Simulations dialog (spec 013), modelled on RSData's.
 
-Name, symbol and color; Test Type, Seepage Condition, Loading Direction,
-Maximum Strain, Number of Steps and Cyclic Loading Cycles, plus the
-confining stress of triaxial and biaxial tests (display unit).
+Fields as in RSData 1.009 (capture 20 and the NorSand / Modified Cam Clay
+tutorials): Name, Symbol, Test Type, Seepage Condition, Loading Direction,
+Initial Effective Lateral Stress (display unit), Initial Effective K0,
+Maximum Strain, Number of Steps and Cyclic Loading Cycles. The General Test
+adds the strain direction (OGR design: RSData does not document its inputs).
 """
 
 from __future__ import annotations
 
-from PySide6.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout, QHBoxLayout, QLabel, QSpinBox, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout, QGridLayout, QHBoxLayout, QLabel, QSpinBox, QVBoxLayout, QWidget
 
 from ..core import simulation as sm
 from ..core.project import SYMBOLS
@@ -19,7 +21,7 @@ class TestSimulationsDialog(_ItemsDialog):
 
     def __init__(self, parent, material_name: str, tests: list, unit: str, initial: int = 0) -> None:
         super().__init__(parent, f"Define Test Simulations - {material_name}", tests, unit, initial)
-        self.resize(640, 400)
+        self.resize(680, 460)
 
     def _build_editor(self, layout: QVBoxLayout) -> None:
         form = QFormLayout()
@@ -39,6 +41,10 @@ class TestSimulationsDialog(_ItemsDialog):
         self._confining.setRange(0.0, 1e12)
         self._confining.setDecimals(4)
         self._confining.setSuffix(f" {self._unit}")
+        self._k0 = QDoubleSpinBox()
+        self._k0.setRange(0.01, 100.0)
+        self._k0.setDecimals(4)
+        self._k0.setSingleStep(0.05)
         self._max_strain = QDoubleSpinBox()
         self._max_strain.setRange(1e-6, 1.0)
         self._max_strain.setDecimals(6)
@@ -54,12 +60,26 @@ class TestSimulationsDialog(_ItemsDialog):
         row.setContentsMargins(0, 0, 0, 0)
         row.addWidget(self._cyclic)
         row.addWidget(self._cycles, stretch=1)
+        # General Test: strain direction (proportional strain path)
+        self._ratio_box = QWidget()
+        grid = QGridLayout(self._ratio_box)
+        grid.setContentsMargins(0, 0, 0, 0)
+        self._ratios: list[QDoubleSpinBox] = []
+        for i, name in enumerate(sm.STRAIN_COMPONENTS):
+            spin = QDoubleSpinBox()
+            spin.setRange(-1000.0, 1000.0)
+            spin.setDecimals(4)
+            grid.addWidget(QLabel(name), i // 3 * 2, i % 3)
+            grid.addWidget(spin, i // 3 * 2 + 1, i % 3)
+            self._ratios.append(spin)
         self._test_type.currentIndexChanged.connect(self._config_changed)
         form.addRow("Symbol:", self._symbol)
         form.addRow("Test Type:", self._test_type)
         form.addRow("Seepage Condition:", self._seepage)
         form.addRow("Loading Direction:", self._loading_dir)
-        form.addRow("Confining Stress:", self._confining)
+        form.addRow(f"Initial Effective Lateral Stress ({self._unit}):", self._confining)
+        form.addRow("Initial Effective K0:", self._k0)
+        form.addRow("Strain direction:", self._ratio_box)
         form.addRow("Maximum Strain:", self._max_strain)
         form.addRow("Number of Steps:", self._steps)
         form.addRow(cyclic_row)
@@ -74,17 +94,23 @@ class TestSimulationsDialog(_ItemsDialog):
     def _config_changed(self) -> None:
         test = sm.TestSimulation(test_type=self._test_type.currentData())
         self._form.setRowVisible(self._confining, test.confined)
-        if not test.simulated:
-            self._note.setText(f"{sm.TEST_TYPES[test.test_type]}: RSData's inputs for it are not documented; kept in the project but not simulated.")
-        elif test.test_type == "biaxial":
-            self._note.setText("Biaxial: plane strain (no strain in the second lateral direction).")
-        elif test.test_type == "simple_shear":
-            self._note.setText(
-                "Simple Shear: imposed shear strain (Maximum Strain = gamma), no lateral strains; "
-                "the Confining Stress is the initial (isotropic) and, drained, the constant vertical stress."
-            )
-        else:
-            self._note.setText("")
+        self._form.setRowVisible(self._k0, test.confined)
+        self._form.setRowVisible(self._ratio_box, test.test_type == "general")
+        notes = {
+            "uniaxial": "",
+            "triaxial": "Initial axial stress = lateral stress / K0.",
+            "biaxial": "Biaxial: plane strain (no strain in the second lateral direction); initial axial stress = lateral / K0.",
+            "simple_shear": (
+                "Simple Shear: imposed shear strain (Maximum Strain = gamma), no lateral strains; the initial "
+                "vertical stress (lateral / K0) is kept constant when drained."
+            ),
+            "general": (
+                "General Test (OGR Data; RSData does not document its inputs): proportional strain path in the given "
+                "direction, Maximum Strain on its largest component. Undrained keeps the volume (normal components "
+                "made deviatoric); pore pressure = change of the mean effective stress."
+            ),
+        }
+        self._note.setText(notes[test.test_type])
 
     def _new_item(self, name: str, color: str):
         return sm.TestSimulation(name=name, color=color)
@@ -98,6 +124,9 @@ class TestSimulationsDialog(_ItemsDialog):
         ):
             widget.setCurrentIndex(max(0, widget.findData(value)))
         self._confining.setValue(item.confining * self._kpa_scale)
+        self._k0.setValue(item.k0)
+        for spin, value in zip(self._ratios, item.strain_ratio):
+            spin.setValue(value)
         self._max_strain.setValue(item.max_strain)
         self._steps.setValue(item.steps)
         self._cyclic.setChecked(item.cyclic)
@@ -111,6 +140,8 @@ class TestSimulationsDialog(_ItemsDialog):
         item.seepage = self._seepage.currentData()
         item.loading = self._loading_dir.currentData()
         item.confining = self._confining.value() / self._kpa_scale
+        item.k0 = self._k0.value()
+        item.strain_ratio = tuple(spin.value() for spin in self._ratios)
         item.max_strain = self._max_strain.value()
         item.steps = self._steps.value()
         item.cyclic = self._cyclic.isChecked()
