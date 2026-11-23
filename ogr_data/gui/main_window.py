@@ -37,6 +37,7 @@ from ..core import application
 from ..core import criteria_envelopes as ce
 from ..core import project as projects
 from ..core import samplers
+from ..core import states as st
 from ..core import units
 from ..core.graph_options import PlotOptions
 from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
@@ -250,6 +251,12 @@ class MainWindow(QMainWindow):
         materials_menu.addAction("Rename Material", self._rename_material)
         materials_menu.addAction("Delete Material", self._delete_material)
 
+        # spec 012
+        states_menu = bar.addMenu("Failure States")
+        states_menu.addAction("Define Failure States…", lambda: self._define_failure_states())
+        paths_menu = bar.addMenu("Stress Paths")
+        paths_menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
+
         analysis_menu = bar.addMenu("Analysis")
         self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
         self._mc_sampler_act = QAction("Instantaneous MC Sampler", self, checkable=True)
@@ -288,9 +295,9 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(box)
         self._tree = QTreeWidget()
         self._tree.setHeaderHidden(True)
-        self._tree.setRootIsDecorated(False)
-        self._tree.setMinimumHeight(96)
-        self._tree.setMaximumHeight(130)
+        self._tree.setRootIsDecorated(True)
+        self._tree.setMinimumHeight(110)
+        self._tree.setMaximumHeight(170)
         self._tree.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self._tree.setEditTriggers(
             QAbstractItemView.EditTrigger.DoubleClicked | QAbstractItemView.EditTrigger.EditKeyPressed
@@ -299,6 +306,7 @@ class MainWindow(QMainWindow):
         self._tree.customContextMenuRequested.connect(self._tree_menu)
         self._tree.currentItemChanged.connect(self._tree_current_changed)
         self._tree.itemChanged.connect(self._tree_item_changed)
+        self._tree.itemDoubleClicked.connect(self._tree_double_clicked)
         layout.addWidget(self._tree)
 
         buttons = QHBoxLayout()
@@ -348,6 +356,21 @@ class MainWindow(QMainWindow):
                 item.setIcon(0, self._swatch(self._material_color(material)))
                 item.setToolTip(0, f"{material.name} ({CRITERIA[material.criterion].label})")
                 self._tree.addTopLevelItem(item)
+                # spec 012: failure states and stress paths of the material
+                children = [("state", i, s, st.FAILURE_TEST_TYPES[s.test_type]) for i, s in enumerate(material.failure_states)]
+                children += [("path", i, p, st.PATH_TEST_TYPES[p.test_type]) for i, p in enumerate(material.stress_paths)]
+                for kind, index, obj, test_label in children:
+                    child = QTreeWidgetItem([obj.name])
+                    child.setFlags(
+                        Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+                    )
+                    child.setData(0, Qt.ItemDataRole.UserRole, (kind, index))
+                    child.setCheckState(0, Qt.CheckState.Checked if obj.visible else Qt.CheckState.Unchecked)
+                    child.setIcon(0, self._swatch(obj.color))
+                    noun = "Failure state" if kind == "state" else "Stress path"
+                    child.setToolTip(0, f"{noun}: {obj.name} ({test_label})")
+                    item.addChild(child)
+            self._tree.expandAll()
             self._tree.setCurrentItem(self._tree.topLevelItem(self._current))
         finally:
             self._tree_updating = False
@@ -396,16 +419,30 @@ class MainWindow(QMainWindow):
             self._loading = False
         self.refresh()
 
+    def _tree_material_index(self, item) -> int:
+        """Material index of a tree item (children belong to their material)."""
+
+        parent = item.parent()
+        return self._tree.indexOfTopLevelItem(parent if parent is not None else item)
+
     def _tree_current_changed(self, current, _previous) -> None:
         if self._tree_updating or current is None:
             return
-        index = self._tree.indexOfTopLevelItem(current)
+        index = self._tree_material_index(current)
         if index >= 0 and index != self._current:
             self._store_current()
             self._load_material(index)
 
     def _tree_item_changed(self, item, _column) -> None:
         if self._tree_updating:
+            return
+        if item.parent() is not None:
+            # spec 012: visibility of a failure state / stress path
+            kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
+            material = self._project.materials[self._tree_material_index(item)]
+            objects = material.failure_states if kind == "state" else material.stress_paths
+            objects[sub].visible = item.checkState(0) == Qt.CheckState.Checked
+            self.refresh()
             return
         index = self._tree.indexOfTopLevelItem(item)
         if index < 0:
@@ -493,6 +530,9 @@ class MainWindow(QMainWindow):
         item = self._tree.itemAt(pos)
         if item is not None:
             self._tree.setCurrentItem(item)
+        if item is not None and item.parent() is not None:
+            self._child_menu(item, pos)
+            return
         menu = QMenu(self)
         menu.addAction("Add Material", lambda: self._add_material("material"))
         menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
@@ -511,9 +551,149 @@ class MainWindow(QMainWindow):
                 act.setChecked(symbol == current)
             menu.addAction("Copy material", self._copy_material)
             menu.addSeparator()
+            menu.addAction("Define Failure States…", lambda: self._define_failure_states())
+            menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
+            menu.addSeparator()
             delete = menu.addAction("Delete Material", lambda: self._delete_material())
             delete.setEnabled(len(self._project.materials) > 1)
         menu.exec(self._tree.viewport().mapToGlobal(pos))
+
+    # ------------------------------------- spec 012: failure states and stress paths
+
+    def _child_menu(self, item, pos) -> None:
+        kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
+        menu = QMenu(self)
+        if kind == "state":
+            menu.addAction("Edit Failure State…", lambda: self._define_failure_states(sub))
+        else:
+            menu.addAction("Edit Stress Path…", lambda: self._define_stress_paths(sub))
+        menu.addAction("Delete", lambda: self._delete_child(kind, sub))
+        menu.exec(self._tree.viewport().mapToGlobal(pos))
+
+    def _tree_double_clicked(self, item, _column) -> None:
+        if item.parent() is None:
+            return  # material rows: double click renames in place
+        kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
+        if kind == "state":
+            self._define_failure_states(sub)
+        else:
+            self._define_stress_paths(sub)
+
+    def _delete_child(self, kind: str, index: int) -> None:
+        material = self._current_material()
+        objects = material.failure_states if kind == "state" else material.stress_paths
+        if 0 <= index < len(objects):
+            del objects[index]
+        self._populate_tree()
+        self.refresh()
+
+    def _define_failure_states(self, initial: int = 0) -> None:
+        from .states_dialog import FailureStatesDialog
+
+        material = self._current_material()
+        dialog = FailureStatesDialog(self, material.name, material.failure_states, self._stress_unit, initial)
+        if dialog.exec():
+            self.set_failure_states(dialog.items)
+
+    def _define_stress_paths(self, initial: int = 0) -> None:
+        from .states_dialog import StressPathsDialog
+
+        material = self._current_material()
+        dialog = StressPathsDialog(self, material.name, material.stress_paths, self._stress_unit, initial)
+        if dialog.exec():
+            self.set_stress_paths(dialog.items)
+
+    def set_failure_states(self, failure_states: list) -> None:
+        """Replace the selected material's failure states (dialog OK)."""
+
+        self._current_material().failure_states = list(failure_states)
+        self._populate_tree()
+        self.refresh()
+
+    def set_stress_paths(self, stress_paths: list) -> None:
+        """Replace the selected material's stress paths (dialog OK)."""
+
+        self._current_material().stress_paths = list(stress_paths)
+        self._populate_tree()
+        self.refresh()
+
+    def _draw_test_data(self) -> None:
+        """Failure-state points, Mohr circles and stress paths of visible materials.
+
+        RocData 3.0 guide pp. 13, 47-48: triaxial data as points in principal
+        space and Mohr circles in shear space; direct shear data as points in
+        shear space. Peak points are filled, residual hollow (residual circles
+        dashed); excluded points are drawn faded.
+        """
+
+        principal, shear = [], []
+        multi = len(self._project.materials) > 1
+        for material in self._project.materials:
+            if not material.visible:
+                continue
+            prefix = f"{material.name}: " if multi else ""
+            for state in material.failure_states:
+                if not state.visible:
+                    continue
+                x_name, y_name = state.columns
+                for kind, points, filled in (("peak", state.peak, True), ("residual", state.residual, False)):
+                    label = f"{prefix}{state.name}" + ("" if kind == "peak" else " (residual)")
+                    for excluded in (False, True):
+                        group = [p for p in points if p.exclude == excluded]
+                        if not group:
+                            continue
+                        alpha = 0.35 if excluded else 1.0
+                        x = np.array([p.x for p in group]) / 1000.0  # kPa -> MPa
+                        y = np.array([p.y for p in group]) / 1000.0
+                        tag = f"{label} excluded" if excluded else label
+                        layer = {
+                            "x": x,
+                            "y": y,
+                            "color": state.color,
+                            "marker": state.symbol,
+                            "filled": filled,
+                            "alpha": alpha,
+                            "legend": "" if excluded else label,
+                            "export": (f"{tag} {x_name}", f"{tag} {y_name}"),
+                        }
+                        if state.test_type == "direct_shear":
+                            shear.append(layer)
+                            continue
+                        principal.append(layer)
+                        for sig3, sig1 in zip(x, y):
+                            normal, tau = st.mohr_circle(float(sig3), float(sig1))
+                            shear.append(
+                                {
+                                    "x": normal,
+                                    "y": tau,
+                                    "color": state.color,
+                                    "linestyle": "-" if kind == "peak" else "--",
+                                    "linewidth": 0.9,
+                                    "alpha": alpha,
+                                }
+                            )
+            for path in material.stress_paths:
+                if not path.visible:
+                    continue
+                curve = path.principal_path()
+                if curve is None:
+                    continue
+                label = f"{prefix}{path.name}"
+                principal.append(
+                    {
+                        "x": curve[0] / 1000.0,
+                        "y": curve[1] / 1000.0,
+                        "color": path.color,
+                        "marker": ".",
+                        "linestyle": "-",
+                        "linewidth": 1.4,
+                        "markersize": 5.0,
+                        "legend": label,
+                        "export": (f"{label} sigma3", f"{label} sigma1"),
+                    }
+                )
+        self._principal.set_layers(principal)
+        self._shear.set_layers(shear)
 
     def _draw_other_materials(self) -> None:
         """The other visible materials, in their colors, on both plots."""
@@ -656,6 +836,9 @@ class MainWindow(QMainWindow):
         x_name, y_name = labels["envelope"]
         for name, x, y in canvas.other_series():
             columns.append((f"{name} {x_name}", f"{name} {y_name}", x * scale, y * scale))
+        # spec 012: failure-state points and stress paths
+        for x_col, y_col, x, y in canvas.layer_series():
+            columns.append((x_col, y_col, x * scale, y * scale))
         if not columns:
             QMessageBox.information(self, "Export", "There is no series to export on this plot.")
             return
@@ -1185,6 +1368,7 @@ class MainWindow(QMainWindow):
         for canvas in (self._principal, self._shear):
             canvas.set_primary(material.color, material.visible, material.name)
         self._draw_other_materials()
+        self._draw_test_data()
 
         if crit.envelope == "none":
             self._principal.redraw([], [])

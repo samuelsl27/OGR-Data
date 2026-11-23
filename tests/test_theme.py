@@ -43,7 +43,7 @@ def test_window_theme_switch_offscreen():
     w = MainWindow()
     # menu bar with the suite structure
     titles = [a.text() for a in w.menuBar().actions()]
-    assert titles == ["File", "Edit", "Materials", "Analysis", "View", "Help"]
+    assert titles == ["File", "Edit", "Materials", "Failure States", "Stress Paths", "Analysis", "View", "Help"]
     w._set_theme("dark")
     assert "#2b2b2b" in QApplication.instance().styleSheet()
     assert w._principal.line_color("envelope") == mpl_colors("dark")["envelope"]

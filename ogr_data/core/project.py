@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Mapping, Union
 
 from .models import CRITERIA, defaults
+from .states import FailureState, StressPath
 
 FORMAT_V1 = "ogr-data-project/1"
 FORMAT = "ogr-data-project/2"
@@ -33,8 +34,8 @@ DEFAULT_CRITERION = next(iter(CRITERIA))
 # Set" (rock) and "Material Model + Test, Stress Path" (soil); the criterion
 # each one starts with is an OGR Data choice: the rock-mass criterion of
 # reference (Generalized Hoek-Brown) and the soil one (Mohr-Coulomb), with
-# the registry defaults captured from RSData. The failure-state / stress-path
-# parts of the templates come with spec 012.
+# the registry defaults captured from RSData. Spec 012: the rock template
+# also brings an (empty) failure state and the soil one a stress path.
 TEMPLATES: dict[str, tuple[str, str]] = {
     "material": ("Material", DEFAULT_CRITERION),
     "rock": ("Rock", "generalized_hoek_brown"),
@@ -93,6 +94,8 @@ class Material:
     color: str = ""  # "" = theme envelope color
     symbol: str = "o"
     visible: bool = True
+    failure_states: list[FailureState] = field(default_factory=list)  # spec 012
+    stress_paths: list[StressPath] = field(default_factory=list)  # spec 012
 
     def __post_init__(self) -> None:
         if self.criterion not in CRITERIA:
@@ -107,7 +110,12 @@ class Material:
         if template not in TEMPLATES:
             raise ValueError(f"unknown material template {template!r}")
         label, criterion = TEMPLATES[template]
-        return cls(name=name or label, criterion=criterion, parameters=defaults(criterion), color=color)
+        material = cls(name=name or label, criterion=criterion, parameters=defaults(criterion), color=color)
+        if template == "rock":
+            material.failure_states.append(FailureState())
+        elif template == "soil":
+            material.stress_paths.append(StressPath())
+        return material
 
     def copy(self) -> "Material":
         return Material.from_dict(self.to_dict())
@@ -122,6 +130,8 @@ class Material:
             "color": self.color,
             "symbol": self.symbol,
             "visible": self.visible,
+            "failure_states": [s.to_dict() for s in self.failure_states],
+            "stress_paths": [p.to_dict() for p in self.stress_paths],
         }
 
     @classmethod
@@ -138,6 +148,8 @@ class Material:
             color=str(data.get("color", "")),
             symbol=str(data.get("symbol", "o")),
             visible=bool(data.get("visible", True)),
+            failure_states=[FailureState.from_dict(s) for s in data.get("failure_states", [])],
+            stress_paths=[StressPath.from_dict(p) for p in data.get("stress_paths", [])],
         )
 
 

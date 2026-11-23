@@ -34,6 +34,7 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self.primary_label = ""
         self._primary_visible = True
         self._others: list = []  # Line2D of the other materials
+        self._layers: list = []  # spec 012: test points, Mohr circles, stress paths
         # spec 017: data stay in internal MPa; ticks show the display unit
         self.display_scale = 1.0
         self.figure = Figure(figsize=(4.0, 4.0), tight_layout=True)
@@ -194,6 +195,49 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self._apply_style()
         self._rescale()
 
+    def set_layers(self, layers) -> None:
+        """Draw data layers (spec 012) above the envelopes.
+
+        Each layer is a dict: x, y (MPa), color, and optionally marker,
+        linestyle ("None" for points), linewidth, filled (marker face),
+        alpha, legend (legend label) and export ((x, y) CSV column names).
+        """
+
+        for line in self._layers:
+            line.remove()
+        self._layers = []
+        for layer in layers:
+            color = layer["color"]
+            (line,) = self.axes.plot(
+                layer["x"],
+                layer["y"],
+                color=color,
+                marker=layer.get("marker") or "None",
+                linestyle=layer.get("linestyle", "None"),
+                linewidth=layer.get("linewidth", 1.0),
+                markersize=layer.get("markersize", 6.0),
+                markerfacecolor=color if layer.get("filled", True) else "none",
+                markeredgecolor=color,
+                alpha=layer.get("alpha", 1.0),
+                zorder=3,
+            )
+            line.ogr_legend = layer.get("legend", "")
+            line.ogr_export = layer.get("export")
+            self._layers.append(line)
+        self._update_legend()
+        self._rescale()
+
+    def layer_series(self) -> list[tuple[str, str, np.ndarray, np.ndarray]]:
+        """(x column, y column, x, y) of the exportable data layers (spec 012)."""
+
+        out = []
+        for line in self._layers:
+            if line.ogr_export:
+                x, y = line.get_data()
+                x_name, y_name = line.ogr_export
+                out.append((x_name, y_name, np.asarray(x, dtype=float), np.asarray(y, dtype=float)))
+        return out
+
     def _update_legend(self) -> None:
         """Legend of material names when more than one material is drawn."""
 
@@ -204,6 +248,7 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         if self._primary_visible and self.options.styles["envelope"].visible and len(self._line.get_xdata()):
             handles.append((self._line, self.primary_label or "Material"))
         handles += [(line, line.ogr_label) for line in self._others]
+        handles += [(line, line.ogr_legend) for line in getattr(self, "_layers", []) if line.ogr_legend]
         if len(handles) < 2:
             return
         colors = mpl_colors(self._theme)

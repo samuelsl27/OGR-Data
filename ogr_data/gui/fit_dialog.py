@@ -157,16 +157,10 @@ class FitDialog(QDialog):
     def _paste(self) -> None:
         from PySide6.QtWidgets import QApplication
 
-        text = QApplication.clipboard().text()
-        rows = [r for r in text.replace("\r", "").split("\n") if r.strip()]
-        data = []
-        for r in rows:
-            cells = r.split("\t") if "\t" in r else r.split()
-            if len(cells) >= 2:
-                try:
-                    data.append((float(cells[0]), float(cells[1])))
-                except ValueError:
-                    continue
+        from ..core.states import parse_rows
+
+        # same parser as the failure-state tables (spec 012)
+        data = parse_rows(QApplication.clipboard().text(), 2)
         self._table.setRowCount(len(data))
         for i, (a, b) in enumerate(data):
             self._table.setItem(i, 0, QTableWidgetItem(repr(a)))

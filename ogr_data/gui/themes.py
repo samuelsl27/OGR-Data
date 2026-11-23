@@ -58,14 +58,14 @@ QTreeView, QListView, QTableView {
     selection-color: #000000;
     gridline-color: #dedede;
 }
-QTreeView::indicator, QListView::indicator {
+QTreeView::indicator, QListView::indicator, QTableView::indicator {
     width: 11px;
     height: 11px;
     border: 1px solid #b0b0b0;
     border-radius: 2px;
     background-color: #ffffff;
 }
-QTreeView::indicator:checked, QListView::indicator:checked {
+QTreeView::indicator:checked, QListView::indicator:checked, QTableView::indicator:checked {
     background-color: #4a90d9;
     border-color: #4a90d9;
 }
@@ -183,14 +183,14 @@ QTreeView, QListView, QTableView {
     selection-color: #ffffff;
     gridline-color: #505050;
 }
-QTreeView::indicator, QListView::indicator {
+QTreeView::indicator, QListView::indicator, QTableView::indicator {
     width: 11px;
     height: 11px;
     border: 1px solid #555;
     border-radius: 2px;
     background-color: #353535;
 }
-QTreeView::indicator:checked, QListView::indicator:checked {
+QTreeView::indicator:checked, QListView::indicator:checked, QTableView::indicator:checked {
     background-color: #6aa3d5;
     border-color: #6aa3d5;
 }
