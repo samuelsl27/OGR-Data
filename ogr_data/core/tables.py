@@ -59,3 +59,21 @@ def disturbance_factor() -> dict[str, Any]:
     """Practical Rock Engineering (2023) Fig. 9: disturbance factor D (spec 022)."""
 
     return _load("disturbance_factor.json")
+
+
+def basic_friction_angle() -> dict[str, Any]:
+    """FHWA-TS-89-045 (1989) p. 5.18: basic friction angles, after Barton (spec 018)."""
+
+    return _load("basic_friction_angle.json")
+
+
+def soil_field_strength() -> dict[str, Any]:
+    """FHWA-TS-89-045 (1989) Table II: soil grades S1-S5 (spec 018)."""
+
+    return _load("soil_field_strength.json")
+
+
+def uscs_compacted_properties() -> dict[str, Any]:
+    """UFC 3-220-01N (2005) Table 8-3.1: typical properties of compacted soils (spec 018)."""
+
+    return _load("uscs_compacted_properties.json")

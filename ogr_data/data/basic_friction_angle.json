@@ -1,0 +1,76 @@
+{
+  "source": "FHWA-TS-89-045 (1989), Rock Slopes: Design, Excavation, Stabilization. U.S. Department of Transportation, Federal Highway Administration, Turner-Fairbank Highway Research Center (public domain). PDF: Referencias/Bibliografia/Rocas/FHWA-TS-89-045_Rock-Slopes_Design-Excavation-Stabilization_1989.pdf (National Transportation Library, ROSA P dot:42214). Page 5.18, margin table 'Approximate values for the basic friction angle phi for different rocks', after Barton (ref. 82 of the report).",
+  "note": "Lower value is generally given by tests on wet rock surfaces (as printed). Single values have no dry/wet split.",
+  "values": [
+    {
+      "rock": "Amphibolite",
+      "phi_lo": 32,
+      "phi_hi": 32
+    },
+    {
+      "rock": "Basalt",
+      "phi_lo": 31,
+      "phi_hi": 36
+    },
+    {
+      "rock": "Conglomerate",
+      "phi_lo": 35,
+      "phi_hi": 35
+    },
+    {
+      "rock": "Chalk",
+      "phi_lo": 30,
+      "phi_hi": 30
+    },
+    {
+      "rock": "Dolomite",
+      "phi_lo": 27,
+      "phi_hi": 31
+    },
+    {
+      "rock": "Gneiss (schistose)",
+      "phi_lo": 23,
+      "phi_hi": 29
+    },
+    {
+      "rock": "Granite (fine grain)",
+      "phi_lo": 29,
+      "phi_hi": 35
+    },
+    {
+      "rock": "Granite (coarse grain)",
+      "phi_lo": 31,
+      "phi_hi": 35
+    },
+    {
+      "rock": "Limestone",
+      "phi_lo": 33,
+      "phi_hi": 40
+    },
+    {
+      "rock": "Porphyry",
+      "phi_lo": 31,
+      "phi_hi": 31
+    },
+    {
+      "rock": "Sandstone",
+      "phi_lo": 25,
+      "phi_hi": 35
+    },
+    {
+      "rock": "Shale",
+      "phi_lo": 27,
+      "phi_hi": 27
+    },
+    {
+      "rock": "Siltstone",
+      "phi_lo": 27,
+      "phi_hi": 31
+    },
+    {
+      "rock": "Slate",
+      "phi_lo": 25,
+      "phi_hi": 30
+    }
+  ]
+}

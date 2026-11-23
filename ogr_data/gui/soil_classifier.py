@@ -52,8 +52,10 @@ class _PlasticityCanvas(FigureCanvasQTAgg):
 
 
 class SoilClassifierDialog(QDialog):
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent=None, on_create=None) -> None:
         super().__init__(parent)
+        self.on_create = on_create  # callback(symbol, {"peak_cohesion", "peak_friction"})
+        self.symbol = ""
         self.setWindowTitle("Soil classifier — USCS (NRCS criteria)")
         self.resize(980, 560)
 
@@ -100,6 +102,14 @@ class SoilClassifierDialog(QDialog):
         right.addWidget(QLabel("Engineering properties (NRCS NEH 631, figure 3-22)"))
         right.addWidget(self._card, stretch=1)
         right.addWidget(QLabel("Source: " + uscs.uscs_properties_source()))
+        # spec 018: numeric typical strength of the compacted soil (UFC 3-220-01N)
+        right.addWidget(QLabel("Typical strength, compacted (UFC 3-220-01N Table 8-3.1, USBR data)"))
+        self._numeric = QLabel()
+        self._numeric.setWordWrap(True)
+        right.addWidget(self._numeric)
+        self._create = QPushButton("Create Mohr-Coulomb material (c' saturated, phi')")
+        self._create.clicked.connect(self.create_material)
+        right.addWidget(self._create)
 
         self._chart = _PlasticityCanvas()
 
@@ -118,24 +128,30 @@ class SoilClassifierDialog(QDialog):
         self._update()
 
     def _update(self) -> None:
-        inp = uscs.UsCSInput(
-            fines_pct=self._fields["fines_pct"].value(),
-            sand_pct=self._fields["sand_pct"].value(),
-            cu=self._fields["cu"].value() or None,
-            cc=self._fields["cc"].value() or None,
-            ll=self._fields["ll"].value() or None,
-            pi=self._fields["pi"].value() or None,
-            organic_ratio=self._fields["organic_ratio"].value(),
-            highly_organic=self._highly_organic.isChecked(),
-        )
-        self._chart.set_point(inp.ll, inp.pi)
+        ll = self._fields["ll"].value() or None
+        pi = self._fields["pi"].value() or None
+        self._chart.set_point(ll, pi)
         try:
+            inp = uscs.UsCSInput(
+                fines_pct=self._fields["fines_pct"].value(),
+                sand_pct=self._fields["sand_pct"].value(),
+                cu=self._fields["cu"].value() or None,
+                cc=self._fields["cc"].value() or None,
+                ll=ll,
+                pi=pi,
+                organic_ratio=self._fields["organic_ratio"].value(),
+                highly_organic=self._highly_organic.isChecked(),
+            )
             result = uscs.classify(inp)
         except ValueError as exc:
             self._symbol.setText("—")
             self._card.setPlainText(str(exc))
+            self.symbol = ""
+            self._show_numeric()
             return
         self._symbol.setText(result.symbol)
+        self.symbol = result.symbol
+        self._show_numeric()
         card = uscs.uscs_properties(result.symbol)
         text = (
             f"Typical names: {card['typical_names']}\n\n"
@@ -147,3 +163,34 @@ class SoilClassifierDialog(QDialog):
         if result.notes:
             text += "\nNotes:\n" + "\n".join(f"- {n}" for n in result.notes)
         self._card.setPlainText(text)
+
+    # ------------------------------------------------------------ spec 018
+
+    def numeric_parameters(self) -> dict | None:
+        from ..core import barton
+
+        try:
+            return barton.mohr_coulomb_from_symbol(self.symbol) if self.symbol else None
+        except ValueError:
+            return None
+
+    def _show_numeric(self) -> None:
+        from ..core import barton
+
+        row = barton.compacted_properties(self.symbol) if self.symbol else None
+        if row is None:
+            self._numeric.setText(f"{self.symbol or 'No class'}: not listed in UFC 3-220-01N Table 8-3.1 (no numeric values).")
+        else:
+            c_comp, c_sat = row["cohesion_compacted_kpa"], row["cohesion_saturated_kpa"]
+            fmt = lambda v: "-----" if v is None else f"{v:g} kPa"
+            self._numeric.setText(
+                f"{row['symbol']}: c' as compacted {fmt(c_comp)}, c' saturated {fmt(c_sat)}, "
+                f"phi' {row['phi_effective'] or '-----'} deg (effective envelope); max dry unit weight "
+                f"{row['max_dry_unit_weight']} g/cm3 (pcf). '>' = greater than the value shown."
+            )
+        self._create.setEnabled(self.numeric_parameters() is not None and self.on_create is not None)
+
+    def create_material(self) -> None:
+        params = self.numeric_parameters()
+        if params is not None and self.on_create is not None:
+            self.on_create(self.symbol, params)

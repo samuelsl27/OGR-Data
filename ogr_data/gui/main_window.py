@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QColorDialog,
     QComboBox,
+    QDialog,
     QDoubleSpinBox,
     QFormLayout,
     QGridLayout,
@@ -1027,7 +1028,26 @@ class MainWindow(QMainWindow):
     def _open_classifier(self) -> None:
         from .soil_classifier import SoilClassifierDialog
 
-        SoilClassifierDialog(self).exec()
+        SoilClassifierDialog(self, on_create=self.add_soil_material).exec()
+
+    def add_soil_material(self, symbol: str, parameters: dict) -> int:
+        """New Mohr-Coulomb material from a USCS group (spec 018, UFC 3-220-01N)."""
+
+        params = defaults("mohr_coulomb")
+        params.update(parameters)
+        params["residual_cohesion"] = params["peak_cohesion"]
+        params["residual_friction"] = params["peak_friction"]
+        material = projects.Material(
+            name=f"{symbol} (typical compacted, UFC 3-220-01N)",
+            criterion="mohr_coulomb",
+            parameters=params,
+            sig3max_mpa=self._current_material().sig3max_mpa,
+        )
+        self._store_current()
+        index = self._project.append(material)
+        self._load_material(index)
+        self._populate_tree()
+        return index
 
     def _open_fit_dialog(self) -> None:
         from .fit_dialog import FitDialog
@@ -1310,16 +1330,43 @@ class MainWindow(QMainWindow):
             params = self._params()
             sigci = params.get("sigci", params.get("compressive_strength", 0.0))
             return estimation.modulus_ratio_picker(float(sigci), self._stress_unit, self)
+        # spec 018
+        dialogs = {
+            "barton_phi": lambda: estimation.PhiRDialog(self),
+            "barton_jrc": lambda: estimation.JrcDialog(float(self._params().get("jrc", 10.0)), self),
+            "barton_jcs": lambda: estimation.JcsDialog(float(self._params().get("jrc", 10.0)), self._stress_unit, self),
+            "compacted_soil": lambda: estimation.CompactedSoilDialog("", self),
+        }
+        if key in dialogs:
+            dialog = dialogs[key]()
+            if dialog.exec() != QDialog.DialogCode.Accepted:
+                return None
+            try:
+                return dialog.value()
+            except ValueError as exc:
+                QMessageBox.warning(self, "Pick", str(exc))
+                return None
         return None
 
     def _pick(self, field, widget: QDoubleSpinBox) -> None:
         """One-click selectors (spec 022); stresses come in kPa, shown in the display unit."""
 
         value = self.pick_value(field.pick)
-        if value is not None:
+        if isinstance(value, dict):  # several fields at once (e.g. c and phi of a soil)
+            self.set_form_values(value)
+        elif value is not None:
             if field.unit == "kPa":
                 value *= self._kpa_scale()
             widget.setValue(value)
+
+    def set_form_values(self, values: dict) -> None:
+        """Set form fields from registry values (kPa for stresses)."""
+
+        units_by_key = {f.key: f.unit for f in self._criterion().fields}
+        for key, value in values.items():
+            widget = self._widgets.get(key)
+            if isinstance(widget, QDoubleSpinBox):
+                widget.setValue(float(value) * (self._kpa_scale() if units_by_key.get(key) == "kPa" else 1.0))
 
     def _params(self) -> dict:
         params = defaults(self._criterion_combo.currentData())

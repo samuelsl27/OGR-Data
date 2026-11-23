@@ -26,8 +26,13 @@ inventar datos):
 
 - Cada tabla nueva lleva cita de fuente y test de spot-check contra el
   documento original.
-- El pick de D devuelve valores dentro de [0, 1] con la descripción del
-  nivel de alteración.
+- El clasificador USCS propone c y φ numéricos de la fuente y crea el
+  material (los grupos sin datos en la fuente lo dicen y no inventan).
+- (El criterio del pick de D pasó a la spec 022.)
+
+Estado: **hecha** (ver `plan.md`). Fuentes: FHWA-TS-89-045, UFC
+3-220-01N (en lugar de NAVFAC DM 7.1, del que es heredera) y Hoek PRE
+2023. Perfiles de JRC sin fuente libre: pendientes.
 
 ## Dependencias
 

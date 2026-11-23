@@ -472,3 +472,206 @@ class ModulusRatioDialog(FilteredTableDialog):
 def modulus_ratio_picker(sigci_kpa: float, unit: str = "kPa", parent=None) -> float | None:
     dlg = ModulusRatioDialog(sigci_kpa, unit, parent)
     return dlg.value() if dlg.exec() == QDialog.DialogCode.Accepted else None
+
+
+# ------------------------------------------------- spec 018: Barton-Bandis and soils
+
+
+class PhiRDialog(FilteredTableDialog):
+    """phi r: basic friction angle (FHWA 1989, after Barton) with the Schmidt correction (eq. 5)."""
+
+    def __init__(self, parent=None) -> None:
+        extra = QWidget()
+        form = QFormLayout(extra)
+        self.surface = QComboBox()
+        self.surface.addItems(["Dry surfaces (upper value)", "Wet surfaces (lower value)"])
+        self.phi_b = _spin(0.0, 60.0, 30.0, decimals=1)
+        self.schmidt = QComboBox()
+        self.schmidt.addItems(["phi r = phi b (fresh joint walls)", "Weathered walls: phi r = (phi b - 20) + 20 r/R (eq. 5)"])
+        self.r = _spin(0.0, 100.0, 30.0, decimals=1)
+        self.big_r = _spin(0.1, 100.0, 40.0, decimals=1)
+        self.result = QLabel()
+        form.addRow("Surface condition", self.surface)
+        form.addRow("phi b (deg)", self.phi_b)
+        form.addRow("Residual angle", self.schmidt)
+        form.addRow("r: rebound on wet weathered joint", self.r)
+        form.addRow("R: rebound on dry unweathered sawn surface", self.big_r)
+        form.addRow("phi r", self.result)
+        self._form = form
+        data = tables.basic_friction_angle()
+        rows = [{**v, "phi b (deg)": f'{v["phi_lo"]:g}' if v["phi_lo"] == v["phi_hi"] else f'{v["phi_lo"]:g}-{v["phi_hi"]:g}'} for v in data["values"]]
+        super().__init__(
+            "Pick phi r — basic friction angle (FHWA 1989, after Barton)",
+            ["rock", "phi b (deg)"], rows, "phi_hi", [], f'{data["source"]} {data["note"]} Eq. 5: Hoek, Practical Rock Engineering 2023.',
+            parent, extra,
+        )
+        self.table.currentCellChanged.connect(lambda *_: self._row_changed())
+        for widget in (self.surface, self.schmidt):
+            widget.currentIndexChanged.connect(lambda _=0: self._row_changed())
+        for widget in (self.phi_b, self.r, self.big_r):
+            widget.valueChanged.connect(lambda _=0: self._update())
+        self._update()
+
+    def _row_changed(self) -> None:
+        row = self.selected()
+        if row is not None:
+            self.phi_b.setValue(float(row["phi_lo"] if self.surface.currentIndex() == 1 else row["phi_hi"]))
+        self._update()
+
+    def phi_r(self) -> float:
+        from ..core import barton
+
+        if self.schmidt.currentIndex() == 1:
+            return barton.phi_r_from_schmidt(self.phi_b.value(), self.r.value(), self.big_r.value())
+        return self.phi_b.value()
+
+    def _update(self) -> None:
+        weathered = self.schmidt.currentIndex() == 1
+        self._form.setRowVisible(self.r, weathered)
+        self._form.setRowVisible(self.big_r, weathered)
+        self.result.setText(f"{self.phi_r():.2f} deg")
+
+    def value(self) -> float | None:
+        return self.phi_r()
+
+
+class JrcDialog(QDialog):
+    """JRC with the Barton and Bandis (1982) scale correction (eq. 6)."""
+
+    def __init__(self, jrc0: float = 10.0, parent=None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("Pick JRC — joint roughness coefficient")
+        form = QFormLayout()
+        self.jrc0 = _spin(0.0, 20.0, jrc0, decimals=2)
+        self.lab = _spin(0.001, 100.0, 0.1, decimals=3, step=0.01)
+        self.length = _spin(0.001, 1000.0, 1.0, decimals=3, step=0.1)
+        self.result = QLabel()
+        form.addRow("JRC0 at laboratory scale (visual comparison with the profiles of Barton and Choubey 1977)", self.jrc0)
+        form.addRow("L0, laboratory length (m)", self.lab)
+        form.addRow("Ln, in-situ block size (m)", self.length)
+        form.addRow("JRCn = JRC0 (Ln/L0)^(-0.02 JRC0)", self.result)
+        for spin in (self.jrc0, self.lab, self.length):
+            spin.valueChanged.connect(lambda _=0: self._update())
+        note = QLabel(
+            "Source: Hoek, Practical Rock Engineering 2023 (eq. 6, Barton and Bandis 1982). The standard roughness "
+            "profiles (Barton and Choubey 1977, Figure 5 of that chapter) are a copyrighted figure and are not "
+            "reproduced: compare the joint with the figure in the book."
+        )
+        note.setWordWrap(True)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout = QVBoxLayout(self)
+        layout.addLayout(form)
+        layout.addWidget(note)
+        layout.addWidget(buttons)
+        self._update()
+
+    def value(self) -> float:
+        from ..core import barton
+
+        return barton.jrc_scaled(self.jrc0.value(), self.length.value(), self.lab.value())
+
+    def _update(self) -> None:
+        self.result.setText(f"{self.value():.3f}")
+
+
+class JcsDialog(FilteredTableDialog):
+    """JCS: field estimates for rocks (Hoek Table 2) and soils (FHWA Table II), scale correction (eq. 7)."""
+
+    def __init__(self, jrc0: float = 10.0, unit: str = "kPa", parent=None) -> None:
+        from ..core import units
+
+        self._kpa_scale = units.stress_factor(unit) / 1000.0
+        self._unit = unit
+        extra = QWidget()
+        form = QFormLayout(extra)
+        self.jcs0 = _spin(0.0, 1e12, 100000.0 * self._kpa_scale, decimals=4)
+        self.jcs0.setSuffix(f" {unit}")
+        self.jrc0 = _spin(0.0, 20.0, jrc0, decimals=2)
+        self.lab = _spin(0.001, 100.0, 0.1, decimals=3, step=0.01)
+        self.length = _spin(0.001, 1000.0, 0.1, decimals=3, step=0.1)
+        self.result = QLabel()
+        form.addRow("JCS0 (laboratory scale)", self.jcs0)
+        form.addRow("JRC0", self.jrc0)
+        form.addRow("L0 (m)", self.lab)
+        form.addRow("Ln, in-situ block size (m)", self.length)
+        form.addRow("JCSn = JCS0 (Ln/L0)^(-0.03 JRC0)", self.result)
+        rocks = tables.rock_strength_grades()
+        soils = tables.soil_field_strength()
+        rows = []
+        for g in rocks["grades"]:
+            hi = g["ucs_hi_mpa"]
+            rows.append({"material": "Rock", "grade": g["grade"], "term": g["term"], "UCS (MPa)": f'{g["ucs_lo_mpa"]:g}-{hi:g}' if hi else f'>{g["ucs_lo_mpa"]:g}',
+                         "description": g["field_estimate"], "pick_kpa": g["ucs_pick_mpa"] * 1000.0})
+        for g in soils["grades"]:
+            lo = g["ucs_lo_mpa"]
+            rows.append({"material": "Soil", "grade": g["grade"], "term": g["term"], "UCS (MPa)": f'{lo:g}-{g["ucs_hi_mpa"]:g}' if lo is not None else f'<{g["ucs_hi_mpa"]:g}',
+                         "description": g["description"], "pick_kpa": g["ucs_pick_mpa"] * 1000.0})
+        super().__init__(
+            "Pick JCS — joint wall compressive strength",
+            ["material", "grade", "term", "UCS (MPa)", "description"], rows, "pick_kpa", ["material"],
+            f'Rocks: {rocks["source"]} Soils: {soils["source"]} Scale correction: Hoek, Practical Rock Engineering 2023, eq. 7 '
+            "(Barton and Bandis 1982). Weathering can reduce the joint wall strength to as low as one quarter of the intact UCS (FHWA 1989, p. 5.18, after Barton).",
+            parent, extra,
+        )
+        self.table.currentCellChanged.connect(lambda *_: self._row_changed())
+        for spin in (self.jcs0, self.jrc0, self.lab, self.length):
+            spin.valueChanged.connect(lambda _=0: self._update())
+        self._update()
+
+    def _row_changed(self) -> None:
+        row = self.selected()
+        if row is not None:
+            self.jcs0.setValue(row["pick_kpa"] * self._kpa_scale)
+
+    def value(self) -> float:  # kPa
+        from ..core import barton
+
+        return barton.jcs_scaled(self.jcs0.value() / self._kpa_scale, self.jrc0.value(), self.length.value(), self.lab.value())
+
+    def _update(self) -> None:
+        self.result.setText(f"{self.value() * self._kpa_scale:.4g} {self._unit}")
+
+
+class CompactedSoilDialog(FilteredTableDialog):
+    """Typical c' and phi' of compacted soils by USCS group (UFC 3-220-01N Table 8-3.1)."""
+
+    def __init__(self, symbol: str = "", parent=None) -> None:
+        extra = QWidget()
+        form = QFormLayout(extra)
+        self.cohesion = QComboBox()
+        self.cohesion.addItems(["Cohesion (saturated)", "Cohesion (as compacted)"])
+        form.addRow("Cohesion to use", self.cohesion)
+        data = tables.uscs_compacted_properties()
+        rows = []
+        for v in data["values"]:
+            rows.append({
+                **v,
+                "c' compacted (kPa)": "-----" if v["cohesion_compacted_kpa"] is None else f'{v["cohesion_compacted_kpa"]:g}',
+                "c' saturated (kPa)": "-----" if v["cohesion_saturated_kpa"] is None else f'{v["cohesion_saturated_kpa"]:g}',
+                "phi' (deg)": v["phi_effective"] or "-----",
+                "dry unit weight g/cm3 (pcf)": v["max_dry_unit_weight"],
+            })
+        super().__init__(
+            "Pick c and phi — typical properties of compacted soils (UFC 3-220-01N)",
+            ["symbol", "soil_type", "c' compacted (kPa)", "c' saturated (kPa)", "phi' (deg)", "dry unit weight g/cm3 (pcf)", "note"],
+            rows, "symbol", [], f'{data["source"]} {data["legend"]} {data["missing"]}', parent, extra,
+        )
+        if symbol:
+            from ..core import barton
+
+            row = barton.compacted_properties(symbol)
+            if row is not None:
+                self.table.setCurrentCell([r["symbol"] for r in rows].index(row["symbol"]), 0)
+
+    def parameters(self) -> dict | None:
+        from ..core import barton
+
+        row = self.selected()
+        if row is None:
+            return None
+        return barton.mohr_coulomb_from_symbol(row["symbol"], saturated=self.cohesion.currentIndex() == 0)
+
+    def value(self) -> dict | None:
+        return self.parameters()

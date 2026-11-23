@@ -1,0 +1,46 @@
+{
+  "source": "FHWA-TS-89-045 (1989), Rock Slopes: Design, Excavation, Stabilization. U.S. Department of Transportation, Federal Highway Administration, Turner-Fairbank Highway Research Center (public domain). PDF: Referencias/Bibliografia/Rocas/FHWA-TS-89-045_Rock-Slopes_Design-Excavation-Stabilization_1989.pdf (National Transportation Library, ROSA P dot:42214). Page 5.17, Table II 'Approximate classification of cohesive soil and rock' (soil grades S1-S5; based on Deere and Miller, Piteau, Robertson and consulting experience).",
+  "note": "Uniaxial compressive strength ranges as printed (lb/in2, kg/cm2, MPa). Pick value: midpoint of the MPa range; open-ended S1 uses its upper bound.",
+  "grades": [
+    {
+      "grade": "S1",
+      "term": "Very soft soil",
+      "description": "Easily moulded with fingers, shows distinct heel marks.",
+      "ucs_lo_mpa": null,
+      "ucs_hi_mpa": 0.04,
+      "ucs_pick_mpa": 0.04
+    },
+    {
+      "grade": "S2",
+      "term": "Soft soil",
+      "description": "Moulds with strong pressure from fingers, shows faint heel marks.",
+      "ucs_lo_mpa": 0.04,
+      "ucs_hi_mpa": 0.08,
+      "ucs_pick_mpa": 0.06
+    },
+    {
+      "grade": "S3",
+      "term": "Firm soil",
+      "description": "Very difficult to mould with fingers, indented with finger nail, difficult to cut with hand spade.",
+      "ucs_lo_mpa": 0.08,
+      "ucs_hi_mpa": 0.15,
+      "ucs_pick_mpa": 0.115
+    },
+    {
+      "grade": "S4",
+      "term": "Stiff soil",
+      "description": "Cannot be moulded with fingers, cannot be cut with hand spade, requires hand picking for excavation.",
+      "ucs_lo_mpa": 0.15,
+      "ucs_hi_mpa": 0.6,
+      "ucs_pick_mpa": 0.375
+    },
+    {
+      "grade": "S5",
+      "term": "Very stiff soil",
+      "description": "Very tough, difficult to move with hand pick, pneumatic spade required for excavation.",
+      "ucs_lo_mpa": 0.6,
+      "ucs_hi_mpa": 1.0,
+      "ucs_pick_mpa": 0.8
+    }
+  ]
+}

@@ -16,8 +16,11 @@ método de Erm; pendientes las cartas de flysch/heterogénea).
 Barton-Bandis, lab o macizo, LR/LM/Simplex, error absoluto/relativo;
 contrastada con RSData) y **010 — Base de datos de materiales** (estilo
 RocProp, 150 registros con fuente: tablas de Hoek, CANMET 1995 y MnDOT
-2018; favoritos, CSV, PDF, probetas → estado de fallo). Siguiente del orden propuesto:
-**018** (pick dialogs avanzados: Barton y c/φ numéricos).
+2018; favoritos, CSV, PDF, probetas → estado de fallo) y **018 — Pick
+dialogs avanzados** (φr, JRC y JCS de Barton-Bandis con corrección de
+escala; c/φ numéricos por grupo USCS de UFC 3-220-01N, y el clasificador
+crea el material; perfiles de JRC pendientes por copyright). Siguiente
+del orden propuesto: **015** (informes).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad
