@@ -27,12 +27,13 @@ from ..core import calibration as cal
 from ..core import fitting
 from ..core import units
 from ..core.models import CRITERIA
+from .i18n import tr
 
 
 class CalibrationDialog(QDialog):
     def __init__(self, parent, project, current: int, unit: str) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Calibration")
+        self.setWindowTitle(tr("Calibration"))
         self.resize(560, 720)
         self._project = project
         self._unit = unit
@@ -42,50 +43,55 @@ class CalibrationDialog(QDialog):
 
         layout = QVBoxLayout(self)
         top = QFormLayout()
-        top.addRow("Material Model:", QLabel(f"{source.name} ({CRITERIA[source.criterion].label})"))
+        criterion = tr(CRITERIA[source.criterion].label)  # i18n: registry
+        top.addRow(tr("Material Model:"), QLabel(f"{source.name} ({criterion})"))
         layout.addLayout(top)
 
-        new_box = QGroupBox("New Model Settings")
+        new_box = QGroupBox(tr("New Model Settings"))
         new_form = QFormLayout(new_box)
         self.name = QLineEdit(project.unique_name("Calibrated Material"))
         self.strength = QComboBox()
         for key, label in cal.STRENGTH_TYPES.items():
-            self.strength.addItem(label, key)
+            self.strength.addItem(tr(label), key)  # i18n: registry
         self.strength.setCurrentIndex(self.strength.findData("generalized_hoek_brown"))  # RSData default
-        new_form.addRow("Material:", self.name)
-        new_form.addRow("Strength type:", self.strength)
+        new_form.addRow("Material:", self.name)  # i18n: ignore
+        new_form.addRow(tr("Strength type:"), self.strength)
         layout.addWidget(new_box)
 
-        fit_box = QGroupBox("Curve Fit Analysis")
+        fit_box = QGroupBox(tr("Curve Fit Analysis"))
         fit_form = QFormLayout(fit_box)
         self.algorithm = QComboBox()
         for key, label in cal.ALGORITHMS.items():
-            self.algorithm.addItem(label, key)
+            self.algorithm.addItem(tr(label), key)  # i18n: registry
         self.algorithm.setCurrentIndex(self.algorithm.findData(fitting.LEVENBERG_MARQUARDT))
         self.summation = QComboBox()
-        self.summation.addItem("Vertical")  # the only summation documented (RocData manual)
+        self.summation.addItem("Vertical")  # i18n: ignore -- the only summation documented (RocData manual)
         self.error_type = QComboBox()
-        self.error_type.addItems(list(cal.ERROR_TYPES))
-        fit_form.addRow("Algorithm:", self.algorithm)
-        fit_form.addRow("Error Summation:", self.summation)
-        fit_form.addRow("Error Type:", self.error_type)
+        for value in cal.ERROR_TYPES:
+            self.error_type.addItem(tr(value), value)  # i18n: registry
+        fit_form.addRow(tr("Algorithm:"), self.algorithm)
+        fit_form.addRow(tr("Error Summation:"), self.summation)
+        fit_form.addRow(tr("Error Type:"), self.error_type)
         layout.addWidget(fit_box)
 
-        states_box = QGroupBox("Failure States")
+        states_box = QGroupBox(tr("Failure States"))
         states_form = QFormLayout(states_box)
         self.states = QListWidget()
         multi = len(project.materials) > 1
+        kinds = {"direct_shear": tr("direct shear")}
         for m_index, material in enumerate(project.materials):
             for s_index, state in enumerate(material.failure_states):
                 label = f"{material.name}: {state.name}" if multi else state.name
-                item = QListWidgetItem(f"{label}  [{state.test_type.replace('_', ' ')}]")
+                kind = kinds.get(state.test_type, state.test_type.replace("_", " "))
+                item = QListWidgetItem(f"{label}  [{kind}]")
                 item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
                 item.setCheckState(Qt.CheckState.Checked if m_index == current else Qt.CheckState.Unchecked)
                 item.setData(Qt.ItemDataRole.UserRole, (m_index, s_index))
                 self.states.addItem(item)
         self.states.setMaximumHeight(150)
         self.data_type = QComboBox()
-        self.data_type.addItems(list(cal.DATA_TYPES))
+        for value in cal.DATA_TYPES:
+            self.data_type.addItem(tr(value), value)  # i18n: registry
         self.sigci = QDoubleSpinBox()
         self.sigci.setRange(0.0, 1e12)
         self.sigci.setDecimals(4)
@@ -100,10 +106,10 @@ class CalibrationDialog(QDialog):
         self.phi_b.setRange(0.0, 89.0)
         self.phi_b.setSuffix(" deg")
         self.phi_b.setValue(float(params.get("phi_r", 30.0)))
-        states_form.addRow("Failure States:", self.states)
-        states_form.addRow("Failure Data Type:", self.data_type)
-        states_form.addRow("sigci (rock mass data):", self.sigci)
-        states_form.addRow("D (rock mass data):", self.disturbance)
+        states_form.addRow(tr("Failure States:"), self.states)
+        states_form.addRow(tr("Failure Data Type:"), self.data_type)
+        states_form.addRow(tr("sigci (rock mass data):"), self.sigci)
+        states_form.addRow(tr("D (rock mass data):"), self.disturbance)
         states_form.addRow("phi b (Barton-Bandis):", self.phi_b)
         self._states_form = states_form
         layout.addWidget(states_box)
@@ -139,8 +145,8 @@ class CalibrationDialog(QDialog):
         return cal.CalibrationSettings(
             strength_type=self.strength.currentData(),
             algorithm=self.algorithm.currentData(),
-            error_type=self.error_type.currentText(),
-            data_type=self.data_type.currentText(),
+            error_type=self.error_type.currentData(),
+            data_type=self.data_type.currentData(),
             sigci_kpa=self.sigci.value() / self._kpa_scale,
             disturbance=self.disturbance.value(),
             phi_b_deg=self.phi_b.value(),
@@ -154,7 +160,7 @@ class CalibrationDialog(QDialog):
             self.data_type.setCurrentIndex(0)
             self.data_type.blockSignals(False)
         self.data_type.setEnabled(ghb)
-        mass = ghb and self.data_type.currentText() == "Rock Mass Data"
+        mass = ghb and self.data_type.currentData() == "Rock Mass Data"
         self._states_form.setRowVisible(self.sigci, mass)
         self._states_form.setRowVisible(self.disturbance, mass)
         self._states_form.setRowVisible(self.phi_b, strength == "barton_bandis")
@@ -162,7 +168,7 @@ class CalibrationDialog(QDialog):
             self.result = cal.calibrate(self.selected_states(), self.settings())
         except ValueError as exc:
             self.result = None
-            self.output.setText(f'<span style="color:#c0392b">{exc}</span>')
+            self.output.setText(f'<span style="color:#c0392b">{exc}</span>')  # i18n: ignore -- core message
         else:
             self.output.setText(self._describe(self.result))
         self._buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(self.result is not None)
@@ -177,11 +183,15 @@ class CalibrationDialog(QDialog):
                 lines.append(f"{key.replace('_deg', '')} = {value:.4f} deg")
             else:
                 lines.append(f"{key} = {value:.6g}")
-        kind = "triaxial" if r.data_kind == fitting.TRIAXIAL else "direct shear"
-        error = "relative" if self.error_type.currentText() == "Relative" else f"{self._unit}²"
-        ssr = r.ssr if error == "relative" else r.ssr * scale**2
+        relative = self.error_type.currentData() == "Relative"
+        error = tr("relative") if relative else f"{self._unit}²"
+        ssr = r.ssr if relative else r.ssr * scale**2
+        if r.data_kind == fitting.TRIAXIAL:
+            summary = tr("{0} triaxial points · residuals (sum of squares, vertical, {1}) = {2}")
+        else:
+            summary = tr("{0} direct shear points · residuals (sum of squares, vertical, {1}) = {2}")
         return (
             "<b>" + " · ".join(lines) + "</b><br>"
-            f"{r.n_points} {kind} points · residuals (sum of squares, vertical, {error}) = {ssr:.6g}<br>"
-            f"<i>{r.method_note}</i>"
+            + summary.format(r.n_points, error, f"{ssr:.6g}")
+            + f"<br><i>{r.method_note}</i>"
         )

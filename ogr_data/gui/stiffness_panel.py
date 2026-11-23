@@ -14,17 +14,25 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox, QHBoxLayout, QPushButton, QWidget
 
 from ..core import simulation as sm
+from .i18n import tr
+
+
+def _t(text: str) -> str:
+    """Marks an English text that is translated where it is shown (spec 024)."""
+
+    return text
+
 
 # (key, label, is_stress, minimum, maximum, decimals)
 _FIELDS = {
-    "poisson": ("Poisson's Ratio", False, -0.99, 0.4999, 4),
-    "young": ("Young's Modulus", True, 1e-9, 1e15, 4),
-    "shear_modulus": ("Shear Modulus", True, 1e-9, 1e15, 4),
-    "g_ref": ("Shear modulus at reference", True, 1e-9, 1e15, 4),
-    "p_ref": ("Reference pressure for shear modulus", True, 1e-9, 1e12, 4),
-    "g_exp": ("Modulus exponent", False, 0.0, 1.0, 4),
-    "ns_poisson": ("Poisson's ratio", False, -0.99, 0.4999, 4),
-    "g_min": ("Minimum Shear Modulus", True, 0.0, 1e15, 4),
+    "poisson": (_t("Poisson's Ratio"), False, -0.99, 0.4999, 4),
+    "young": (_t("Young's Modulus"), True, 1e-9, 1e15, 4),
+    "shear_modulus": (_t("Shear Modulus"), True, 1e-9, 1e15, 4),
+    "g_ref": (_t("Shear modulus at reference"), True, 1e-9, 1e15, 4),
+    "p_ref": (_t("Reference pressure for shear modulus"), True, 1e-9, 1e12, 4),
+    "g_exp": (_t("Modulus exponent"), False, 0.0, 1.0, 4),
+    "ns_poisson": (_t("Poisson's ratio"), False, -0.99, 0.4999, 4),
+    "g_min": (_t("Minimum Shear Modulus"), True, 0.0, 1e15, 4),
 }
 _ROWS = {
     "linear": ("poisson", "young"),
@@ -45,17 +53,18 @@ class StiffnessPanel(QGroupBox):
     changed = Signal()
 
     def __init__(self, kpa_scale: float, unit: str, on_erm=None) -> None:
-        super().__init__("Stiffness (Linear Isotropic)")
+        super().__init__(tr("Stiffness ({0})").format(tr(sm.STIFFNESS_TYPES[0])))  # i18n: registry
         self._scale = kpa_scale
         self._unit = unit
         self._kind = "linear"
         self.form = QFormLayout(self)
         self.spins: dict[str, QDoubleSpinBox] = {}
         self.elastic_parameter = QComboBox()
-        self.elastic_parameter.addItems(sm.CAM_CLAY_ELASTIC)
+        for option in sm.CAM_CLAY_ELASTIC:
+            self.elastic_parameter.addItem(tr(option), option)  # i18n: registry
         self.elastic_parameter.currentIndexChanged.connect(self._update_rows)
         self.elastic_parameter.currentIndexChanged.connect(self.changed)
-        self.form.addRow("Elastic Parameter", self.elastic_parameter)
+        self.form.addRow(tr("Elastic Parameter"), self.elastic_parameter)
         for key, (label, stress, lo, hi, decimals) in _FIELDS.items():
             spin = QDoubleSpinBox()
             spin.setRange(lo, hi)
@@ -69,7 +78,7 @@ class StiffnessPanel(QGroupBox):
             self.spins[key] = spin
             if key == "young":
                 self.use_erm = QPushButton("Erm")
-                self.use_erm.setToolTip("Young's modulus = rock mass modulus Erm (Generalized Hoek-Brown)")
+                self.use_erm.setToolTip(tr("Young's modulus = rock mass modulus Erm (Generalized Hoek-Brown)"))
                 if on_erm is not None:
                     self.use_erm.clicked.connect(on_erm)
                 row = QWidget()
@@ -77,18 +86,18 @@ class StiffnessPanel(QGroupBox):
                 layout.setContentsMargins(0, 0, 0, 0)
                 layout.addWidget(spin, stretch=1)
                 layout.addWidget(self.use_erm)
-                self.form.addRow(label, row)
+                self.form.addRow(tr(label), row)  # i18n: ignore (keys marked with _t)
                 self._young_row = row
             else:
-                self.form.addRow(label, spin)
+                self.form.addRow(tr(label), spin)  # i18n: ignore (keys marked with _t)
         self._update_rows()
 
     # ------------------------------------------------------------- rows
 
     def set_criterion(self, criterion: str) -> None:
         self._kind = stiffness_kind(criterion)
-        title = {"linear": "Linear Isotropic", "camclay": "CamClay Isotropic", "norsand": "NorSand"}[self._kind]
-        self.setTitle(f"Stiffness ({title})")
+        title = {"linear": tr(sm.STIFFNESS_TYPES[0]), "camclay": tr("CamClay Isotropic"), "norsand": "NorSand"}[self._kind]  # i18n: registry
+        self.setTitle(tr("Stiffness ({0})").format(title))
         self.use_erm.setEnabled(criterion == "generalized_hoek_brown")
         self._update_rows()
 
@@ -102,7 +111,7 @@ class StiffnessPanel(QGroupBox):
     def _update_rows(self, *_args) -> None:
         shown = set(_ROWS[self._kind])
         if self._kind == "camclay":
-            constant_g = self.elastic_parameter.currentText() == "Constant Shear Modulus"
+            constant_g = self.elastic_parameter.currentData() == "Constant Shear Modulus"
             shown.discard("poisson" if constant_g else "shear_modulus")
         for key in ("elastic_parameter", *_FIELDS):
             self.form.setRowVisible(self._row_widget(key), key in shown)
@@ -113,7 +122,7 @@ class StiffnessPanel(QGroupBox):
         data = sm.stiffness_from(stiffness)
         for widget in (self.elastic_parameter, *self.spins.values()):
             widget.blockSignals(True)
-        self.elastic_parameter.setCurrentText(data["elastic_parameter"])
+        self.elastic_parameter.setCurrentIndex(max(0, self.elastic_parameter.findData(data["elastic_parameter"])))
         for key, spin in self.spins.items():
             stress = _FIELDS[key][1]
             spin.setValue(data[key] * self._scale if stress else data[key])
@@ -122,7 +131,7 @@ class StiffnessPanel(QGroupBox):
         self._update_rows()
 
     def values(self) -> dict:
-        out = {"type": "Linear Isotropic", "elastic_parameter": self.elastic_parameter.currentText()}
+        out = {"type": "Linear Isotropic", "elastic_parameter": self.elastic_parameter.currentData()}
         for key, spin in self.spins.items():
             stress = _FIELDS[key][1]
             out[key] = spin.value() / self._scale if stress else spin.value()

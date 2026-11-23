@@ -16,10 +16,15 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import tables
+from .i18n import tr
 
 
 class TablePickerDialog(QDialog):
-    """Searchable table dialog; exec returns the picked value (MPa for sigci)."""
+    """Searchable table dialog; exec returns the picked value (MPa for sigci).
+
+    ``columns[0]`` names the hidden value column; the others are the headers shown
+    (translated by the caller, spec 024).
+    """
 
     def __init__(self, title: str, columns: list[str], rows: list[list[str]], source: str, parent=None) -> None:
         super().__init__(parent)
@@ -29,7 +34,7 @@ class TablePickerDialog(QDialog):
         self._values: list[float] = [float(r[0]) for r in rows]
 
         self._search = QLineEdit()
-        self._search.setPlaceholderText("Filter…")
+        self._search.setPlaceholderText(tr("Filter…"))
         self._search.textChanged.connect(self._filter)
         self._table = QTableWidget(len(rows), len(columns) - 1)
         self._table.setHorizontalHeaderLabels(columns[1:])
@@ -49,7 +54,7 @@ class TablePickerDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.addWidget(self._search)
         layout.addWidget(self._table)
-        layout.addWidget(QLabel(f"Source: {source}"))
+        layout.addWidget(QLabel(tr("Source: {0}").format(source)))
         layout.addWidget(buttons)
         self._filter("")
 
@@ -75,8 +80,8 @@ def sigci_picker(parent=None) -> float | None:
         for g in data["grades"]
     ]
     dlg = TablePickerDialog(
-        "Pick sigci — field estimates of UCS (Hoek, Table 2)",
-        ["value_kpa", "Grade", "Term", "UCS range", "Examples"],
+        tr("Pick sigci — field estimates of UCS (Hoek, Table 2)"),
+        ["value_kpa", tr("Grade"), tr("Term"), tr("UCS range"), tr("Examples")],
         rows,
         data["source"],
         parent,
@@ -103,8 +108,8 @@ def mi_picker(parent=None) -> float | None:
         for v in data["values"]
     ]
     dlg = TablePickerDialog(
-        "Pick mi — Hoek-Brown constant for intact rock (Hoek, Table 3)",
-        ["value", "Rock", "Type", "Class", "Group", "Texture", "mi ± std"],
+        tr("Pick mi — Hoek-Brown constant for intact rock (Hoek, Table 3)"),
+        ["value", tr("Rock"), tr("Type"), tr("Class"), tr("Group"), tr("Texture"), "mi ± std"],
         rows,
         data["source"],
         parent,
@@ -119,7 +124,7 @@ class GsiPickerDialog(QDialog):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Pick GSI — Hoek & Marinos (2000) chart")
+        self.setWindowTitle(tr("Pick GSI — Hoek & Marinos (2000) chart"))
         self.resize(560, 320)
         data = tables.gsi_chart()
 
@@ -146,10 +151,10 @@ class GsiPickerDialog(QDialog):
         buttons.rejected.connect(self.reject)
 
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Structure of the rock mass"))
+        layout.addWidget(QLabel(tr("Structure of the rock mass")))
         layout.addWidget(self._structure)
         layout.addWidget(self._structure_desc)
-        layout.addWidget(QLabel("Surface condition of discontinuities"))
+        layout.addWidget(QLabel(tr("Surface condition of discontinuities")))
         layout.addWidget(self._surface)
         layout.addWidget(self._surface_desc)
         layout.addWidget(self._range_label)
@@ -157,7 +162,7 @@ class GsiPickerDialog(QDialog):
         row.addWidget(QLabel("GSI"))
         row.addWidget(self._value)
         layout.addLayout(row)
-        layout.addWidget(QLabel(f"Source: {data['source']}\n{data['note']}"))
+        layout.addWidget(QLabel(tr("Source: {0}").format(data["source"]) + "\n" + data["note"]))
         layout.addWidget(buttons)
         self._update()
 
@@ -171,10 +176,10 @@ class GsiPickerDialog(QDialog):
         self._surface_desc.setText(f["description"])
         rng = tables.gsi_range(s_key, f_key)
         if rng is None:
-            self._range_label.setText("Combination not present on the published chart (N/A).")
+            self._range_label.setText(tr("Combination not present on the published chart (N/A)."))
             self._value.setEnabled(False)
         else:
-            self._range_label.setText(f"Indicative GSI range on the chart: {rng[0]:.0f}–{rng[1]:.0f}")
+            self._range_label.setText(tr("Indicative GSI range on the chart: {0:.0f}–{1:.0f}").format(rng[0], rng[1]))
             self._value.setEnabled(True)
             self._value.setRange(rng[0], rng[1])
             self._value.setValue((rng[0] + rng[1]) / 2.0)

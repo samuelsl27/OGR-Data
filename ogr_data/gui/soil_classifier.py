@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import uscs
+from .i18n import tr
 
 
 class _PlasticityCanvas(FigureCanvasQTAgg):
@@ -29,15 +30,15 @@ class _PlasticityCanvas(FigureCanvasQTAgg):
         self.figure = Figure(figsize=(4.0, 4.0), tight_layout=True)
         super().__init__(self.figure)
         ax = self.figure.add_subplot(111)
-        ax.set_title("USCS plasticity chart")
-        ax.set_xlabel("Liquid limit")
-        ax.set_ylabel("Plasticity index")
+        ax.set_title(tr("USCS plasticity chart"))
+        ax.set_xlabel(tr("Liquid limit"))
+        ax.set_ylabel(tr("Plasticity index"))
         ax.set_xlim(0, 100)
         ax.set_ylim(0, 60)
         ax.grid(True, alpha=0.3)
         ll = np.linspace(0, 100, 200)
-        ax.plot(ll, np.clip(uscs.a_line_pi(ll), 0, 60), color="#c0392b", label="A-line (PI = 0.73 (LL-20))")
-        ax.plot(ll, np.clip(uscs.u_line_pi(ll), 0, 60), color="#95a5a6", linestyle=":", label="U-line")
+        ax.plot(ll, np.clip(uscs.a_line_pi(ll), 0, 60), color="#c0392b", label=tr("A-line (PI = 0.73 (LL-20))"))
+        ax.plot(ll, np.clip(uscs.u_line_pi(ll), 0, 60), color="#95a5a6", linestyle=":", label=tr("U-line"))
         ax.axvline(50.0, color="#bdc3c7", linestyle="--")
         self.axes = ax
         (self._point,) = ax.plot([], [], "o", color="#2c3e50")
@@ -56,19 +57,19 @@ class SoilClassifierDialog(QDialog):
         super().__init__(parent)
         self.on_create = on_create  # callback(symbol, {"peak_cohesion", "peak_friction"})
         self.symbol = ""
-        self.setWindowTitle("Soil classifier — USCS (NRCS criteria)")
+        self.setWindowTitle(tr("Soil classifier — USCS (NRCS criteria)"))
         self.resize(980, 560)
 
         self._fields: dict[str, QDoubleSpinBox] = {}
         form = QFormLayout()
         for key, label, value, lo, hi, dec in [
-            ("fines_pct", "Fines, passing No. 200 (%)", 30.0, 0.0, 100.0, 1),
-            ("sand_pct", "Sand, of total sample (%)", 50.0, 0.0, 100.0, 1),
+            ("fines_pct", tr("Fines, passing No. 200 (%)"), 30.0, 0.0, 100.0, 1),
+            ("sand_pct", tr("Sand, of total sample (%)"), 50.0, 0.0, 100.0, 1),
             ("cu", "Cu = D60/D10", 0.0, 0.0, 1e6, 2),
             ("cc", "Cc = D30^2/(D10 D60)", 0.0, 0.0, 1e6, 2),
-            ("ll", "Liquid limit, LL", 0.0, 0.0, 200.0, 1),
-            ("pi", "Plasticity index, PI", 0.0, 0.0, 200.0, 1),
-            ("organic_ratio", "LL(oven dry) / LL(air dry)", 1.0, 0.0, 1.5, 3),
+            ("ll", tr("Liquid limit, LL"), 0.0, 0.0, 200.0, 1),
+            ("pi", tr("Plasticity index, PI"), 0.0, 0.0, 200.0, 1),
+            ("organic_ratio", tr("LL(oven dry) / LL(air dry)"), 1.0, 0.0, 1.5, 3),
         ]:
             spin = QDoubleSpinBox()
             spin.setRange(lo, hi)
@@ -77,10 +78,10 @@ class SoilClassifierDialog(QDialog):
             spin.valueChanged.connect(self._update)
             self._fields[key] = spin
             form.addRow(label, spin)
-        self._highly_organic = QCheckBox("Highly organic soil (peat-like)")
+        self._highly_organic = QCheckBox(tr("Highly organic soil (peat-like)"))
         self._highly_organic.toggled.connect(self._update)
 
-        classify_button = QPushButton("Classify")
+        classify_button = QPushButton(tr("Classify"))
         classify_button.clicked.connect(self._update)
 
         inputs = QWidget()
@@ -97,17 +98,17 @@ class SoilClassifierDialog(QDialog):
 
         results = QWidget()
         right = QVBoxLayout(results)
-        right.addWidget(QLabel("USCS classification"))
+        right.addWidget(QLabel(tr("USCS classification")))
         right.addWidget(self._symbol)
-        right.addWidget(QLabel("Engineering properties (NRCS NEH 631, figure 3-22)"))
+        right.addWidget(QLabel(tr("Engineering properties (NRCS NEH 631, figure 3-22)")))
         right.addWidget(self._card, stretch=1)
-        right.addWidget(QLabel("Source: " + uscs.uscs_properties_source()))
+        right.addWidget(QLabel(tr("Source: {0}").format(uscs.uscs_properties_source())))
         # spec 018: numeric typical strength of the compacted soil (UFC 3-220-01N)
-        right.addWidget(QLabel("Typical strength, compacted (UFC 3-220-01N Table 8-3.1, USBR data)"))
+        right.addWidget(QLabel(tr("Typical strength, compacted (UFC 3-220-01N Table 8-3.1, USBR data)")))
         self._numeric = QLabel()
         self._numeric.setWordWrap(True)
         right.addWidget(self._numeric)
-        self._create = QPushButton("Create Mohr-Coulomb material (c' saturated, phi')")
+        self._create = QPushButton(tr("Create Mohr-Coulomb material (c' saturated, phi')"))
         self._create.clicked.connect(self.create_material)
         right.addWidget(self._create)
 
@@ -154,14 +155,14 @@ class SoilClassifierDialog(QDialog):
         self._show_numeric()
         card = uscs.uscs_properties(result.symbol)
         text = (
-            f"Typical names: {card['typical_names']}\n\n"
-            f"Shear strength: {card['shear_strength']}\n"
-            f"Compressibility: {card['compressibility']}\n"
-            f"Workability as construction material: {card['workability']}\n"
-            f"Permeability when compacted: {card['permeability']}\n"
+            tr("Typical names: {0}").format(card["typical_names"]) + "\n\n"
+            + tr("Shear strength: {0}").format(card["shear_strength"]) + "\n"
+            + tr("Compressibility: {0}").format(card["compressibility"]) + "\n"
+            + tr("Workability as construction material: {0}").format(card["workability"]) + "\n"
+            + tr("Permeability when compacted: {0}").format(card["permeability"]) + "\n"
         )
         if result.notes:
-            text += "\nNotes:\n" + "\n".join(f"- {n}" for n in result.notes)
+            text += "\n" + tr("Notes:") + "\n" + "\n".join(f"- {n}" for n in result.notes)
         self._card.setPlainText(text)
 
     # ------------------------------------------------------------ spec 018
@@ -179,14 +180,15 @@ class SoilClassifierDialog(QDialog):
 
         row = barton.compacted_properties(self.symbol) if self.symbol else None
         if row is None:
-            self._numeric.setText(f"{self.symbol or 'No class'}: not listed in UFC 3-220-01N Table 8-3.1 (no numeric values).")
+            self._numeric.setText(tr("{0}: not listed in UFC 3-220-01N Table 8-3.1 (no numeric values).").format(self.symbol or tr("No class")))
         else:
             c_comp, c_sat = row["cohesion_compacted_kpa"], row["cohesion_saturated_kpa"]
             fmt = lambda v: "-----" if v is None else f"{v:g} kPa"
             self._numeric.setText(
-                f"{row['symbol']}: c' as compacted {fmt(c_comp)}, c' saturated {fmt(c_sat)}, "
-                f"phi' {row['phi_effective'] or '-----'} deg (effective envelope); max dry unit weight "
-                f"{row['max_dry_unit_weight']} g/cm3 (pcf). '>' = greater than the value shown."
+                tr(
+                    "{0}: c' as compacted {1}, c' saturated {2}, phi' {3} deg (effective envelope); max dry unit weight "
+                    "{4} g/cm3 (pcf). '>' = greater than the value shown."
+                ).format(row["symbol"], fmt(c_comp), fmt(c_sat), row["phi_effective"] or "-----", row["max_dry_unit_weight"])
             )
         self._create.setEnabled(self.numeric_parameters() is not None and self.on_create is not None)
 

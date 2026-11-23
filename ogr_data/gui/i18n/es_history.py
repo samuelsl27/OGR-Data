@@ -1,0 +1,25 @@
+"""Spanish of the undo / redo step texts (core.history.STEP_TEMPLATES, spec 023)."""
+
+ES = {
+    "Add Material '{0}'": "Añadir el material «{0}»",
+    "Delete Material '{0}'": "Eliminar el material «{0}»",
+    "Edit Materials": "Editar materiales",
+    "Change Criterion to {0}": "Cambiar el criterio a {0}",
+    "Change Application": "Cambiar la aplicación",
+    "Change {0}": "Cambiar {0}",
+    "Change Parameters": "Cambiar parámetros",
+    "Change sig3max": "Cambiar sig3max",
+    "Rename Material '{0}' to '{1}'": "Renombrar el material «{0}» como «{1}»",
+    "Edit Failure States": "Editar estados de rotura",
+    "Edit Test Simulations": "Editar simulaciones de ensayo",
+    "Edit Stress Paths": "Editar trayectorias de tensiones",
+    "Change Stiffness": "Cambiar la rigidez",
+    "Change Color": "Cambiar el color",
+    "Change Symbol": "Cambiar el símbolo",
+    "Show Material": "Mostrar el material",
+    "Hide Material": "Ocultar el material",
+    "Edit Material": "Editar el material",
+    "Change Project Title": "Cambiar el título del proyecto",
+    "Change Graph Options": "Cambiar las opciones de gráfica",
+    "Edit": "Editar",
+}

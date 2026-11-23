@@ -34,25 +34,34 @@ from PySide6.QtWidgets import (
 )
 
 from ..core.graph_options import LINE_STYLES, SERIES_KEYS, PlotOptions, SeriesStyle
+from .i18n import tr
 from .themes import mpl_colors
 
+
+def _t(text: str) -> str:
+    """Marks an English text that is translated where it is shown (spec 024)."""
+
+    return text
+
+
 _STYLE_LABELS = {
-    "envelope": "Envelope",
-    "mc": "Equivalent MC",
-    "tangent": "MC tangent (sampler)",
-    "mogi": "Mogi line",
+    "envelope": _t("Envelope"),
+    "mc": _t("Equivalent MC"),
+    "tangent": _t("MC tangent (sampler)"),
+    "mogi": _t("Mogi line"),
 }
 
-_STYLE_NAMES = ["default", "solid", "dashed", "dash-dot", "dotted"]
+# combo values (shown translated, compared in English)
+_STYLE_NAMES = [_t("default"), _t("solid"), _t("dashed"), _t("dash-dot"), _t("dotted")]
 
 
 class GraphEditorDialog(QDialog):
     def __init__(self, window) -> None:
         super().__init__(window)
-        self.setWindowTitle("Graph Editor")
+        self.setWindowTitle(tr("Graph Editor"))
         self.resize(520, 460)
         self._window = window
-        self._canvases = [("Principal Stress Plot", window._principal), ("Normal/Shear Stress", window._shear)]
+        self._canvases = [(tr("Principal Stress Plot"), window._principal), (tr("Normal/Shear Stress"), window._shear)]
         self._snapshot = {canvas: copy.deepcopy(canvas.options) for _, canvas in self._canvases}
 
         self._plot_list = QListWidget()
@@ -62,9 +71,9 @@ class GraphEditorDialog(QDialog):
         self._plot_list.setMaximumWidth(180)
 
         self._tabs = QTabWidget()
-        self._tabs.addTab(self._build_title_axis_tab(), "Title and Axis")
-        self._tabs.addTab(self._build_graph_display_tab(), "Graph Display")
-        self._tabs.addTab(self._build_series_tab(), "Series Display")
+        self._tabs.addTab(self._build_title_axis_tab(), tr("Title and Axis"))
+        self._tabs.addTab(self._build_graph_display_tab(), tr("Graph Display"))
+        self._tabs.addTab(self._build_series_tab(), tr("Series Display"))
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(self.accept)
@@ -85,45 +94,46 @@ class GraphEditorDialog(QDialog):
         tab = QWidget()
         layout = QVBoxLayout(tab)
 
-        title_box = QGroupBox("Title")
+        title_box = QGroupBox(tr("Title"))
         title_form = QFormLayout(title_box)
         self._title_edit = QLineEdit()
-        self._title_edit.setPlaceholderText("default plot title")
+        self._title_edit.setPlaceholderText(tr("default plot title"))
         self._title_edit.textChanged.connect(self._apply)
-        title_form.addRow("Title:", self._title_edit)
+        title_form.addRow(tr("Title:"), self._title_edit)
         layout.addWidget(title_box)
 
-        axis_box = QGroupBox("Axis Label Position")
+        axis_box = QGroupBox(tr("Axis Label Position"))
         axis_form = QFormLayout(axis_box)
         self._label_position = QComboBox()
-        self._label_position.addItems(["Outside", "Inside"])
-        self._label_position.currentTextChanged.connect(self._apply)
-        axis_form.addRow("X-Axis:", self._label_position)
-        axis_form.addRow("Y-Axis:", self._label_position)
+        self._label_position.addItem(tr("Outside"), "Outside")
+        self._label_position.addItem(tr("Inside"), "Inside")
+        self._label_position.currentIndexChanged.connect(self._apply)
+        axis_form.addRow(tr("X-Axis:"), self._label_position)
+        axis_form.addRow(tr("Y-Axis:"), self._label_position)
         layout.addWidget(axis_box)
 
-        range_box = QGroupBox("Axis Range")
+        range_box = QGroupBox(tr("Axis Range"))
         range_layout = QGridLayout(range_box)
-        self._default_range = QCheckBox("Use Default Axis Range")
+        self._default_range = QCheckBox(tr("Use Default Axis Range"))
         self._default_range.setChecked(True)
         self._default_range.toggled.connect(self._apply)
         range_layout.addWidget(self._default_range, 0, 0, 1, 4)
         self._range_edits: dict[str, QLineEdit] = {}
         for row, axis in ((1, "x"), (2, "y")):
-            range_layout.addWidget(QLabel(f"{axis.upper()}-Axis"), row, 0)
-            range_layout.addWidget(QLabel("Min:"), row, 1)
+            range_layout.addWidget(QLabel(tr("{0}-Axis").format(axis.upper())), row, 0)
+            range_layout.addWidget(QLabel(tr("Min:")), row, 1)
             lo = QLineEdit()
             lo.setMaximumWidth(80)
             lo.textChanged.connect(self._apply)
             range_layout.addWidget(lo, row, 2)
-            range_layout.addWidget(QLabel("Max:"), row, 3)
+            range_layout.addWidget(QLabel(tr("Max:")), row, 3)
             hi = QLineEdit()
             hi.setMaximumWidth(80)
             hi.textChanged.connect(self._apply)
             range_layout.addWidget(hi, row, 4)
             self._range_edits[f"{axis}_lo"] = lo
             self._range_edits[f"{axis}_hi"] = hi
-        self._square_axis = QCheckBox("Use Square Axis")
+        self._square_axis = QCheckBox(tr("Use Square Axis"))
         self._square_axis.toggled.connect(self._apply)
         range_layout.addWidget(self._square_axis, 3, 0, 1, 4)
         layout.addWidget(range_box)
@@ -133,7 +143,7 @@ class GraphEditorDialog(QDialog):
     def _build_graph_display_tab(self) -> QWidget:
         tab = QWidget()
         layout = QVBoxLayout(tab)
-        self._grid = QCheckBox("Show grid")
+        self._grid = QCheckBox(tr("Show grid"))
         self._grid.toggled.connect(self._apply)
         layout.addWidget(self._grid)
         layout.addStretch(1)
@@ -142,14 +152,14 @@ class GraphEditorDialog(QDialog):
     def _build_series_tab(self) -> QWidget:
         tab = QWidget()
         grid = QGridLayout(tab)
-        grid.addWidget(QLabel("Series"), 0, 0)
-        grid.addWidget(QLabel("Visible"), 0, 1)
-        grid.addWidget(QLabel("Color"), 0, 2)
-        grid.addWidget(QLabel("Width"), 0, 3)
-        grid.addWidget(QLabel("Style"), 0, 4)
+        grid.addWidget(QLabel(tr("Series")), 0, 0)
+        grid.addWidget(QLabel("Visible"), 0, 1)  # i18n: ignore (same in Spanish)
+        grid.addWidget(QLabel("Color"), 0, 2)  # i18n: ignore (same in Spanish)
+        grid.addWidget(QLabel(tr("Width")), 0, 3)
+        grid.addWidget(QLabel(tr("Style")), 0, 4)
         self._series_controls: dict[str, dict] = {}
         for row, key in enumerate(SERIES_KEYS, start=1):
-            grid.addWidget(QLabel(_STYLE_LABELS[key]), row, 0)
+            grid.addWidget(QLabel(tr(_STYLE_LABELS[key])), row, 0)  # i18n: ignore (keys marked with _t)
             visible = QCheckBox()
             visible.setChecked(True)
             visible.toggled.connect(self._apply)
@@ -161,11 +171,12 @@ class GraphEditorDialog(QDialog):
             width = QDoubleSpinBox()
             width.setRange(0.0, 10.0)
             width.setSingleStep(0.2)
-            width.setSpecialValueText("default")
+            width.setSpecialValueText(tr("default"))
             width.valueChanged.connect(self._apply)
             grid.addWidget(width, row, 3)
             style = QComboBox()
-            style.addItems(_STYLE_NAMES)
+            for name in _STYLE_NAMES:
+                style.addItem(tr(name), name)  # i18n: ignore (keys marked with _t)
             style.currentIndexChanged.connect(self._apply)
             grid.addWidget(style, row, 4)
             self._series_controls[key] = {
@@ -187,7 +198,7 @@ class GraphEditorDialog(QDialog):
         self._loading = True
         try:
             self._title_edit.setText(options.title)
-            self._label_position.setCurrentText("Inside" if options.labels_inside else "Outside")
+            self._label_position.setCurrentIndex(self._label_position.findData("Inside" if options.labels_inside else "Outside"))
             self._default_range.setChecked(options.x_range is None and options.y_range is None)
             # ranges are stored in internal MPa and edited in the display unit
             k = getattr(canvas, "display_scale", 1.0)
@@ -207,8 +218,8 @@ class GraphEditorDialog(QDialog):
                 style = options.styles[key]
                 controls["visible"].setChecked(style.visible)
                 controls["width"].setValue(style.linewidth)
-                controls["style"].setCurrentText(
-                    _STYLE_NAMES[LINE_STYLES.index(style.linestyle)] if style.linestyle else "default"
+                controls["style"].setCurrentIndex(
+                    controls["style"].findData(_STYLE_NAMES[LINE_STYLES.index(style.linestyle)] if style.linestyle else "default")
                 )
                 self._set_color_button(controls["color"], style.color or default_colors[key], style.color)
         finally:
@@ -224,7 +235,7 @@ class GraphEditorDialog(QDialog):
     def _pick_color(self, key: str) -> None:
         controls = self._series_controls[key]
         current = controls["color"].property("color_shown") or "#4a90d9"
-        chosen = QColorDialog.getColor(QColor(current), self, f"{_STYLE_LABELS[key]} color")
+        chosen = QColorDialog.getColor(QColor(current), self, tr("{0} color").format(tr(_STYLE_LABELS[key])))  # i18n: ignore (_t keys)
         if chosen.isValid():
             self._set_color_button(controls["color"], chosen.name(), chosen.name())
             self._apply()
@@ -247,7 +258,7 @@ class GraphEditorDialog(QDialog):
         canvas = self._canvas()
         styles = {}
         for key, controls in self._series_controls.items():
-            style_name = controls["style"].currentText()
+            style_name = controls["style"].currentData()
             styles[key] = SeriesStyle(
                 visible=controls["visible"].isChecked(),
                 color=controls["color"].property("color_value") or "",
@@ -258,7 +269,7 @@ class GraphEditorDialog(QDialog):
             title=self._title_edit.text().strip(),
             grid=self._grid.isChecked(),
             square_axis=self._square_axis.isChecked(),
-            labels_inside=self._label_position.currentText() == "Inside",
+            labels_inside=self._label_position.currentData() == "Inside",
             x_range=self._range_from("x"),
             y_range=self._range_from("y"),
             styles=styles,

@@ -41,9 +41,10 @@ código en inglés**.
    - los ficheros: `.ogrdata`, CSV y el contrato del portapapeles no
      cambian con el idioma (un proyecto guardado en español abre igual en
      inglés);
-   - el separador decimal: en v1 sigue siendo el punto en los dos idiomas,
-     para que los CSV, el portapapeles y lo pegado en Excel no cambien
-     (decidir en el plan si se ofrece la coma más adelante).
+   - el separador decimal no depende del idioma de la interfaz: los
+     campos numéricos siguen la configuración regional de Windows (coma en
+     un Windows en español, ya antes de esta spec) y los textos, CSV y el
+     portapapeles usan el punto, en los dos idiomas.
 4. **Terminología**: un glosario único, coherente con el de las cartas GSI
    (spec 022: macizo rocoso, discontinuidad, meteorizado/alterado,
    «espejos de falla»…) y con el de OGR-Slip2D cuando el término es común

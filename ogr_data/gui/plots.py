@@ -8,6 +8,7 @@ from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 from ..core.graph_options import PlotOptions
+from .i18n import tr
 from .themes import mpl_colors
 
 _EMPTY_OFFSETS = np.empty((0, 2))
@@ -76,12 +77,12 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         from PySide6.QtWidgets import QMenu
 
         menu = QMenu(self)
-        menu.addAction("Copy Graph as Image", lambda: self.menu_handler(self, "copy"))
-        menu.addAction("Save Graph as Image…", lambda: self.menu_handler(self, "save"))
-        menu.addAction("Export Graph to Excel (CSV)…", lambda: self.menu_handler(self, "export"))
+        menu.addAction(tr("Copy Graph as Image"), lambda: self.menu_handler(self, "copy"))
+        menu.addAction(tr("Save Graph as Image…"), lambda: self.menu_handler(self, "save"))
+        menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
         menu.addSeparator()
-        menu.addAction("Zoom Extents", lambda: self.menu_handler(self, "zoom"))
-        menu.addAction("Graph Editor…", lambda: self.menu_handler(self, "editor"))
+        menu.addAction(tr("Zoom Extents"), lambda: self.menu_handler(self, "zoom"))
+        menu.addAction(tr("Graph Editor…"), lambda: self.menu_handler(self, "editor"))
         menu.exec(event.globalPos())
 
     # --------------------------------------------------------------- theme
@@ -360,7 +361,9 @@ class PathCanvas(FigureCanvasQTAgg):
     """One of the Stress Path Graphs (spec 012): series of (x, y) per path.
 
     Stress axes hold internal MPa and show the display unit through a tick
-    formatter (spec 017); strain axes are plotted as given.
+    formatter (spec 017); strain axes are plotted as given. The axis labels
+    come in English: shown translated, kept in English for the CSV export
+    (spec 024: files do not change with the language).
     """
 
     def __init__(self, title: str, xlabel: str, ylabel: str, x_stress: bool, y_stress: bool, theme: str = "light") -> None:
@@ -368,6 +371,7 @@ class PathCanvas(FigureCanvasQTAgg):
         self.title = title
         self._labels = (xlabel, ylabel)
         self._stress_axes = (x_stress, y_stress)
+        self._unit = "kPa"
         self.menu_handler = None  # fn(canvas, kind)
         self.figure = Figure(figsize=(4.0, 3.0), tight_layout=True)
         super().__init__(self.figure)
@@ -392,7 +396,8 @@ class PathCanvas(FigureCanvasQTAgg):
     def set_display(self, scale: float, unit: str) -> None:
         """Display factor and unit of the stress axes."""
 
-        xlabel, ylabel = self._labels
+        self._unit = unit
+        xlabel, ylabel = (tr(label) for label in self._labels)  # i18n: ignore (keys marked where the canvases are made)
         self.axes.set_xlabel(f"{xlabel} ({unit})" if self._stress_axes[0] else xlabel)
         self.axes.set_ylabel(f"{ylabel} ({unit})" if self._stress_axes[1] else ylabel)
         for axis, is_stress in ((self.axes.xaxis, self._stress_axes[0]), (self.axes.yaxis, self._stress_axes[1])):
@@ -400,6 +405,13 @@ class PathCanvas(FigureCanvasQTAgg):
                 axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: f"{v * k:g}"))
         self.display_scale = scale
         self.apply_theme(self._theme)
+
+    def export_labels(self) -> tuple[str, str]:
+        """The axis labels in English with the stress unit (CSV column names)."""
+
+        return tuple(
+            f"{label} ({self._unit})" if stress else label for label, stress in zip(self._labels, self._stress_axes)
+        )
 
     def apply_theme(self, theme: str) -> None:
         self._theme = theme
@@ -464,7 +476,7 @@ class PathCanvas(FigureCanvasQTAgg):
         from PySide6.QtWidgets import QMenu
 
         menu = QMenu(self)
-        menu.addAction("Copy Graph as Image", lambda: self.menu_handler(self, "copy"))
-        menu.addAction("Save Graph as Image…", lambda: self.menu_handler(self, "save"))
-        menu.addAction("Export Graph to Excel (CSV)…", lambda: self.menu_handler(self, "export"))
+        menu.addAction(tr("Copy Graph as Image"), lambda: self.menu_handler(self, "copy"))
+        menu.addAction(tr("Save Graph as Image…"), lambda: self.menu_handler(self, "save"))
+        menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
         menu.exec(event.globalPos())

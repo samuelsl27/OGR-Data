@@ -71,8 +71,10 @@ Siguientes (spec.md redactadas el 23-11-2026; plan y tasks al desarrollarlas):
     Guardar / Descartar / Cancelar; en la API, un paso por operación que
     edita y `project_history`. Requisito del modo `--attach` del servidor
     MCP.
-14. **024 — Interfaz en inglés y español**: selector de idioma, ventana e
-    informe traducidos; código, API y ficheros siguen en inglés.
+14. **024 — Interfaz en inglés y español** (hecha): View > Language
+    (la ventana se reabre en el idioma sin perder nada), toda la ventana,
+    los diálogos y el informe HTML en español; código, API, MCP y
+    ficheros siguen en inglés; contenido bibliográfico en su idioma.
 
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.

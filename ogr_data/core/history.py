@@ -58,8 +58,15 @@ def _param_label(criterion: str, key: str) -> str:
     return key
 
 
-def describe(before: dict, after: dict) -> tuple[str, tuple | None]:
-    """(text, key) of the edit that turns ``before`` into ``after``.
+# A step text is a template and its arguments, so that the interface can show
+# it in its language (spec 024) while the core knows none: an argument is
+# ("label", text) when it is a registry label the interface translates, or
+# ("data", text) for user data (material names) that is never translated.
+Parts = tuple[str, tuple[tuple[str, str], ...]]
+
+
+def describe_parts(before: dict, after: dict) -> tuple[Parts, tuple | None]:
+    """((template, args), key) of the edit that turns ``before`` into ``after``.
 
     The key identifies edits that may merge (same field of the same
     material); None for edits that never merge.
@@ -70,57 +77,88 @@ def describe(before: dict, after: dict) -> tuple[str, tuple | None]:
     if len(am) > len(bm):
         names = {m["name"] for m in bm}
         new = next((m["name"] for m in am if m["name"] not in names), am[-1]["name"])
-        return f"Add Material '{new}'", None
+        return ("Add Material '{0}'", (("data", new),)), None
     if len(am) < len(bm):
         names = {m["name"] for m in am}
         gone = next((m["name"] for m in bm if m["name"] not in names), "")
-        return f"Delete Material '{gone}'", None
+        return ("Delete Material '{0}'", (("data", gone),)), None
     changed = [i for i, (x, y) in enumerate(zip(bm, am)) if x != y]
     if len(changed) > 1:
-        return "Edit Materials", None
+        return ("Edit Materials", ()), None
     if changed:
         i = changed[0]
         x, y = bm[i], am[i]
         if x["criterion"] != y["criterion"]:
-            return f"Change Criterion to {CRITERIA[y['criterion']].label}", ("criterion", i)
+            return ("Change Criterion to {0}", (("label", CRITERIA[y["criterion"]].label),)), ("criterion", i)
         if x["application"] != y["application"]:
-            return "Change Application", ("application", i)
+            return ("Change Application", ()), ("application", i)
         if x["parameters"] != y["parameters"]:
             keys = [k for k in y["parameters"] if x["parameters"].get(k) != y["parameters"].get(k)]
             if len(keys) == 1:
-                return f"Change {_param_label(y['criterion'], keys[0])}", ("param", i, keys[0])
-            return "Change Parameters", None
+                return ("Change {0}", (("label", _param_label(y["criterion"], keys[0])),)), ("param", i, keys[0])
+            return ("Change Parameters", ()), None
         if x["sig3max_mpa"] != y["sig3max_mpa"]:
-            return "Change sig3max", ("sig3max", i)
+            return ("Change sig3max", ()), ("sig3max", i)
         if x["name"] != y["name"]:
-            return f"Rename Material '{x['name']}' to '{y['name']}'", ("name", i)
+            return ("Rename Material '{0}' to '{1}'", (("data", x["name"]), ("data", y["name"]))), ("name", i)
         for key, text in (("failure_states", "Edit Failure States"), ("test_simulations", "Edit Test Simulations"),
                           ("stress_paths", "Edit Stress Paths")):
             if x[key] != y[key]:
-                return text, None
+                return (text, ()), None
         if x["stiffness"] != y["stiffness"]:
             keys = [k for k in y["stiffness"] if x["stiffness"].get(k) != y["stiffness"].get(k)]
-            return "Change Stiffness", ("stiffness", i, tuple(keys))
+            return ("Change Stiffness", ()), ("stiffness", i, tuple(keys))
         if x["color"] != y["color"]:
-            return "Change Color", None
+            return ("Change Color", ()), None
         if x["symbol"] != y["symbol"]:
-            return "Change Symbol", None
+            return ("Change Symbol", ()), None
         if x["visible"] != y["visible"]:
-            return ("Show Material" if y["visible"] else "Hide Material"), None
-        return "Edit Material", None
+            return (("Show Material" if y["visible"] else "Hide Material"), ()), None
+        return ("Edit Material", ()), None
     if b.get("title") != a.get("title"):
-        return "Change Project Title", ("title",)
+        return ("Change Project Title", ()), ("title",)
     if b.get("graph_options") != a.get("graph_options"):
-        return "Change Graph Options", None
-    return "Edit", None
+        return ("Change Graph Options", ()), None
+    return ("Edit", ()), None
+
+
+#: Every step template, for the interface's dictionaries (spec 024).
+STEP_TEMPLATES = (
+    "Add Material '{0}'", "Delete Material '{0}'", "Edit Materials", "Change Criterion to {0}", "Change Application",
+    "Change {0}", "Change Parameters", "Change sig3max", "Rename Material '{0}' to '{1}'", "Edit Failure States",
+    "Edit Test Simulations", "Edit Stress Paths", "Change Stiffness", "Change Color", "Change Symbol",
+    "Show Material", "Hide Material", "Edit Material", "Change Project Title", "Change Graph Options", "Edit",
+)
+
+
+def render(parts: Parts, translate=None) -> str:
+    """The step text, in English or through ``translate`` (labels translated, data kept)."""
+
+    template, args = parts
+    t = translate or (lambda text: text)
+    return t(template).format(*(t(v) if kind == "label" else v for kind, v in args))
+
+
+def describe(before: dict, after: dict) -> tuple[str, tuple | None]:
+    """(English text, key) of the edit that turns ``before`` into ``after``."""
+
+    parts, key = describe_parts(before, after)
+    return render(parts), key
 
 
 @dataclass
 class Step:
-    text: str
+    parts: Parts
     key: tuple | None
     before: dict
     after: dict
+
+    @property
+    def text(self) -> str:
+        return render(self.parts)
+
+    def text_in(self, translate) -> str:
+        return render(self.parts, translate)
 
 
 class History:
@@ -149,9 +187,9 @@ class History:
         if cmp == self._current_cmp:
             self.current = state  # same edit-wise; keep the newest (selection)
             return None
-        label, key = describe(self.current, state)
+        parts, key = describe_parts(self.current, state)
         if text is not None:
-            label, key = text, None
+            parts, key = (text, ()), None
         top = self.undo_steps[-1] if self.undo_steps else None
         if self._open and key is not None and top is not None and top.key == key:
             top.after = state
@@ -160,7 +198,7 @@ class History:
                 self.undo_steps.pop()
                 step = None
         else:
-            step = Step(label, key, self.current, state)
+            step = Step(parts, key, self.current, state)
             self.undo_steps.append(step)
             if len(self.undo_steps) > self.limit:
                 del self.undo_steps[0]
@@ -196,6 +234,12 @@ class History:
     @property
     def redo_text(self) -> str:
         return self.redo_steps[-1].text if self.redo_steps else ""
+
+    def undo_text_in(self, translate) -> str:
+        return self.undo_steps[-1].text_in(translate) if self.undo_steps else ""
+
+    def redo_text_in(self, translate) -> str:
+        return self.redo_steps[-1].text_in(translate) if self.redo_steps else ""
 
     def undo(self) -> dict | None:
         """The state to restore (a copy), or None."""

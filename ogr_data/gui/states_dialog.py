@@ -42,6 +42,20 @@ from PySide6.QtWidgets import (
 from ..core import states as st
 from ..core import units
 from ..core.project import SYMBOLS
+from .i18n import tr
+
+
+def _header_text(name: str) -> str:
+    """A column name on screen: RSData's symbol-like names stay, words are translated.
+
+    The English name is kept for the CSV files (they do not change with the language).
+    """
+
+    words = {"Pore Water Pressure": tr("Pore Water Pressure"), "Exclude": tr("Exclude")}
+    for english, shown in words.items():
+        if name == english or name.startswith(english + " ("):
+            return shown + name[len(english):]
+    return name
 
 
 def _swatch(color: str) -> QIcon:
@@ -62,17 +76,18 @@ class PointTable(QWidget):
         self._numeric = len(column_scales)
         self._scales = list(column_scales)
         self._flag = bool(flag_header)
+        self._headers = list(headers) + ([flag_header] if self._flag else [])  # English (CSV)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         tools = QHBoxLayout()
         for label, slot in (
-            ("Cut", self.cut),
-            ("Copy", self.copy),
-            ("Paste", self.paste),
-            ("Insert Row", self.insert_row),
-            ("Delete Rows", self.delete_rows),
-            ("Import…", self.import_csv),
-            ("Export…", self.export_csv),
+            (tr("Cut"), self.cut),
+            (tr("Copy"), self.copy),
+            (tr("Paste"), self.paste),
+            (tr("Insert Row"), self.insert_row),
+            (tr("Delete Rows"), self.delete_rows),
+            (tr("Import…"), self.import_csv),
+            (tr("Export…"), self.export_csv),
         ):
             button = QPushButton(label)
             button.clicked.connect(lambda _=False, f=slot: f())
@@ -80,7 +95,7 @@ class PointTable(QWidget):
         tools.addStretch(1)
         layout.addLayout(tools)
         self.table = QTableWidget(0, self._numeric + (1 if self._flag else 0))
-        self.table.setHorizontalHeaderLabels(headers + ([flag_header] if self._flag else []))
+        self.table.setHorizontalHeaderLabels([_header_text(h) for h in self._headers])
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.table)
@@ -107,7 +122,8 @@ class PointTable(QWidget):
         self._flag = bool(flag_header)
         self.table.setRowCount(0)
         self.table.setColumnCount(self._numeric + (1 if self._flag else 0))
-        self.table.setHorizontalHeaderLabels(list(headers) + ([flag_header] if self._flag else []))
+        self._headers = list(headers) + ([flag_header] if self._flag else [])
+        self.table.setHorizontalHeaderLabels([_header_text(h) for h in self._headers])
         for row, flag in zip(kept, flag_values):
             numbers = [v for v in row if not isinstance(v, bool)][: self._numeric]
             numbers += [0.0] * (self._numeric - len(numbers))
@@ -147,7 +163,7 @@ class PointTable(QWidget):
             try:
                 values = [float(t.replace(",", ".")) / self._scales[c] for c, t in enumerate(texts)]
             except ValueError:
-                raise ValueError(f"row {r + 1}: enter a number in every column") from None
+                raise ValueError(tr("row {0}: enter a number in every column").format(r + 1)) from None
             if self._flag:
                 item = self.table.item(r, self._numeric)
                 values.append(item is not None and item.checkState() == Qt.CheckState.Checked)
@@ -213,26 +229,26 @@ class PointTable(QWidget):
         """Append rows from a CSV/text file (values in the displayed unit)."""
 
         if path is None:
-            path, _ = QFileDialog.getOpenFileName(self, "Import points", "", "CSV / text (*.csv *.txt);;All files (*)")
+            path, _ = QFileDialog.getOpenFileName(self, tr("Import points"), "", tr("CSV / text (*.csv *.txt);;All files (*)"))
             if not path:
                 return 0
         try:
             with open(path, encoding="utf-8-sig") as fh:
                 text = fh.read()
         except OSError as exc:
-            QMessageBox.warning(self, "Import failed", str(exc))
+            QMessageBox.warning(self, tr("Import failed"), str(exc))
             return 0
         self.table.setCurrentCell(-1, -1)
         return self.paste_text(text)
 
     def export_csv(self, path: str | None = None) -> None:
         if path is None:
-            path, _ = QFileDialog.getSaveFileName(self, "Export points", "", "CSV (*.csv)")
+            path, _ = QFileDialog.getSaveFileName(self, tr("Export points"), "", "CSV (*.csv)")  # i18n: ignore
             if not path:
                 return
             if not path.endswith(".csv"):
                 path += ".csv"
-        headers = [self.table.horizontalHeaderItem(c).text() for c in range(self.table.columnCount())]
+        headers = list(self._headers)  # English: files do not change with the language
         shown = [
             tuple(row[c] * self._scales[c] for c in range(self._numeric)) + tuple(row[self._numeric:])
             for row in self.rows()
@@ -264,10 +280,10 @@ class _ItemsDialog(QDialog):
         buttons = QHBoxLayout()
         for label, slot in (
             ("+", self.add_item),
-            ("Delete", self.delete_item),
-            ("Duplicate", self.duplicate_item),
-            ("Up", lambda: self.move_item(-1)),
-            ("Down", lambda: self.move_item(1)),
+            (tr("Delete"), self.delete_item),
+            (tr("Duplicate"), self.duplicate_item),
+            (tr("Up"), lambda: self.move_item(-1)),
+            (tr("Down"), lambda: self.move_item(1)),
         ):
             button = QPushButton(label)
             button.clicked.connect(lambda _=False, f=slot: f())
@@ -278,7 +294,7 @@ class _ItemsDialog(QDialog):
         editor_layout = QVBoxLayout(self._editor)
         editor_layout.setContentsMargins(0, 0, 0, 0)
         header = QHBoxLayout()
-        header.addWidget(QLabel("Name"))
+        header.addWidget(QLabel(tr("Name")))
         self._name = QLineEdit()
         self._name.textEdited.connect(self._name_edited)
         header.addWidget(self._name, stretch=1)
@@ -417,7 +433,7 @@ class _ItemsDialog(QDialog):
     def _pick_color(self) -> None:
         if not (0 <= self._row < len(self.items)):
             return
-        chosen = QColorDialog.getColor(QColor(self._color.property("color_value") or st.DEFAULT_COLOR), self, "Color")
+        chosen = QColorDialog.getColor(QColor(self._color.property("color_value") or st.DEFAULT_COLOR), self, "Color")  # i18n: ignore
         if chosen.isValid():
             self._set_color(chosen.name())
             self.items[self._row].color = chosen.name()
@@ -434,19 +450,19 @@ class FailureStatesDialog(_ItemsDialog):
     noun = "State"
 
     def __init__(self, parent, material_name: str, failure_states: list, unit: str, initial: int = 0) -> None:
-        super().__init__(parent, f"Define Failure States - {material_name}", failure_states, unit, initial)
+        super().__init__(parent, tr("Define Failure States - {0}").format(material_name), failure_states, unit, initial)
 
     def _build_editor(self, layout: QVBoxLayout) -> None:
         form = QFormLayout()
         self._symbol = QComboBox()
         for key, label in SYMBOLS.items():
-            self._symbol.addItem(label, key)
-        form.addRow("Symbol:", self._symbol)
+            self._symbol.addItem(tr(label), key)  # i18n: registry
+        form.addRow(tr("Symbol:"), self._symbol)
         self._test_type = QComboBox()
         for key, label in st.FAILURE_TEST_TYPES.items():
-            self._test_type.addItem(label, key)
+            self._test_type.addItem(tr(label), key)  # i18n: registry
         self._test_type.currentIndexChanged.connect(self._test_type_changed)
-        form.addRow("Test Type:", self._test_type)
+        form.addRow(tr("Test Type:"), self._test_type)
         layout.addLayout(form)
         self._points = PointTable([], [self._kpa_scale, self._kpa_scale], "Exclude")
         layout.addWidget(self._points, stretch=1)
@@ -491,7 +507,7 @@ class StressPathsDialog(_ItemsDialog):
     noun = "Path"
 
     def __init__(self, parent, material_name: str, stress_paths: list, unit: str, initial: int = 0) -> None:
-        super().__init__(parent, f"Define Stress Paths - {material_name}", stress_paths, unit, initial)
+        super().__init__(parent, tr("Define Stress Paths - {0}").format(material_name), stress_paths, unit, initial)
 
     def _build_editor(self, layout: QVBoxLayout) -> None:
         form = QFormLayout()
@@ -500,10 +516,10 @@ class StressPathsDialog(_ItemsDialog):
             widget = QComboBox()
             if isinstance(options, dict):
                 for key, label in options.items():
-                    widget.addItem(label, key)
+                    widget.addItem(tr(label), key)  # i18n: registry
             else:
                 for value in options:
-                    widget.addItem(value, value)
+                    widget.addItem(tr(value), value)  # i18n: registry
             return widget
 
         self._test_type = combo(st.PATH_TEST_TYPES)
@@ -519,12 +535,12 @@ class StressPathsDialog(_ItemsDialog):
         self._strain_type = combo(st.STRAIN_TYPES)
         for widget in (self._test_type, self._seepage, self._loading_dir, self._strain_type):
             widget.currentIndexChanged.connect(self._config_changed)
-        form.addRow("Test Type:", self._test_type)
-        form.addRow("Seepage Condition:", self._seepage)
-        form.addRow("Loading Direction:", self._loading_dir)
-        form.addRow("Initial Effective Lateral Stress:", self._lateral)
-        form.addRow("Initial Effective K0:", self._k0)
-        form.addRow("Strain Type:", self._strain_type)
+        form.addRow(tr("Test Type:"), self._test_type)
+        form.addRow(tr("Seepage Condition:"), self._seepage)
+        form.addRow(tr("Loading Direction:"), self._loading_dir)
+        form.addRow(tr("Initial Effective Lateral Stress:"), self._lateral)
+        form.addRow(tr("Initial Effective K0:"), self._k0)
+        form.addRow(tr("Strain Type:"), self._strain_type)
         self._form = form
         layout.addLayout(form)
         self._note = QLabel()
@@ -568,14 +584,14 @@ class StressPathsDialog(_ItemsDialog):
         if config.drawable:
             note = ""
             if test_type == "uniaxial":
-                note = "Uniaxial: the radial stress is zero (RSData 1.009 plots p and q with a hidden 100 kPa)."
+                note = tr("Uniaxial: the radial stress is zero (RSData 1.009 plots p and q with a hidden 100 kPa).")
         elif triaxial_like and config.loading == "Lateral":
-            note = (
+            note = tr(
                 "Loading Direction Lateral: RSData 1.009 overwrites SigmaXX with the initial lateral stress and "
                 "plots no axial stress; the path is kept but not drawn (spec 021)."
             )
         else:
-            note = "Kept but not drawn: the stress invariants of this configuration are not verified (spec 021)."
+            note = tr("Kept but not drawn: the stress invariants of this configuration are not verified (spec 021).")
         self._note.setText(note)
 
     def _new_item(self, name: str, color: str):

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import io
 import math
 
@@ -50,8 +51,21 @@ from ..core import units
 from ..core.graph_options import PlotOptions
 from ..core.hoek_brown import HbInput, ModulusMethod, compute
 from ..core.models import CRITERIA, Criterion, defaults
+from . import i18n
+from .i18n import tr
 from .plots import EnvelopeCanvas, PathCanvas
 from .themes import THEMES, apply_theme
+
+
+def _t(text: str) -> str:
+    """Marks an English text that is translated later, where it is shown (spec 024)."""
+
+    return text
+
+
+#: Windows opened by a language switch (spec 024): referenced here so that
+#: Python keeps them alive once the window that created them has closed.
+_OPEN_WINDOWS: list = []
 
 
 class MainWindow(QMainWindow):
@@ -101,7 +115,7 @@ class MainWindow(QMainWindow):
 
         self._criterion_combo = QComboBox()
         for key, crit in CRITERIA.items():
-            self._criterion_combo.addItem(crit.label, key)
+            self._criterion_combo.addItem(tr(crit.label), key)  # i18n: registry
         self._criterion_combo.currentIndexChanged.connect(self._rebuild_form)
         self._criterion_combo.currentIndexChanged.connect(self._update_application)
         self._criterion_combo.currentIndexChanged.connect(self.refresh)
@@ -117,7 +131,7 @@ class MainWindow(QMainWindow):
 
         # spec 009: sigma3max by application (tunnel / slope)
         self._application_combo = QComboBox()
-        for label, app_key in (("Custom", "custom"), ("Tunnel", "tunnel"), ("Slope", "slope")):
+        for label, app_key in ((tr("Custom"), "custom"), (tr("Tunnel"), "tunnel"), (tr("Slope"), "slope")):
             self._application_combo.addItem(label, app_key)
         self._application_combo.currentIndexChanged.connect(self._update_application)
         self._unit_weight = QDoubleSpinBox()
@@ -137,12 +151,12 @@ class MainWindow(QMainWindow):
         self._app_fields = QWidget()
         app_form = QFormLayout(self._app_fields)
         app_form.setContentsMargins(0, 0, 0, 0)
-        self._depth_label = QLabel("Tunnel depth")
-        app_form.addRow("Unit weight", self._unit_weight)
+        self._depth_label = QLabel(tr("Tunnel depth"))
+        app_form.addRow(tr("Unit weight"), self._unit_weight)
         app_form.addRow(self._depth_label, self._app_depth)
         self._app_fields.setVisible(False)
 
-        self._form_box = QGroupBox("Parameters")
+        self._form_box = QGroupBox(tr("Parameters"))
         self._form_layout = QFormLayout(self._form_box)
         self._widgets: dict[str, object] = {}
 
@@ -164,16 +178,16 @@ class MainWindow(QMainWindow):
 
         sidebar = QVBoxLayout()
         sidebar.addWidget(self._build_material_panel())
-        sidebar.addWidget(QLabel("Failure criterion"))
+        sidebar.addWidget(QLabel(tr("Failure criterion")))
         sidebar.addWidget(self._criterion_combo)
-        self._classifier_button = QPushButton("Soil classifier (USCS)…")
+        self._classifier_button = QPushButton(tr("Soil classifier (USCS)…"))
         self._classifier_button.clicked.connect(self._open_classifier)
         sidebar.addWidget(self._classifier_button)
-        self._fit_button = QPushButton("Fit lab data…")
+        self._fit_button = QPushButton(tr("Fit lab data…"))
         self._fit_button.clicked.connect(self._open_fit_dialog)
         sidebar.addWidget(self._fit_button)
         self._name_edit = QLineEdit()
-        self._name_edit.setPlaceholderText("Material name")
+        self._name_edit.setPlaceholderText(tr("Material name"))
         self._name_edit.setText(self._project.materials[0].name)
         self._name_edit.textChanged.connect(self._name_edited)
         self._name_edit.editingFinished.connect(self._name_edit_finished)
@@ -181,7 +195,7 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(self._name_edit)
         # spec 017: display stress unit and project title
         unit_row = QHBoxLayout()
-        unit_row.addWidget(QLabel("Stress unit"))
+        unit_row.addWidget(QLabel(tr("Stress unit")))
         self._unit_combo = QComboBox()
         for unit_name in units.STRESS_FACTORS:
             self._unit_combo.addItem(unit_name)
@@ -189,41 +203,41 @@ class MainWindow(QMainWindow):
         unit_row.addWidget(self._unit_combo)
         sidebar.addLayout(unit_row)
         self._title_edit = QLineEdit()
-        self._title_edit.setPlaceholderText("Project title")
+        self._title_edit.setPlaceholderText(tr("Project title"))
         self._title_edit.textChanged.connect(self._update_window_title)
         self._title_edit.editingFinished.connect(self._title_edited)
         sidebar.addWidget(self._title_edit)
         copy_row = QHBoxLayout()
-        copy_material = QPushButton("Copy material")
+        copy_material = QPushButton(tr("Copy material"))
         copy_material.clicked.connect(self._copy_material)
-        copy_data = QPushButton("Copy data")
+        copy_data = QPushButton(tr("Copy data"))
         copy_data.clicked.connect(self._copy_data)
-        copy_image = QPushButton("Copy plot")
+        copy_image = QPushButton(tr("Copy plot"))
         copy_image.clicked.connect(self._copy_plot_image)
         copy_row.addWidget(copy_material)
         copy_row.addWidget(copy_data)
         copy_row.addWidget(copy_image)
         sidebar.addLayout(copy_row)
         file_row = QHBoxLayout()
-        save_button = QPushButton("Save…")
+        save_button = QPushButton(tr("Save…"))
         save_button.clicked.connect(self._save_project)
-        load_button = QPushButton("Load…")
+        load_button = QPushButton(tr("Load…"))
         load_button.clicked.connect(self._load_project)
-        import_button = QPushButton("Import .roc…")
+        import_button = QPushButton(tr("Import .roc…"))
         import_button.clicked.connect(self._import_roc)
         file_row.addWidget(save_button)
         file_row.addWidget(load_button)
         file_row.addWidget(import_button)
         sidebar.addLayout(file_row)
-        sidebar.addWidget(QLabel("Application (sigma3max range)"))
+        sidebar.addWidget(QLabel(tr("Application (sigma3max range)")))
         sidebar.addWidget(self._application_combo)
-        self._sig3max_label = QLabel("sig3max (envelope range)")
+        self._sig3max_label = QLabel(tr("sig3max (envelope range)"))
         sidebar.addWidget(self._sig3max_label)
         sidebar.addWidget(self._sig3max)
         sidebar.addWidget(self._app_fields)
         sidebar.addWidget(self._form_box)
         sidebar.addWidget(self._stiffness_box)
-        sidebar.addWidget(QLabel("Computed"))
+        sidebar.addWidget(QLabel(tr("Computed")))
         sidebar.addWidget(self._outputs, stretch=1)
 
         sidebar_widget = QWidget()
@@ -234,8 +248,14 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setMaximumWidth(380)
 
-        self._principal = EnvelopeCanvas("Principal Stresses", f"sigma3 ({self._stress_unit})", f"sigma1 ({self._stress_unit})", self._theme, space="principal")
-        self._shear = EnvelopeCanvas("Shear - Normal Stresses", f"normal stress ({self._stress_unit})", f"shear stress ({self._stress_unit})", self._theme, space="shear")
+        self._principal = EnvelopeCanvas(
+            tr("Principal Stresses"), tr("sigma3 ({0})").format(self._stress_unit),
+            tr("sigma1 ({0})").format(self._stress_unit), self._theme, space="principal",
+        )
+        self._shear = EnvelopeCanvas(
+            tr("Shear - Normal Stresses"), tr("normal stress ({0})").format(self._stress_unit),
+            tr("shear stress ({0})").format(self._stress_unit), self._theme, space="shear",
+        )
         for canvas in (self._principal, self._shear):
             canvas.sampler_handler = self._on_plot_event
             canvas.menu_handler = self._on_canvas_menu
@@ -246,12 +266,16 @@ class MainWindow(QMainWindow):
         plots.addWidget(self._shear)
 
         # spec 012: Stress Path Graphs tab (RSData's four default graphs; the
-        # second shows volumetric strain: path tables hold no pore pressure)
+        # second shows volumetric strain: path tables hold no pore pressure).
+        # Axis labels go in English (_t): the canvas translates them on screen
+        # and keeps the English for the CSV headers.
         self._path_canvases = {
-            "axial": PathCanvas("Axial Stress vs Axial Strain", "Axial Strain", "Axial Stress", False, True, self._theme),
-            "volumetric": PathCanvas("Volumetric Strain vs Axial Strain", "Axial Strain", "Volumetric Strain", False, False, self._theme),
-            "deviatoric": PathCanvas("q vs Deviatoric Strain", "Deviatoric Strain", "q", False, True, self._theme),
-            "pq": PathCanvas("q vs p", "p", "q", True, True, self._theme),
+            "axial": PathCanvas(tr("Axial Stress vs Axial Strain"), _t("Axial Strain"), _t("Axial Stress"), False, True, self._theme),
+            "volumetric": PathCanvas(
+                tr("Volumetric Strain vs Axial Strain"), _t("Axial Strain"), _t("Volumetric Strain"), False, False, self._theme
+            ),
+            "deviatoric": PathCanvas(tr("q vs Deviatoric Strain"), _t("Deviatoric Strain"), "q", False, True, self._theme),
+            "pq": PathCanvas(tr("q vs p"), "p", "q", True, True, self._theme),
         }
         path_page = QWidget()
         path_grid = QGridLayout(path_page)
@@ -265,8 +289,8 @@ class MainWindow(QMainWindow):
         self._animation = AnimationPanel(self)
         path_grid.addWidget(self._animation, 2, 0, 1, 2)
         self._graph_tabs = QTabWidget()
-        self._graph_tabs.addTab(plots, "Strength Graphs")
-        self._graph_tabs.addTab(path_page, "Stress Path Graphs")
+        self._graph_tabs.addTab(plots, tr("Strength Graphs"))
+        self._graph_tabs.addTab(path_page, tr("Stress Path Graphs"))
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(scroll)
@@ -292,53 +316,53 @@ class MainWindow(QMainWindow):
         bar = QMenuBar(self)
         self.setMenuBar(bar)
 
-        file_menu = bar.addMenu("File")
-        file_menu.addAction("New Project", self._new_project)
-        file_menu.addAction("Save…", self._save_project)
-        file_menu.addAction("Load…", self._load_project)
-        file_menu.addAction("Import .roc…", self._import_roc)
+        file_menu = bar.addMenu(tr("File"))
+        file_menu.addAction(tr("New Project"), self._new_project)
+        file_menu.addAction(tr("Save…"), self._save_project)
+        file_menu.addAction(tr("Load…"), self._load_project)
+        file_menu.addAction(tr("Import .roc…"), self._import_roc)
         file_menu.addSeparator()
-        file_menu.addAction("Exit", self.close)
+        file_menu.addAction(tr("Exit"), self.close)
 
-        edit_menu = bar.addMenu("Edit")
+        edit_menu = bar.addMenu(tr("Edit"))
         # spec 023
-        self._undo_act = QAction("Undo", self)
+        self._undo_act = QAction(tr("Undo"), self)
         self._undo_act.setShortcut(QKeySequence(QKeySequence.StandardKey.Undo))
         self._undo_act.triggered.connect(self.undo)
-        self._redo_act = QAction("Redo", self)
+        self._redo_act = QAction(tr("Redo"), self)
         self._redo_act.setShortcuts([QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z")])
         self._redo_act.triggered.connect(self.redo)
         edit_menu.addAction(self._undo_act)
         edit_menu.addAction(self._redo_act)
         edit_menu.addSeparator()
-        edit_menu.addAction("Copy material", self._copy_material)
-        edit_menu.addAction("Copy data", self._copy_data)
+        edit_menu.addAction(tr("Copy material"), self._copy_material)
+        edit_menu.addAction(tr("Copy data"), self._copy_data)
 
-        materials_menu = bar.addMenu("Materials")
-        materials_menu.addAction("Add Material", lambda: self._add_material("material"))
-        materials_menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
-        materials_menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        materials_menu = bar.addMenu(tr("Materials"))
+        materials_menu.addAction(tr("Add Material"), lambda: self._add_material("material"))
+        materials_menu.addAction(tr("Add Rock Template"), lambda: self._add_material("rock"))
+        materials_menu.addAction(tr("Add Soil Template"), lambda: self._add_material("soil"))
         materials_menu.addSeparator()
-        materials_menu.addAction("Duplicate Material", self._duplicate_material)
-        materials_menu.addAction("Rename Material", self._rename_material)
-        materials_menu.addAction("Delete Material", self._delete_material)
+        materials_menu.addAction(tr("Duplicate Material"), self._duplicate_material)
+        materials_menu.addAction(tr("Rename Material"), self._rename_material)
+        materials_menu.addAction(tr("Delete Material"), self._delete_material)
 
         # spec 012
-        states_menu = bar.addMenu("Failure States")
-        states_menu.addAction("Define Failure States…", lambda: self._define_failure_states())
-        tests_menu = bar.addMenu("Tests")  # spec 013
-        tests_menu.addAction("Define Test Simulations…", lambda: self._define_test_simulations())
-        paths_menu = bar.addMenu("Stress Paths")
-        paths_menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
+        states_menu = bar.addMenu(tr("Failure States"))
+        states_menu.addAction(tr("Define Failure States…"), lambda: self._define_failure_states())
+        tests_menu = bar.addMenu(tr("Tests"))  # spec 013
+        tests_menu.addAction(tr("Define Test Simulations…"), lambda: self._define_test_simulations())
+        paths_menu = bar.addMenu(tr("Stress Paths"))
+        paths_menu.addAction(tr("Define Stress Paths…"), lambda: self._define_stress_paths())
         # spec 014
-        calibrate_menu = bar.addMenu("Calibrate")
-        calibrate_menu.addAction("Calibrate…", self._open_calibration)
-        compute_menu = bar.addMenu("Compute")  # spec 013
-        compute_menu.addAction("Compute", self.compute)
+        calibrate_menu = bar.addMenu(tr("Calibrate"))
+        calibrate_menu.addAction(tr("Calibrate…"), self._open_calibration)
+        compute_menu = bar.addMenu(tr("Compute"))  # spec 013
+        compute_menu.addAction(tr("Compute"), self.compute)
 
-        analysis_menu = bar.addMenu("Analysis")
-        self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
-        self._mc_sampler_act = QAction("Instantaneous MC Sampler", self, checkable=True)
+        analysis_menu = bar.addMenu(tr("Analysis"))
+        self._stress_sampler_act = QAction(tr("Stress Sampler"), self, checkable=True)
+        self._mc_sampler_act = QAction(tr("Instantaneous MC Sampler"), self, checkable=True)
         sampler_group = QActionGroup(self)
         sampler_group.setExclusive(True)
         sampler_group.addAction(self._stress_sampler_act)
@@ -346,38 +370,47 @@ class MainWindow(QMainWindow):
         analysis_menu.addAction(self._stress_sampler_act)
         analysis_menu.addAction(self._mc_sampler_act)
         analysis_menu.addSeparator()
-        self._overlay_mc_act = QAction("Overlay MC Envelope", self, checkable=True)
-        self._overlay_mogi_act = QAction("Overlay Mogi Line", self, checkable=True)
+        self._overlay_mc_act = QAction(tr("Overlay MC Envelope"), self, checkable=True)
+        self._overlay_mogi_act = QAction(tr("Overlay Mogi Line"), self, checkable=True)
         analysis_menu.addAction(self._overlay_mc_act)
         analysis_menu.addAction(self._overlay_mogi_act)
         analysis_menu.addSeparator()
-        analysis_menu.addAction("Material Database…", self._open_database)  # spec 010 (RSData: Open RocProp)
+        analysis_menu.addAction(tr("Material Database…"), self._open_database)  # spec 010 (RSData: Open RocProp)
         analysis_menu.addSeparator()
         # spec 015 (RSData names)
-        analysis_menu.addAction("Report Generator…", self._open_report_generator)
-        analysis_menu.addAction("Add View To Report", self.add_view_to_report)
-        analysis_menu.addAction("Manage Report View…", self._manage_report_views)
+        analysis_menu.addAction(tr("Report Generator…"), self._open_report_generator)
+        analysis_menu.addAction(tr("Add View To Report"), self.add_view_to_report)
+        analysis_menu.addAction(tr("Manage Report View…"), self._manage_report_views)
         self._stress_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._mc_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._overlay_mc_act.toggled.connect(self.refresh)
         self._overlay_mogi_act.toggled.connect(self.refresh)
 
-        view_menu = bar.addMenu("View")
-        theme_menu = view_menu.addMenu("Theme")
+        view_menu = bar.addMenu(tr("View"))
+        theme_menu = view_menu.addMenu(tr("Theme"))
+        theme_names = {"light": tr("Light"), "dark": tr("Dark")}
         for name in THEMES:
-            theme_menu.addAction(name.capitalize(), lambda _=False, n=name: self._set_theme(n))
+            theme_menu.addAction(theme_names.get(name, name.capitalize()), lambda _=False, n=name: self._set_theme(n))
+        # spec 024: interface language (the window reopens in it, keeping everything)
+        language_menu = view_menu.addMenu(tr("Language"))
+        language_group = QActionGroup(self)
+        for code, native in i18n.LANGUAGES.items():
+            act = language_menu.addAction(native, lambda _=False, c=code: self.set_language(c))
+            act.setCheckable(True)
+            act.setChecked(code == i18n.current_language())
+            language_group.addAction(act)
         view_menu.addSeparator()
-        view_menu.addAction("Graph Editor…", self._open_graph_editor)
+        view_menu.addAction(tr("Graph Editor…"), self._open_graph_editor)
 
-        help_menu = bar.addMenu("Help")
-        help_menu.addAction("About OGR Data", self._about)
+        help_menu = bar.addMenu(tr("Help"))
+        help_menu.addAction(tr("About OGR Data"), self._about)
 
     # ------------------------------------------------- spec 011: materials
 
     def _build_material_panel(self) -> QWidget:
         """Materials tree (RSData's Visibility panel) with its buttons."""
 
-        box = QGroupBox("Materials")
+        box = QGroupBox(tr("Materials"))
         layout = QVBoxLayout(box)
         self._tree = QTreeWidget()
         self._tree.setHeaderHidden(True)
@@ -397,16 +430,16 @@ class MainWindow(QMainWindow):
 
         buttons = QHBoxLayout()
         self._add_button = QToolButton()
-        self._add_button.setText("Add Material")
+        self._add_button.setText(tr("Add Material"))
         self._add_button.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup)
         add_menu = QMenu(self._add_button)
-        add_menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
-        add_menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        add_menu.addAction(tr("Add Rock Template"), lambda: self._add_material("rock"))
+        add_menu.addAction(tr("Add Soil Template"), lambda: self._add_material("soil"))
         self._add_button.setMenu(add_menu)
         self._add_button.clicked.connect(lambda: self._add_material("material"))
-        self._duplicate_button = QPushButton("Duplicate")
+        self._duplicate_button = QPushButton(tr("Duplicate"))
         self._duplicate_button.clicked.connect(self._duplicate_material)
-        self._delete_button = QPushButton("Delete")
+        self._delete_button = QPushButton(tr("Delete"))
         self._delete_button.clicked.connect(lambda: self._delete_material())
         self._add_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         buttons.addWidget(self._add_button)
@@ -440,7 +473,7 @@ class MainWindow(QMainWindow):
                 )
                 item.setCheckState(0, Qt.CheckState.Checked if material.visible else Qt.CheckState.Unchecked)
                 item.setIcon(0, self._swatch(self._material_color(material)))
-                item.setToolTip(0, f"{material.name} ({CRITERIA[material.criterion].label})")
+                item.setToolTip(0, f"{material.name} ({tr(CRITERIA[material.criterion].label)})")  # i18n: registry
                 self._tree.addTopLevelItem(item)
                 # spec 012: failure states and stress paths of the material
                 children = [("state", i, s, st.FAILURE_TEST_TYPES[s.test_type]) for i, s in enumerate(material.failure_states)]
@@ -454,8 +487,8 @@ class MainWindow(QMainWindow):
                     child.setData(0, Qt.ItemDataRole.UserRole, (kind, index))
                     child.setCheckState(0, Qt.CheckState.Checked if obj.visible else Qt.CheckState.Unchecked)
                     child.setIcon(0, self._swatch(obj.color))
-                    noun = {"state": "Failure state", "test": "Test simulation", "path": "Stress path"}[kind]
-                    child.setToolTip(0, f"{noun}: {obj.name} ({test_label})")
+                    noun = {"state": tr("Failure state"), "test": tr("Test simulation"), "path": tr("Stress path")}[kind]
+                    child.setToolTip(0, f"{noun}: {obj.name} ({tr(test_label)})")  # i18n: registry
                     item.addChild(child)
             self._tree.expandAll()
             self._tree.setCurrentItem(self._tree.topLevelItem(self._current))
@@ -482,7 +515,7 @@ class MainWindow(QMainWindow):
         item = self._tree.topLevelItem(self._current)
         if item is not None:
             self._tree_updating = True
-            item.setToolTip(0, f"{material.name} ({CRITERIA[material.criterion].label})")
+            item.setToolTip(0, f"{material.name} ({tr(CRITERIA[material.criterion].label)})")  # i18n: registry
             self._tree_updating = False
 
     def _load_material(self, index: int) -> None:
@@ -553,7 +586,7 @@ class MainWindow(QMainWindow):
                 name = material.name
             self._tree_updating = True
             item.setText(0, name)
-            item.setToolTip(0, f"{name} ({CRITERIA[material.criterion].label})")
+            item.setToolTip(0, f"{name} ({tr(CRITERIA[material.criterion].label)})")  # i18n: registry
             self._tree_updating = False
             if index == self._current:
                 self._name_edit.setText(name)
@@ -601,7 +634,7 @@ class MainWindow(QMainWindow):
             return
         name = self._current_material().name
         if confirm:
-            answer = QMessageBox.question(self, "Delete material", f"Delete material '{name}'?")
+            answer = QMessageBox.question(self, tr("Delete material"), tr("Delete material '{0}'?").format(name))
             if answer != QMessageBox.StandardButton.Yes:
                 return
         index = self._project.remove(self._current)
@@ -615,7 +648,7 @@ class MainWindow(QMainWindow):
 
     def _choose_material_color(self) -> None:
         initial = QColor(self._material_color(self._current_material()))
-        color = QColorDialog.getColor(initial, self, "Material color")
+        color = QColorDialog.getColor(initial, self, tr("Material color"))
         if color.isValid():
             self._set_material_color(color.name())
 
@@ -632,28 +665,28 @@ class MainWindow(QMainWindow):
             self._child_menu(item, pos)
             return
         menu = QMenu(self)
-        menu.addAction("Add Material", lambda: self._add_material("material"))
-        menu.addAction("Add Rock Template", lambda: self._add_material("rock"))
-        menu.addAction("Add Soil Template", lambda: self._add_material("soil"))
+        menu.addAction(tr("Add Material"), lambda: self._add_material("material"))
+        menu.addAction(tr("Add Rock Template"), lambda: self._add_material("rock"))
+        menu.addAction(tr("Add Soil Template"), lambda: self._add_material("soil"))
         if item is not None:
             menu.addSeparator()
-            menu.addAction("Duplicate Material", self._duplicate_material)
-            menu.addAction("Rename", self._rename_material)
-            menu.addAction("Color…", self._choose_material_color)
-            menu.addAction("Automatic color", lambda: self._set_material_color(""))
-            symbol_menu = menu.addMenu("Symbol")
+            menu.addAction(tr("Duplicate Material"), self._duplicate_material)
+            menu.addAction(tr("Rename"), self._rename_material)
+            menu.addAction("Color…", self._choose_material_color)  # i18n: ignore (same in Spanish)
+            menu.addAction(tr("Automatic color"), lambda: self._set_material_color(""))
+            symbol_menu = menu.addMenu(tr("Symbol"))
             current = self._current_material().symbol
             for symbol, label in projects.SYMBOLS.items():
-                act = symbol_menu.addAction(label, lambda s=symbol: self._set_material_symbol(s))
+                act = symbol_menu.addAction(tr(label), lambda s=symbol: self._set_material_symbol(s))  # i18n: registry
                 act.setCheckable(True)
                 act.setChecked(symbol == current)
-            menu.addAction("Copy material", self._copy_material)
+            menu.addAction(tr("Copy material"), self._copy_material)
             menu.addSeparator()
-            menu.addAction("Define Failure States…", lambda: self._define_failure_states())
-            menu.addAction("Define Test Simulations…", lambda: self._define_test_simulations())
-            menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
+            menu.addAction(tr("Define Failure States…"), lambda: self._define_failure_states())
+            menu.addAction(tr("Define Test Simulations…"), lambda: self._define_test_simulations())
+            menu.addAction(tr("Define Stress Paths…"), lambda: self._define_stress_paths())
             menu.addSeparator()
-            delete = menu.addAction("Delete Material", lambda: self._delete_material())
+            delete = menu.addAction(tr("Delete Material"), lambda: self._delete_material())
             delete.setEnabled(len(self._project.materials) > 1)
         menu.exec(self._tree.viewport().mapToGlobal(pos))
 
@@ -663,12 +696,12 @@ class MainWindow(QMainWindow):
         kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
         menu = QMenu(self)
         if kind == "state":
-            menu.addAction("Edit Failure State…", lambda: self._define_failure_states(sub))
+            menu.addAction(tr("Edit Failure State…"), lambda: self._define_failure_states(sub))
         elif kind == "test":
-            menu.addAction("Edit Test Simulation…", lambda: self._define_test_simulations(sub))
+            menu.addAction(tr("Edit Test Simulation…"), lambda: self._define_test_simulations(sub))
         else:
-            menu.addAction("Edit Stress Path…", lambda: self._define_stress_paths(sub))
-        menu.addAction("Delete", lambda: self._delete_child(kind, sub))
+            menu.addAction(tr("Edit Stress Path…"), lambda: self._define_stress_paths(sub))
+        menu.addAction(tr("Delete"), lambda: self._delete_child(kind, sub))
         menu.exec(self._tree.viewport().mapToGlobal(pos))
 
     def _tree_double_clicked(self, item, _column) -> None:
@@ -759,7 +792,7 @@ class MainWindow(QMainWindow):
         try:
             database = MaterialDatabase(self._database_file())
         except (ValueError, OSError) as exc:
-            QMessageBox.warning(self, "Material Database", str(exc))
+            QMessageBox.warning(self, tr("Material Database"), str(exc))
             return
         DatabaseDialog(database, self, on_use=self.use_database_record, on_use_state=self.use_database_specimens).exec()
 
@@ -769,7 +802,11 @@ class MainWindow(QMainWindow):
         material = self._current_material()
         state = factory.state_from_record(record, material.failure_states)
         self.set_failure_states(material.failure_states + [state])
-        self.statusBar().showMessage(f"Failure state '{state.name}' added to {material.name} ({len(state.points)} points from record {record.get('record_id')}).")
+        self.statusBar().showMessage(
+            tr("Failure state '{0}' added to {1} ({2} points from record {3}).").format(
+                state.name, material.name, len(state.points), record.get("record_id")
+            )
+        )
 
     def use_database_record(self, record: dict) -> int:
         """New Generalized Hoek-Brown material from a database record (sigci, mi)."""
@@ -780,7 +817,9 @@ class MainWindow(QMainWindow):
         self._load_material(index)
         self._populate_tree()
         self.statusBar().showMessage(
-            f"Material created from database record {record.get('record_id')}: GSI and D keep their defaults; set them for the rock mass."
+            tr("Material created from database record {0}: GSI and D keep their defaults; set them for the rock mass.").format(
+                record.get("record_id")
+            )
         )
         return index
 
@@ -938,12 +977,12 @@ class MainWindow(QMainWindow):
             QApplication.clipboard().setPixmap(canvas.grab())
         elif kind == "save":
             path, _ = QFileDialog.getSaveFileName(
-                self, "Save graph as image", "", "PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)"
+                self, tr("Save graph as image"), "", tr("PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)")
             )
             if path:
                 canvas.save_image(path)
         elif kind == "export":
-            path, _ = QFileDialog.getSaveFileName(self, "Export graph to CSV", "", "CSV (*.csv)")
+            path, _ = QFileDialog.getSaveFileName(self, tr("Export graph to CSV"), "", "CSV (*.csv)")  # i18n: ignore (filter)
             if not path:
                 return
             if not path.endswith(".csv"):
@@ -955,7 +994,7 @@ class MainWindow(QMainWindow):
 
         from ..core import export as series_export
 
-        x_name, y_name = canvas.axes.get_xlabel(), canvas.axes.get_ylabel()
+        x_name, y_name = canvas.export_labels()  # English: CSV headers do not follow the language
         kx = canvas.display_scale if canvas._stress_axes[0] else 1.0
         ky = canvas.display_scale if canvas._stress_axes[1] else 1.0
         columns = [(f"{label} {x_name}", f"{label} {y_name}", x * kx, y * ky) for label, x, y in canvas.series_data()]
@@ -1019,8 +1058,8 @@ class MainWindow(QMainWindow):
 
     def _set_plot_labels(self) -> None:
         u = self._stress_unit
-        self._principal.set_axes_labels(f"sigma3 ({u})", f"sigma1 ({u})")
-        self._shear.set_axes_labels(f"normal stress ({u})", f"shear stress ({u})")
+        self._principal.set_axes_labels(tr("sigma3 ({0})").format(u), tr("sigma1 ({0})").format(u))
+        self._shear.set_axes_labels(tr("normal stress ({0})").format(u), tr("shear stress ({0})").format(u))
         for canvas in (self._principal, self._shear):
             canvas.set_display_scale(self._scale())
         for canvas in getattr(self, "_path_canvases", {}).values():
@@ -1077,7 +1116,7 @@ class MainWindow(QMainWindow):
             QApplication.clipboard().setPixmap(canvas.grab())
         elif kind == "save":
             path, _ = QFileDialog.getSaveFileName(
-                self, "Save graph as image", "", "PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)"
+                self, tr("Save graph as image"), "", tr("PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)")
             )
             if path:
                 canvas.save_image(path)
@@ -1095,7 +1134,7 @@ class MainWindow(QMainWindow):
 
         from ..core import export as series_export
 
-        path, _ = QFileDialog.getSaveFileName(self, "Export graph to CSV", "", "CSV (*.csv)")
+        path, _ = QFileDialog.getSaveFileName(self, tr("Export graph to CSV"), "", "CSV (*.csv)")  # i18n: ignore (filter)
         if not path:
             return
         if not path.endswith(".csv"):
@@ -1126,7 +1165,7 @@ class MainWindow(QMainWindow):
         for x_col, y_col, x, y in canvas.layer_series():
             columns.append((x_col, y_col, x * scale, y * scale))
         if not columns:
-            QMessageBox.information(self, "Export", "There is no series to export on this plot.")
+            QMessageBox.information(self, tr("Export"), tr("There is no series to export on this plot."))
             return
         series_export.write_series_csv(path, columns, unit=self._stress_unit)
 
@@ -1170,7 +1209,7 @@ class MainWindow(QMainWindow):
 
         computed = self._ghb_computed()
         if not computed:
-            QMessageBox.information(self, "Stiffness", "Erm is computed for Generalized Hoek-Brown materials only.")
+            QMessageBox.information(self, tr("Stiffness"), tr("Erm is computed for Generalized Hoek-Brown materials only."))
             return
         self._young.setValue(units.to_display(computed["erm_mpa"], self._stress_unit))
 
@@ -1209,11 +1248,14 @@ class MainWindow(QMainWindow):
                 else:
                     done += 1
         self.refresh()
-        message = f"Compute: {done} test simulation{'s' if done != 1 else ''} computed"
+        if done == 1:
+            message = tr("Compute: 1 test simulation computed")
+        else:
+            message = tr("Compute: {0} test simulations computed").format(done)
         if problems:
-            message += f", {len(problems)} not simulated"
+            message += tr(", {0} not simulated").format(len(problems))
             if report_problems:
-                QMessageBox.information(self, "Compute", "\n".join(problems))
+                QMessageBox.information(self, tr("Compute"), "\n".join(problems))
         self.statusBar().showMessage(message, 8000)
         return problems
 
@@ -1244,10 +1286,10 @@ class MainWindow(QMainWindow):
         self._store_current()
         material = self._current_material()
         if self._graph_tabs.currentIndex() == 0:
-            kind = "Strength Graphs"
+            kind = tr("Strength Graphs")
             canvases = [(c.axes.get_title(), c) for c in (self._principal, self._shear)]
         else:
-            kind = "Stress Path Graphs"
+            kind = tr("Stress Path Graphs")
             canvases = [(c.title, c) for c in self._path_canvases.values()]
         sample = self.statusBar().currentMessage() if self._sampler_mode else ""
         view = report.ReportView(
@@ -1262,7 +1304,8 @@ class MainWindow(QMainWindow):
         )
         self.report_views.add(view)
         n = len(self.report_views)
-        self.statusBar().showMessage(f"View added to the report ({n} view{'s' if n != 1 else ''})", 5000)
+        message = tr("View added to the report (1 view)") if n == 1 else tr("View added to the report ({0} views)").format(n)
+        self.statusBar().showMessage(message, 5000)
         return view
 
     def _manage_report_views(self) -> None:
@@ -1280,10 +1323,12 @@ class MainWindow(QMainWindow):
 
         QMessageBox.about(
             self,
-            "About OGR Data",
-            f"<b>OGR Data</b> {__version__}<br/>"
-            "Rock and soil material properties for the OpenGeoRock suite.<br/>"
-            "Design language: OGR-Slip2D (QGIS-inspired).",
+            tr("About OGR Data"),
+            tr(
+                "<b>OGR Data</b> {0}<br/>"
+                "Rock and soil material properties for the OpenGeoRock suite.<br/>"
+                "Design language: OGR-Slip2D (QGIS-inspired)."
+            ).format(__version__),
         )
 
 
@@ -1378,7 +1423,7 @@ class MainWindow(QMainWindow):
     def _save_project(self) -> bool:
         from PySide6.QtWidgets import QFileDialog
 
-        path, _ = QFileDialog.getSaveFileName(self, "Save project", "", "OGR Data project (*.ogrdata)")
+        path, _ = QFileDialog.getSaveFileName(self, tr("Save project"), "", tr("OGR Data project (*.ogrdata)"))
         if not path:
             return False
         return self.save_project_to(path)
@@ -1392,7 +1437,7 @@ class MainWindow(QMainWindow):
         try:
             projects.save_project(path, self._project_for_save())
         except (ValueError, OSError) as exc:
-            QMessageBox.warning(self, "Save failed", str(exc))
+            QMessageBox.warning(self, tr("Save failed"), str(exc))
             return False
         if self._history is not None:
             self._history.mark_saved()
@@ -1404,13 +1449,13 @@ class MainWindow(QMainWindow):
 
         if not self._confirm_discard():
             return
-        path, _ = QFileDialog.getOpenFileName(self, "Load project", "", "OGR Data project (*.ogrdata)")
+        path, _ = QFileDialog.getOpenFileName(self, tr("Load project"), "", tr("OGR Data project (*.ogrdata)"))
         if not path:
             return
         try:
             loaded = projects.load_project(path)
         except (ValueError, OSError) as exc:
-            QMessageBox.warning(self, "Load failed", str(exc))
+            QMessageBox.warning(self, tr("Load failed"), str(exc))
             return
         self.open_project(loaded)
 
@@ -1462,13 +1507,13 @@ class MainWindow(QMainWindow):
 
         from ..core import roc_import
 
-        path, _ = QFileDialog.getOpenFileName(self, "Import RocData file", "", "RocData (*.roc)")
+        path, _ = QFileDialog.getOpenFileName(self, tr("Import RocData file"), "", "RocData (*.roc)")  # i18n: ignore (filter)
         if not path:
             return
         try:
             roc = roc_import.parse_roc(path)
         except (ValueError, OSError) as exc:
-            QMessageBox.warning(self, "Import failed", str(exc))
+            QMessageBox.warning(self, tr("Import failed"), str(exc))
             return
         self.import_material(roc.title, roc.criterion, roc.parameters, roc.sig3max_mpa)
 
@@ -1500,7 +1545,7 @@ class MainWindow(QMainWindow):
             elif isinstance(widget, QCheckBox):
                 widget.setChecked(bool(value))
             elif isinstance(widget, QComboBox):
-                index = widget.findText(str(value))
+                index = widget.findData(str(value))  # enum options: English value in itemData
                 if index >= 0:
                     widget.setCurrentIndex(index)
             elif hasattr(widget, "value") and isinstance(value, (list, tuple)):
@@ -1546,8 +1591,8 @@ class MainWindow(QMainWindow):
             return
         self._undo_act.setEnabled(h.can_undo)
         self._redo_act.setEnabled(h.can_redo)
-        self._undo_act.setText(f"Undo {h.undo_text}" if h.can_undo else "Undo")
-        self._redo_act.setText(f"Redo {h.redo_text}" if h.can_redo else "Redo")
+        self._undo_act.setText(tr("Undo {0}").format(h.undo_text_in(tr)) if h.can_undo else tr("Undo"))
+        self._redo_act.setText(tr("Redo {0}").format(h.redo_text_in(tr)) if h.can_redo else tr("Redo"))
         self._update_window_title()
         self.setWindowModified(h.modified)
 
@@ -1590,7 +1635,7 @@ class MainWindow(QMainWindow):
         else:
             buttons = QMessageBox.StandardButton
             answer = QMessageBox.question(
-                self, "Unsaved changes", "The project has unsaved changes. Save them?",
+                self, tr("Unsaved changes"), tr("The project has unsaved changes. Save them?"),
                 buttons.Save | buttons.Discard | buttons.Cancel, buttons.Save,
             )
             choice = {buttons.Save: "save", buttons.Discard: "discard"}.get(answer, "cancel")
@@ -1599,10 +1644,60 @@ class MainWindow(QMainWindow):
         return choice == "discard"
 
     def closeEvent(self, event) -> None:  # noqa: N802 (Qt)
-        if self._confirm_discard():
+        if getattr(self, "_replaced", False) or self._confirm_discard():
             event.accept()
+            if self in _OPEN_WINDOWS:
+                _OPEN_WINDOWS.remove(self)
         else:
             event.ignore()
+
+    # ------------------------------------------------------------ spec 024: language
+
+    def set_language(self, code: str) -> "MainWindow":
+        """Switch the interface language: a new window in it takes over this one's
+        project, selection, undo history, report views and view options; this one closes.
+        The choice is saved for the next start."""
+
+        if code == i18n.current_language():
+            return self
+        from PySide6.QtWidgets import QApplication
+
+        self._checkpoint()
+        self._settings.setValue("language", code)
+        i18n.set_language(code)
+        i18n.install_qt_translator(QApplication.instance(), code)
+        window = MainWindow()
+        window.adopt(self)
+        window.setGeometry(self.geometry())
+        if self.isVisible():
+            window.show()
+        _OPEN_WINDOWS.append(window)
+        self._replaced = True
+        self.close()
+        return window
+
+    def adopt(self, old: "MainWindow") -> None:
+        """Take over the state of another window (language switch)."""
+
+        old._store_current()
+        old._project.selected = old._current
+        project = old._project
+        project.title = old._title_edit.text()
+        self.report_views = old.report_views
+        self.report_visibility = old.report_visibility
+        self._overlay_mc_act.setChecked(old._overlay_mc_act.isChecked())
+        self._overlay_mogi_act.setChecked(old._overlay_mogi_act.isChecked())
+        self.database_path = old.database_path
+        self._history_hold += 1
+        try:
+            self._show_project(project)
+            for name, canvas in (("principal", self._principal), ("shear", self._shear)):
+                canvas.apply_options(copy.deepcopy(getattr(old, f"_{name}").options))
+        finally:
+            self._history_hold -= 1
+        self._history = old._history
+        self._absorb()
+        self._graph_tabs.setCurrentIndex(old._graph_tabs.currentIndex())
 
     # ------------------------------------------------------------------ form
 
@@ -1621,13 +1716,14 @@ class MainWindow(QMainWindow):
                 widget.toggled.connect(self.refresh)
             elif field.kind == "enum":
                 widget = QComboBox()
-                widget.addItems(field.options)
+                for option in field.options:
+                    widget.addItem(tr(option), option)  # i18n: registry
                 widget.currentIndexChanged.connect(self.refresh)
             elif field.kind == "table":  # spec 013b: tabular hardening laws
                 from .table_field import TableField
 
                 widget = TableField(
-                    field.label, field.options, field.stress_columns, field.default,
+                    tr(field.label), field.options, field.stress_columns, field.default,  # i18n: registry
                     lambda: (self._kpa_scale(), self._stress_unit),
                 )
                 widget.changed.connect(self.refresh)
@@ -1653,10 +1749,10 @@ class MainWindow(QMainWindow):
                 row = QHBoxLayout(editor)
                 row.setContentsMargins(0, 0, 0, 0)
                 row.addWidget(widget, stretch=1)
-                pick_button = QPushButton("Pick…")
+                pick_button = QPushButton(tr("Pick…"))
                 pick_button.clicked.connect(lambda _=False, f=field, w=widget: self._pick(f, w))
                 row.addWidget(pick_button)
-            self._form_layout.addRow(field.label, editor)
+            self._form_layout.addRow(tr(field.label), editor)  # i18n: registry
 
     def pick_value(self, key: str) -> float | None:
         """Open the selector of a pick key; the value in registry units (kPa for stresses)."""
@@ -1689,7 +1785,7 @@ class MainWindow(QMainWindow):
             try:
                 return dialog.value()
             except ValueError as exc:
-                QMessageBox.warning(self, "Pick", str(exc))
+                QMessageBox.warning(self, tr("Pick"), str(exc))
                 return None
         return None
 
@@ -1720,7 +1816,7 @@ class MainWindow(QMainWindow):
             if field.kind == "bool":
                 params[field.key] = widget.isChecked()
             elif field.kind == "enum":
-                params[field.key] = widget.currentText()
+                params[field.key] = widget.currentData()
             elif field.kind == "table":
                 params[field.key] = widget.value()
             elif field.unit == "kPa":
@@ -1770,7 +1866,7 @@ class MainWindow(QMainWindow):
         self._sig3max.setEnabled(custom)
         self._sig3max_label.setVisible(custom)
         self._app_fields.setVisible(not custom)
-        self._depth_label.setText("Tunnel depth" if mode == "tunnel" else "Slope height")
+        self._depth_label.setText(tr("Tunnel depth") if mode == "tunnel" else tr("Slope height"))
         self._apply_application()
         self.refresh()
 
@@ -1926,7 +2022,7 @@ class MainWindow(QMainWindow):
         if crit.envelope == "none":
             self._principal.redraw([], [])
             self._shear.redraw([], [])
-            self._outputs.setText("envelope not available for this criterion yet")
+            self._outputs.setText(tr("envelope not available for this criterion yet"))
             return
 
         if crit.envelope == "principal":

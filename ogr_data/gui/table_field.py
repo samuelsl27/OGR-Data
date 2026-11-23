@@ -10,6 +10,7 @@ from __future__ import annotations
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QPushButton, QVBoxLayout
 
+from .i18n import tr
 from .states_dialog import PointTable
 
 
@@ -28,7 +29,7 @@ class TableField(QPushButton):
 
     def _refresh_text(self) -> None:
         n = len(self._rows)
-        self.setText(f"Edit table ({n} row{'s' if n != 1 else ''})…")
+        self.setText(tr("Edit table (1 row)…") if n == 1 else tr("Edit table ({0} rows)…").format(n))
 
     def value(self) -> list[list[float]]:
         return [list(r) for r in self._rows]
@@ -38,9 +39,12 @@ class TableField(QPushButton):
         self._refresh_text()
         self.changed.emit()
 
-    def _headers_scales(self):
+    def _headers_scales(self, translate=lambda text: text):
+        """Column headers (English by default: the table's CSV files keep them) and display scales."""
+
         scale, unit = self._scale_unit()
-        headers = [f"{c} ({unit})" if s else c for c, s in zip(self._columns, self._stress)]
+        columns = [translate(c) for c in self._columns]
+        headers = [f"{c} ({unit})" if s else c for c, s in zip(columns, self._stress)]
         scales = [scale if s else 1.0 for s in self._stress]
         return headers, scales
 
@@ -50,6 +54,8 @@ class TableField(QPushButton):
         dialog.setWindowTitle(self._title)
         dialog.resize(560, 360)
         table = PointTable(headers, scales)
+        shown, _ = self._headers_scales(tr)  # on screen: the registry column names translated
+        table.table.setHorizontalHeaderLabels(shown)
         table.set_rows(self._rows)
         box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         box.accepted.connect(dialog.accept)
@@ -69,6 +75,6 @@ class TableField(QPushButton):
             QMessageBox.warning(self, self._title, str(exc))
             return
         if not rows:
-            QMessageBox.warning(self, self._title, "The table needs at least one row.")
+            QMessageBox.warning(self, self._title, tr("The table needs at least one row."))
             return
         self.setValue(sorted((list(r[: len(self._columns)]) for r in rows), key=lambda r: r[0]))

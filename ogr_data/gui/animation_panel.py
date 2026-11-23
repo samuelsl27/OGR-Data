@@ -21,6 +21,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QComboBox, QGroupBox, QHBoxLayout, QLabel, QPushButton, QSlider, QVBoxLayout
 
 from ..core import simulation as sm
+from .i18n import tr
 
 
 class SpecimenSketch(FigureCanvasQTAgg):
@@ -66,12 +67,12 @@ class AnimationPanel(QGroupBox):
     """Animation controls; `window` provides animation_targets() and show_animation_step()."""
 
     def __init__(self, window) -> None:
-        super().__init__("Animation")
+        super().__init__(tr("Animation"))
         self.window_ = window
         self.material = QComboBox()
         self.material.currentIndexChanged.connect(lambda _i: self.set_step(0))
-        self.play = QPushButton("▶ Play")
-        self.pause = QPushButton("⏸ Pause")
+        self.play = QPushButton(tr("▶ Play"))
+        self.pause = QPushButton(tr("⏸ Pause"))
         self.play.clicked.connect(self.start)
         self.pause.clicked.connect(self.stop)
         self.slider = QSlider(Qt.Orientation.Horizontal)
@@ -83,7 +84,7 @@ class AnimationPanel(QGroupBox):
         self.timer.timeout.connect(self._tick)
         controls = QVBoxLayout()
         top = QHBoxLayout()
-        top.addWidget(QLabel("Material:"))
+        top.addWidget(QLabel("Material:"))  # i18n: ignore (same in Spanish)
         top.addWidget(self.material, stretch=1)
         controls.addLayout(top)
         row = QHBoxLayout()

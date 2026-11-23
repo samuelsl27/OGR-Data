@@ -13,6 +13,12 @@ from any browser. Empty sections are left out, also from the contents.
 
 Values: registry parameters are kPa and degrees; computed stresses are
 MPa (core convention); both are shown in the display stress unit.
+
+Language (spec 024): the core knows no languages. Every user-visible text
+goes through ``_t(text, translate)`` (English is the key; the default
+translation is the identity) and the interface passes its translator,
+``build_html(..., translate=i18n.translator("es"), lang="es")``. Numbers,
+units and data (names) are never translated.
 """
 
 from __future__ import annotations
@@ -23,7 +29,7 @@ import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Callable, Iterable, Mapping, Sequence
 
 from . import criteria_envelopes as ce
 from . import material_results
@@ -54,9 +60,15 @@ SECTION_LABELS = dict(SECTIONS)
 FRAME_SECTIONS = ("cover", "toc", "title")
 
 UNTITLED = "Untitled Project"
-APPLICATION_LABELS = {"custom": "Custom", "tunnel": "Tunnel", "slope": "Slope"}
 
 Rows = list[tuple[str, str]]
+Translate = Callable[[str], str]
+
+
+def _t(text: str, translate: Translate | None = None) -> str:
+    """``text`` (English) through the report's translation (identity by default)."""
+
+    return translate(text) if translate is not None else text
 
 
 def default_visibility() -> dict[str, bool]:
@@ -154,16 +166,16 @@ def _mpa_text(value: float, unit: str) -> str:
     return f"{_number(units.to_display(value, unit))} {unit}"
 
 
-def parameter_rows(material: Material, unit: str) -> Rows:
+def parameter_rows(material: Material, unit: str, translate: Translate | None = None) -> Rows:
     """(label, value) of the material's registry fields in the display unit."""
 
     rows: Rows = []
     for f in CRITERIA[material.criterion].fields:
         value = material.parameters.get(f.key, f.default)
         if f.kind == "bool":
-            text = "Yes" if value else "No"
+            text = _t("Yes", translate) if value else _t("No", translate)
         elif f.kind == "enum":
-            text = str(value)
+            text = _t(str(value), translate)
         elif f.kind == "table":
             scale = units.stress_factor(unit) / 1000.0
             stress = f.stress_columns or tuple(False for _ in f.options)
@@ -171,48 +183,62 @@ def parameter_rows(material: Material, unit: str) -> Rows:
                 "(" + ", ".join(_number(float(v) * (scale if st else 1.0)) for v, st in zip(row, stress)) + ")"
                 for row in (value or [])
             ]
-            text = f"{len(cells)} rows: " + " ".join(cells)
+            text = _t("{0} rows: ", translate).format(len(cells)) + " ".join(cells)
         elif f.unit == "kPa":
             text = f"{_number(_kpa(value, unit))} {unit}"
         elif f.unit == "deg":
             text = f"{_number(float(value))} deg"
         else:
             text = _number(float(value))
-        rows.append((f.label, text))
+        rows.append((_t(f.label, translate), text))
     return rows
 
 
-def stiffness_rows(material: Material, unit: str) -> Rows:
+def stiffness_rows(material: Material, unit: str, translate: Translate | None = None) -> Rows:
     """Stiffness tab of the material, by model (spec 013)."""
 
     st = sm.stiffness_from(material.stiffness)
     stress = lambda key: f"{_number(_kpa(st[key], unit))} {unit}"  # noqa: E731
+    stiffness = _t("Stiffness", translate)
     if material.criterion in ("cam_clay", "modified_cam_clay"):
-        rows: Rows = [("Stiffness", "CamClay Isotropic"), ("Elastic Parameter", st["elastic_parameter"])]
+        rows: Rows = [
+            (stiffness, _t("CamClay Isotropic", translate)),
+            (_t("Elastic Parameter", translate), _t(st["elastic_parameter"], translate)),
+        ]
         if st["elastic_parameter"] == "Constant Shear Modulus":
-            return rows + [("Shear Modulus", stress("shear_modulus"))]
-        return rows + [("Poisson's Ratio", _number(st["poisson"]))]
+            return rows + [(_t("Shear Modulus", translate), stress("shear_modulus"))]
+        return rows + [(_t("Poisson's Ratio", translate), _number(st["poisson"]))]
     if material.criterion == "norsand":
         return [
-            ("Stiffness", "NorSand"),
-            ("Shear modulus at reference", stress("g_ref")),
-            ("Reference pressure for shear modulus", stress("p_ref")),
-            ("Modulus exponent", _number(st["g_exp"])),
-            ("Poisson's ratio", _number(st["ns_poisson"])),
-            ("Minimum Shear Modulus", stress("g_min")),
+            (stiffness, "NorSand"),
+            (_t("Shear modulus at reference", translate), stress("g_ref")),
+            (_t("Reference pressure for shear modulus", translate), stress("p_ref")),
+            (_t("Modulus exponent", translate), _number(st["g_exp"])),
+            (_t("Poisson's ratio", translate), _number(st["ns_poisson"])),
+            (_t("Minimum Shear Modulus", translate), stress("g_min")),
         ]
-    return [("Stiffness", st["type"]), ("Poisson's Ratio", _number(st["poisson"])), ("Young's Modulus", stress("young"))]
+    return [
+        (stiffness, _t(st["type"], translate)),
+        (_t("Poisson's Ratio", translate), _number(st["poisson"])),
+        (_t("Young's Modulus", translate), stress("young")),
+    ]
 
 
-def range_rows(material: Material, unit: str) -> Rows:
+def _application_label(mode: str, translate: Translate | None) -> str:
+    labels = {"custom": _t("Custom", translate), "tunnel": _t("Tunnel", translate), "slope": _t("Slope", translate)}
+    return labels.get(mode, mode)
+
+
+def range_rows(material: Material, unit: str, translate: Translate | None = None) -> Rows:
     """Envelope range and application (spec 009) of a material."""
 
     app = material.application
-    rows: Rows = [("Application", APPLICATION_LABELS.get(app.mode, app.mode))]
+    rows: Rows = [(_t("Application", translate), _application_label(app.mode, translate))]
     if app.mode != "custom":
-        rows.append(("Unit weight", f"{_number(app.unit_weight)} MN/m3"))
-        rows.append(("Tunnel depth" if app.mode == "tunnel" else "Slope height", f"{_number(app.depth)} m"))
-    rows.append(("sig3max (envelope range)", _mpa_text(material.sig3max_mpa, unit)))
+        rows.append((_t("Unit weight", translate), f"{_number(app.unit_weight)} MN/m3"))
+        depth = _t("Tunnel depth", translate) if app.mode == "tunnel" else _t("Slope height", translate)
+        rows.append((depth, f"{_number(app.depth)} m"))
+    rows.append((_t("sig3max (envelope range)", translate), _mpa_text(material.sig3max_mpa, unit)))
     return rows
 
 
@@ -220,7 +246,7 @@ def _modulus_method(params: Mapping) -> ModulusMethod:
     return material_results.modulus_method(params)
 
 
-def computed_rows(material: Material, unit: str) -> Rows:
+def computed_rows(material: Material, unit: str, translate: Translate | None = None) -> Rows:
     """Derived results of a material, as the window's Computed panel.
 
     Generalized Hoek-Brown: mb, s, a, sigt, sigc, sigcm, equivalent MC and
@@ -231,6 +257,7 @@ def computed_rows(material: Material, unit: str) -> Rows:
 
     p = material.parameters
     sig3max = float(material.sig3max_mpa)
+    deg = lambda value: f"{value:.2f} deg"  # noqa: E731
     try:
         if material.criterion == "generalized_hoek_brown":
             inp = HbInput(
@@ -246,12 +273,12 @@ def computed_rows(material: Material, unit: str) -> Rows:
                 ("mb", f"{r.mb:.4f}"),
                 ("s", f"{r.s:.6g}"),
                 ("a", f"{r.a:.4f}"),
-                ("Tensile strength sigt", _mpa_text(r.sigt, unit)),
-                ("Uniaxial compressive strength sigc", _mpa_text(r.sigc, unit)),
-                ("Global strength sigcm", _mpa_text(r.sigcm, unit)),
-                ("Equivalent cohesion c", _mpa_text(r.mc.cohesion, unit)),
-                ("Equivalent friction angle phi", f"{r.mc.friction_deg:.2f} deg"),
-                ("Rock mass modulus Erm", _mpa_text(r.erm, unit)),
+                (_t("Tensile strength sigt", translate), _mpa_text(r.sigt, unit)),
+                (_t("Uniaxial compressive strength sigc", translate), _mpa_text(r.sigc, unit)),
+                (_t("Global strength sigcm", translate), _mpa_text(r.sigcm, unit)),
+                (_t("Equivalent cohesion c", translate), _mpa_text(r.mc.cohesion, unit)),
+                (_t("Equivalent friction angle phi", translate), deg(r.mc.friction_deg)),
+                (_t("Rock mass modulus Erm", translate), _mpa_text(r.erm, unit)),
             ]
         if material.criterion == "hoek_brown":
             sigci = float(p["compressive_strength"]) / 1000.0
@@ -259,9 +286,9 @@ def computed_rows(material: Material, unit: str) -> Rows:
             inp = HbInput(sigci=sigci, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=sig3max)
             mc = equivalent_mc(inp, mb, s, a)
             return [
-                ("Global strength sigcm", _mpa_text(global_strength(inp, mb, s, a), unit)),
-                ("Equivalent cohesion c", _mpa_text(mc.cohesion, unit)),
-                ("Equivalent friction angle phi", f"{mc.friction_deg:.2f} deg"),
+                (_t("Global strength sigcm", translate), _mpa_text(global_strength(inp, mb, s, a), unit)),
+                (_t("Equivalent cohesion c", translate), _mpa_text(mc.cohesion, unit)),
+                (_t("Equivalent friction angle phi", translate), deg(mc.friction_deg)),
             ]
         if material.criterion in ("power_curve", "barton_bandis"):
             curve = ce.shear_curve(material.criterion, p, sig3max)
@@ -269,11 +296,11 @@ def computed_rows(material: Material, unit: str) -> Rows:
                 return []
             fit = samplers.best_fit_mc(*curve)
             return [
-                ("Best-fit MC cohesion c", _mpa_text(fit.cohesion_mpa, unit)),
-                ("Best-fit MC friction angle phi", f"{fit.friction_deg:.2f} deg"),
+                (_t("Best-fit MC cohesion c", translate), _mpa_text(fit.cohesion_mpa, unit)),
+                (_t("Best-fit MC friction angle phi", translate), deg(fit.friction_deg)),
             ]
     except (ValueError, ZeroDivisionError, FloatingPointError) as exc:
-        return [("Computation", f"not available ({exc})")]
+        return [(_t("Computation", translate), _t("not available ({0})", translate).format(exc))]
     return []
 
 
@@ -350,30 +377,31 @@ def _image(caption: str, png: bytes) -> str:
     )
 
 
-def _state_rows(state: FailureState, unit: str) -> tuple[list[str], list[list[str]]]:
+def _state_rows(state: FailureState, unit: str, translate: Translate | None = None) -> tuple[list[str], list[list[str]]]:
     if state.test_type == "general":
         header = [f"{c} ({unit})" for c in state.columns]
         rows = [[_number(_kpa(v, unit)) for v in row] for row in state.tensors]
         return header, rows
-    header = [f"{c} ({unit})" for c in state.columns] + ["Exclude"]
+    header = [f"{c} ({unit})" for c in state.columns] + [_t("Exclude", translate)]
+    yes, no = _t("Yes", translate), _t("No", translate)
     rows = [
-        [_number(_kpa(p.x, unit)), _number(_kpa(p.y, unit)), "Yes" if p.exclude else "No"]
+        [_number(_kpa(p.x, unit)), _number(_kpa(p.y, unit)), yes if p.exclude else no]
         for p in state.points
     ]
     return header, rows
 
 
-def _path_settings(path: StressPath, unit: str) -> Rows:
-    rows: Rows = [("Test Type", PATH_TEST_TYPES.get(path.test_type, path.test_type))]
+def _path_settings(path: StressPath, unit: str, translate: Translate | None = None) -> Rows:
+    rows: Rows = [(_t("Test Type", translate), _t(PATH_TEST_TYPES.get(path.test_type, path.test_type), translate))]
     if path.test_type in ("triaxial", "biaxial"):
         rows += [
-            ("Seepage Condition", path.seepage),
-            ("Loading Direction", path.loading),
-            ("Initial Effective Lateral Stress", f"{_number(_kpa(path.lateral_stress, unit))} {unit}"),
-            ("Initial Effective K0", _number(path.k0)),
+            (_t("Seepage Condition", translate), _t(path.seepage, translate)),
+            (_t("Loading Direction", translate), _t(path.loading, translate)),
+            (_t("Initial Effective Lateral Stress", translate), f"{_number(_kpa(path.lateral_stress, unit))} {unit}"),
+            (_t("Initial Effective K0", translate), _number(path.k0)),
         ]
     elif path.test_type == "uniaxial":
-        rows.append(("Strain Type", path.strain_type))
+        rows.append((_t("Strain Type", translate), _t(path.strain_type, translate)))
     return rows
 
 
@@ -392,13 +420,30 @@ def _path_rows(path: StressPath, unit: str) -> tuple[list[str], list[list[str]]]
 
 
 class _Builder:
-    def __init__(self, project: Project, views: Sequence[ReportView], visibility: Mapping[str, bool], title: str, generated: datetime) -> None:
+    def __init__(
+        self,
+        project: Project,
+        views: Sequence[ReportView],
+        visibility: Mapping[str, bool],
+        title: str,
+        generated: datetime,
+        translate: Translate | None = None,
+        lang: str = "en",
+    ) -> None:
         self.project = project
         self.views = list(views)
         self.visibility = {**default_visibility(), **dict(visibility)}
         self.title = title
         self.generated = generated
+        self.translate = translate
+        self.lang = lang
         self.unit = project.stress_unit if project.stress_unit in units.STRESS_FACTORS else units.DEFAULT_STRESS_UNIT
+
+    def _t(self, text: str) -> str:
+        return _t(text, self.translate)
+
+    def _yes_no(self, value: bool) -> str:
+        return self._t("Yes") if value else self._t("No")
 
     # ------------------------------------------------------------ sections
 
@@ -408,44 +453,52 @@ class _Builder:
         n_paths = sum(len(m.stress_paths) for m in p.materials)
         summary = _kv_table(
             [
-                ("Project title", self.title),
-                ("Date", self.generated.strftime("%Y-%m-%d %H:%M")),
-                ("Materials", str(len(p.materials))),
-                ("Failure states", str(n_states)),
-                ("Test simulations", str(sum(len(m.test_simulations) for m in p.materials))),
-                ("Stress paths", str(n_paths)),
-                ("Graph views", str(len(self.views))),
+                (self._t("Project title"), self.title),
+                (self._t("Date"), self.generated.strftime("%Y-%m-%d %H:%M")),
+                (self._t("Materials"), str(len(p.materials))),
+                (self._t("Failure states"), str(n_states)),
+                (self._t("Test simulations"), str(sum(len(m.test_simulations) for m in p.materials))),
+                (self._t("Stress paths"), str(n_paths)),
+                (self._t("Graph views"), str(len(self.views))),
             ]
         )
+        rock, soil = self._t("Rock"), self._t("Soil")
         rows = [
-            [m.name, CRITERIA[m.criterion].label, "Rock" if CRITERIA[m.criterion].category == "rock" else "Soil",
-             str(len(m.failure_states)), str(len(m.stress_paths)), "Yes" if m.visible else "No"]
+            [m.name, self._t(CRITERIA[m.criterion].label), rock if CRITERIA[m.criterion].category == "rock" else soil,
+             str(len(m.failure_states)), str(len(m.stress_paths)), self._yes_no(m.visible)]
             for m in p.materials
         ]
-        materials = _grid_table(["Material", "Criterion", "Category", "Failure states", "Stress paths", "Visible"], rows)
-        return summary + "<h3>Materials</h3>" + materials
+        header = ["Material", self._t("Criterion"), self._t("Category"), self._t("Failure states"),
+                  self._t("Stress paths"), "Visible"]
+        materials = _grid_table(header, rows)
+        return summary + f"<h3>{_e(self._t('Materials'))}</h3>" + materials
 
     def project_settings(self) -> str:
         return _kv_table(
             [
-                ("Units", f"Metric, stress as {self.unit}"),
-                ("Stress", self.unit),
-                ("Length", "m"),
-                ("Unit weight", "MN/m3"),
-                ("Angles", "deg"),
+                (self._t("Units"), self._t("Metric, stress as {0}").format(self.unit)),
+                (self._t("Stress"), self.unit),
+                (self._t("Length"), "m"),
+                (self._t("Unit weight"), "MN/m3"),
+                (self._t("Angles"), "deg"),
             ]
         )
 
     def views_section(self) -> str:
+        # a view is a snapshot with the English registry labels: translated here
+        # (a label already translated is not a key and stays as it is)
+        tr = self._t
         parts = []
         for i, v in enumerate(self.views, 1):
             figures = "".join(_image(caption, png) for caption, png in v.images)
-            meta = f"{_e(v.material)} · {_e(v.criterion)} · {_e(v.created)}" if v.material else _e(v.created)
+            meta = f"{_e(v.material)} · {_e(tr(v.criterion))} · {_e(v.created)}" if v.material else _e(v.created)
             tables = ""
             if v.parameters:
-                tables += f"<div><h4>Parameters ({_e(v.stress_unit)})</h4>{_kv_table(v.parameters)}</div>"
+                rows = [(tr(k), value) for k, value in v.parameters]
+                tables += f"<div><h4>{_e(self._t('Parameters ({0})').format(v.stress_unit))}</h4>{_kv_table(rows)}</div>"
             if v.results:
-                tables += f"<div><h4>Computed</h4>{_kv_table(v.results)}</div>"
+                rows = [(tr(k), value) for k, value in v.results]
+                tables += f"<div><h4>{_e(self._t('Computed'))}</h4>{_kv_table(rows)}</div>"
             parts.append(
                 f'<div class="view" id="view-{i}"><h3>{i}. {_e(v.title)}</h3>'
                 f'<p class="muted">{meta}</p>'
@@ -458,25 +511,26 @@ class _Builder:
         rows = [[v.title, v.sample] for v in self.views if v.sample]
         if not rows:
             return ""
-        header = ["View", "Sampler reading"]
-        head = "".join(f"<th>{h}</th>" for h in header)
+        header = [self._t("View"), self._t("Sampler reading")]
+        head = "".join(f"<th>{_e(h)}</th>" for h in header)
         body = "".join(f"<tr><td>{_e(a)}</td><td>{_e(b)}</td></tr>" for a, b in rows)
         return f"<table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>"
 
     def material_models(self) -> str:
         parts = []
+        tr = self.translate
         for m in self.project.materials:
             crit = CRITERIA[m.criterion]
             display = _kv_table(
-                [("Criterion", crit.label), ("Color", m.color or "theme default"),
-                 ("Symbol", SYMBOLS.get(m.symbol, m.symbol)), ("Visible", "Yes" if m.visible else "No")]
+                [(self._t("Criterion"), self._t(crit.label)), ("Color", m.color or self._t("theme default")),
+                 (self._t("Symbol"), self._t(SYMBOLS.get(m.symbol, m.symbol))), ("Visible", self._yes_no(m.visible))]
             )
-            computed = computed_rows(m, self.unit)
+            computed = computed_rows(m, self.unit, tr)
             parts.append(
                 f"<h3>{_swatch(m.color)}{_e(m.name)}</h3>{display}"
-                f'<div class="pair"><div><h4>Parameters</h4>{_kv_table(parameter_rows(m, self.unit))}</div>'
-                f"<div><h4>Envelope range</h4>{_kv_table(range_rows(m, self.unit))}"
-                + (f"<h4>Computed</h4>{_kv_table(computed)}" if computed else "")
+                f'<div class="pair"><div><h4>{_e(self._t("Parameters"))}</h4>{_kv_table(parameter_rows(m, self.unit, tr))}</div>'
+                f"<div><h4>{_e(self._t('Envelope range'))}</h4>{_kv_table(range_rows(m, self.unit, tr))}"
+                + (f"<h4>{_e(self._t('Computed'))}</h4>{_kv_table(computed)}" if computed else "")
                 + "</div></div>"
             )
         return "".join(parts)
@@ -488,12 +542,12 @@ class _Builder:
                 continue
             parts.append(f"<h3>{_e(m.name)}</h3>")
             for s in m.failure_states:
-                header, rows = _state_rows(s, self.unit)
+                header, rows = _state_rows(s, self.unit, self.translate)
                 info = _kv_table(
-                    [("Test Type", FAILURE_TEST_TYPES.get(s.test_type, s.test_type)),
-                     ("Points", str(len(rows))), ("Visible", "Yes" if s.visible else "No")]
+                    [(self._t("Test Type"), self._t(FAILURE_TEST_TYPES.get(s.test_type, s.test_type))),
+                     (self._t("Points"), str(len(rows))), ("Visible", self._yes_no(s.visible))]
                 )
-                table = _grid_table(header, rows) if rows else '<p class="muted">No points.</p>'
+                table = _grid_table(header, rows) if rows else f'<p class="muted">{_e(self._t("No points."))}</p>'
                 parts.append(f"<h4>{_swatch(s.color)}{_e(s.name)}</h4>{info}{table}")
         return "".join(parts)
 
@@ -502,39 +556,41 @@ class _Builder:
 
         parts = []
         u = self.unit
+        stress = lambda value: f"{_number(_kpa(value, u))} {u}"  # noqa: E731
         for m in self.project.materials:
             if not m.test_simulations:
                 continue
-            parts.append(f"<h3>{_e(m.name)}</h3>" + _kv_table(stiffness_rows(m, u)))
+            parts.append(f"<h3>{_e(m.name)}</h3>" + _kv_table(stiffness_rows(m, u, self.translate)))
             for t in m.test_simulations:
-                rows: Rows = [("Test Type", sm.TEST_TYPES[t.test_type])]
+                rows: Rows = [(self._t("Test Type"), self._t(sm.TEST_TYPES[t.test_type]))]
                 if t.test_type != "uniaxial":
-                    rows.append(("Seepage Condition", t.seepage))
-                rows.append(("Loading Direction", t.loading))
+                    rows.append((self._t("Seepage Condition"), self._t(t.seepage)))
+                rows.append((self._t("Loading Direction"), self._t(t.loading)))
                 if t.confined:
-                    rows.append(("Initial Effective Lateral Stress", f"{_number(_kpa(t.confining, u))} {u}"))
-                    rows.append(("Initial Effective K0", _number(t.k0)))
+                    rows.append((self._t("Initial Effective Lateral Stress"), stress(t.confining)))
+                    rows.append((self._t("Initial Effective K0"), _number(t.k0)))
                 if t.test_type == "general":
-                    rows.append(("Strain direction", ", ".join(f"{n} {_number(v)}" for n, v in zip(sm.STRAIN_COMPONENTS, t.strain_ratio))))
-                rows += [("Maximum Strain", _number(t.max_strain)), ("Number of Steps", str(t.steps))]
+                    direction = ", ".join(f"{n} {_number(v)}" for n, v in zip(sm.STRAIN_COMPONENTS, t.strain_ratio))
+                    rows.append((self._t("Strain direction"), direction))
+                rows += [(self._t("Maximum Strain"), _number(t.max_strain)), (self._t("Number of Steps"), str(t.steps))]
                 if t.cyclic:
-                    rows.append(("Cyclic Loading Cycles", str(t.cycles)))
+                    rows.append((self._t("Cyclic Loading Cycles"), str(t.cycles)))
                 try:
                     r = sm.simulate_material(m, t)
                 except sm.SimulationError as exc:
-                    result = f'<p class="muted">Not simulated: {_e(exc)}</p>'
+                    result = f'<p class="muted">{_e(self._t("Not simulated: {0}").format(exc))}</p>'
                 else:
                     end: Rows = [
-                        ("Peak deviator q", f"{_number(_kpa(r.peak_q, u))} {u}"),
-                        ("Final axial strain", _number(float(r.axial_strain[-1]))),
-                        ("Final axial stress sigma'a", f"{_number(_kpa(float(r.axial_stress[-1]), u))} {u}"),
-                        ("Final p'", f"{_number(_kpa(float(r.p[-1]), u))} {u}"),
-                        ("Final q", f"{_number(_kpa(float(r.q[-1]), u))} {u}"),
-                        ("Final volumetric strain", _number(float(r.eps_v[-1]))),
+                        (self._t("Peak deviator q"), stress(r.peak_q)),
+                        (self._t("Final axial strain"), _number(float(r.axial_strain[-1]))),
+                        (self._t("Final axial stress sigma'a"), stress(float(r.axial_stress[-1]))),
+                        (self._t("Final p'"), stress(float(r.p[-1]))),
+                        (self._t("Final q"), stress(float(r.q[-1]))),
+                        (self._t("Final volumetric strain"), _number(float(r.eps_v[-1]))),
                     ]
                     if t.seepage == "Undrained":
-                        end.append(("Final pore pressure u", f"{_number(_kpa(float(r.pore_pressure[-1]), u))} {u}"))
-                    result = f"<h4>Computed</h4>{_kv_table(end)}"
+                        end.append((self._t("Final pore pressure u"), stress(float(r.pore_pressure[-1]))))
+                    result = f"<h4>{_e(self._t('Computed'))}</h4>{_kv_table(end)}"
                 parts.append(f"<h4>{_swatch(t.color)}{_e(t.name)}</h4>{_kv_table(rows)}{result}")
         return "".join(parts)
 
@@ -546,16 +602,17 @@ class _Builder:
             parts.append(f"<h3>{_e(m.name)}</h3>")
             for path in m.stress_paths:
                 header, rows = _path_rows(path, self.unit)
-                table = _grid_table(header, rows) if rows else '<p class="muted">No steps.</p>'
+                table = _grid_table(header, rows) if rows else f'<p class="muted">{_e(self._t("No steps."))}</p>'
                 parts.append(
-                    f"<h4>{_swatch(path.color)}{_e(path.name)}</h4>{_kv_table(_path_settings(path, self.unit))}{table}"
+                    f"<h4>{_swatch(path.color)}{_e(path.name)}</h4>"
+                    f"{_kv_table(_path_settings(path, self.unit, self.translate))}{table}"
                 )
         return "".join(parts)
 
     # -------------------------------------------------------------- document
 
     def content(self) -> list[tuple[str, str, str]]:
-        """(key, label, html) of the visible, non-empty content sections."""
+        """(key, label, html) of the visible, non-empty content sections (label translated)."""
 
         makers = {
             "project_summary": self.project_summary,
@@ -573,7 +630,7 @@ class _Builder:
                 continue
             body = makers[key]()
             if body:
-                out.append((key, label, body))
+                out.append((key, self._t(label), body))
         return out
 
     def build(self) -> str:
@@ -581,26 +638,28 @@ class _Builder:
 
         sections = self.content()
         date = self.generated.strftime("%Y-%m-%d %H:%M")
+        report_name = self._t("OGR Data Report")
         parts = []
         if self.visibility.get("cover"):
             parts.append(
                 '<div class="cover"><div class="brand">OPENGEOROCK · OGR DATA</div>'
-                f"<h1>{_e(self.title)}</h1><p>OGR Data Report</p><p class=\"muted\">{_e(date)}</p></div>"
+                f"<h1>{_e(self.title)}</h1><p>{_e(report_name)}</p><p class=\"muted\">{_e(date)}</p></div>"
             )
         if self.visibility.get("toc") and sections:
             items = "".join(f'<li><a href="#{key}">{_e(label)}</a></li>' for key, label, _ in sections)
-            parts.append(f'<nav class="toc"><h2>Table of Contents</h2><ol>{items}</ol></nav>')
+            parts.append(f'<nav class="toc"><h2>{_e(self._t("Table of Contents"))}</h2><ol>{items}</ol></nav>')
         if self.visibility.get("title"):
-            parts.append(f'<header><h1>{_e(self.title)}</h1><p class="muted">OGR Data Report · {_e(date)}</p></header>')
+            parts.append(f'<header><h1>{_e(self.title)}</h1><p class="muted">{_e(report_name)} · {_e(date)}</p></header>')
         for key, label, body in sections:
             parts.append(f'<section class="content" id="{key}"><h2>{_e(label)}</h2>{body}</section>')
-        parts.append(f"<footer>Generated by OGR Data {_e(__version__)} on {_e(date)}.</footer>")
+        footer = self._t("Generated by OGR Data {0} on {1}.").format(__version__, date)
+        parts.append(f"<footer>{_e(footer)}</footer>")
         return (
             "<!DOCTYPE html>\n"
-            '<html lang="en"><head><meta charset="utf-8">'
+            f'<html lang="{_e(self.lang)}"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<meta name="generator" content="OGR Data {_e(__version__)}">'
-            f"<title>{_e(self.title)} - OGR Data Report</title>"
+            f"<title>{_e(self.title)} - {_e(report_name)}</title>"
             f"<style>{_CSS}</style></head><body><main>"
             + "".join(parts)
             + "</main></body></html>\n"
@@ -613,17 +672,28 @@ def build_html(
     visibility: Mapping[str, bool] | None = None,
     title: str | None = None,
     generated: datetime | None = None,
+    translate: Translate | None = None,
+    lang: str = "en",
 ) -> str:
-    """Self-contained HTML report of a project and its graph views."""
+    """Self-contained HTML report of a project and its graph views.
 
-    title = (title if title is not None else project.title).strip() or UNTITLED
-    return _Builder(project, list(views), visibility or {}, title, generated or datetime.now()).build()
+    ``translate`` gives each English text of the document in the report's
+    language (identity by default); ``lang`` is the ``<html lang>``.
+    """
+
+    title = (title if title is not None else project.title).strip() or _t("Untitled Project", translate)
+    return _Builder(project, list(views), visibility or {}, title, generated or datetime.now(), translate, lang).build()
 
 
-def included_sections(project: Project, views: Iterable[ReportView] = (), visibility: Mapping[str, bool] | None = None) -> list[str]:
+def included_sections(
+    project: Project,
+    views: Iterable[ReportView] = (),
+    visibility: Mapping[str, bool] | None = None,
+    translate: Translate | None = None,
+) -> list[str]:
     """Keys of the content sections a report would contain (non-empty, visible)."""
 
-    builder = _Builder(project, list(views), visibility or {}, UNTITLED, datetime.now())
+    builder = _Builder(project, list(views), visibility or {}, _t("Untitled Project", translate), datetime.now(), translate)
     return [key for key, _, _ in builder.content()]
 
 

@@ -179,6 +179,44 @@ def test_section_visibility_and_empty_sections() -> None:
         assert path.read_text(encoding="utf-8") == document
 
 
+def test_spanish_report_same_numbers() -> None:
+    """Spec 024: the report in Spanish translates texts, never values."""
+
+    from ogr_data.gui import i18n
+
+    proj = _two_material_project()
+    proj.title = ""
+    proj.materials[0].application.mode = "tunnel"
+    views = [_view("Granite - Strength Graphs", "sigma3 = 1 MPa   sigma1 = 50 MPa")]
+    generated = datetime(2026, 11, 23, 10, 30)
+    english = report.build_html(proj, views, generated=generated)
+    spanish = report.build_html(proj, views, generated=generated, translate=i18n.translator("es"), lang="es")
+    _check(spanish)
+    assert '<html lang="en">' in english and '<html lang="es">' in spanish
+    for text in ("Modelos de material definidos", "Estados de rotura definidos", "Índice", "Resumen del proyecto",
+                 "Proyecto sin título", "Hoek Brown generalizado", "Ensayo triaxial", "Ensayo de compresión simple",
+                 "Resistencia global sigcm", "Profundidad del túnel", "Peso específico", "Métricas, tensiones en MPa",
+                 "Hoek &amp; Diederichs generalizado (2006)", "<td class=\"num\">Sí</td>", "Informe de OGR Data"):
+        assert text in spanish, text
+    for text in ("Defined Material Models", "Table of Contents", "Untitled Project", "Global strength", "Triaxial Test",
+                 "Tunnel depth", "Peak Friction Angle"):
+        assert text in english and text not in spanish, text
+    # data are not translated: names, sampler reading, and every number
+    for text in ("Granite", "Clayey sand", "Triaxial UCS", "sigma1 = 50 MPa", "2026-11-23 10:30"):
+        assert text in spanish, text
+    number = re.compile(r"(?<![\w.])-?\d+(?:\.\d+)?(?:e[+-]?\d+)?")
+    texts = lambda doc: re.sub(r"<[^>]*>", " ", doc[doc.index("<main>"):])  # noqa: E731
+    numbers = lambda doc: sorted(number.findall(texts(doc)))  # noqa: E731
+    assert numbers(english) == numbers(spanish) and len(numbers(english)) > 40
+    # rows used by the window and the API: English unless a translation is given
+    rock = proj.materials[0]
+    assert report.parameter_rows(rock, "MPa") == report.parameter_rows(rock, "MPa", translate=None)
+    es_rows = report.parameter_rows(rock, "MPa", translate=i18n.translator("es"))
+    assert [v for _, v in es_rows][:2] == [v for _, v in report.parameter_rows(rock, "MPa")][:2]
+    assert dict(es_rows)["RCS de la roca intacta"] == "120 MPa"
+    assert report.included_sections(proj, views, translate=i18n.translator("es")) == report.included_sections(proj, views)
+
+
 def test_window_add_view_manage_and_generate() -> None:
     from PySide6.QtWidgets import QApplication
 

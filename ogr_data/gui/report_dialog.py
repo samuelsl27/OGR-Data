@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import report
+from .i18n import current_language, tr, translator
 
 
 class ManageReportViewsDialog(QDialog):
@@ -32,15 +33,15 @@ class ManageReportViewsDialog(QDialog):
 
     def __init__(self, views: report.ReportViews, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Manage Report View")
+        self.setWindowTitle(tr("Manage Report View"))
         self.resize(460, 340)
         self.views = views
         self.list = QListWidget()
         self.list.itemChanged.connect(self._renamed)
         self.list.currentRowChanged.connect(self._update_buttons)
-        self.up = QPushButton("Up")
-        self.down = QPushButton("Down")
-        self.remove = QPushButton("Remove")
+        self.up = QPushButton(tr("Up"))
+        self.down = QPushButton(tr("Down"))
+        self.remove = QPushButton(tr("Remove"))
         self.up.clicked.connect(lambda: self.move(-1))
         self.down.clicked.connect(lambda: self.move(1))
         self.remove.clicked.connect(self.remove_current)
@@ -54,7 +55,7 @@ class ManageReportViewsDialog(QDialog):
         close = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         close.rejected.connect(self.accept)
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Views in report order (double-click to rename):"))
+        layout.addWidget(QLabel(tr("Views in report order (double-click to rename):")))
         layout.addLayout(row)
         layout.addWidget(close)
         self.populate(0)
@@ -106,32 +107,32 @@ class ReportGeneratorDialog(QDialog):
 
     def __init__(self, main) -> None:
         super().__init__(main)
-        self.setWindowTitle("Report Generator")
+        self.setWindowTitle(tr("Report Generator"))
         self.main = main
         self.title = QLineEdit(main.report_project().title)
-        self.title.setPlaceholderText(report.UNTITLED)
+        self.title.setPlaceholderText(tr("Untitled Project"))  # report.UNTITLED
 
-        box = QGroupBox("Section Visibility")
+        box = QGroupBox(tr("Section Visibility"))
         grid = QGridLayout(box)
         self.checks: dict[str, QCheckBox] = {}
         visibility = main.report_visibility
         for i, (key, label) in enumerate(report.SECTIONS):
-            check = QCheckBox(label)
+            check = QCheckBox(tr(label))  # i18n: registry
             check.setChecked(visibility.get(key, True))
             check.toggled.connect(self._store_visibility)
             self.checks[key] = check
             grid.addWidget(check, i % 6, i // 6)
 
         self.views_label = QLabel()
-        manage = QPushButton("Manage Report View…")
+        manage = QPushButton(tr("Manage Report View…"))
         manage.clicked.connect(self._manage)
         views_row = QHBoxLayout()
         views_row.addWidget(self.views_label, stretch=1)
         views_row.addWidget(manage)
 
-        self.open_after = QCheckBox("Open in the browser after generating (Save / Print to PDF from there)")
+        self.open_after = QCheckBox(tr("Open in the browser after generating (Save / Print to PDF from there)"))
         self.open_after.setChecked(True)
-        self.generate_button = QPushButton("Generate…")
+        self.generate_button = QPushButton(tr("Generate…"))
         self.generate_button.setDefault(True)
         self.generate_button.clicked.connect(self._generate_clicked)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
@@ -139,12 +140,12 @@ class ReportGeneratorDialog(QDialog):
         buttons.rejected.connect(self.reject)
 
         form = QFormLayout()
-        form.addRow("Report title", self.title)
+        form.addRow(tr("Report title"), self.title)
         layout = QVBoxLayout(self)
         layout.addLayout(form)
         layout.addWidget(box)
         layout.addLayout(views_row)
-        note = QLabel("Empty sections are left out of the report.")
+        note = QLabel(tr("Empty sections are left out of the report."))
         note.setEnabled(False)
         layout.addWidget(note)
         layout.addWidget(self.open_after)
@@ -159,11 +160,13 @@ class ReportGeneratorDialog(QDialog):
 
     def _update_views_label(self) -> None:
         n = len(self.main.report_views)
-        self.views_label.setText(
-            f"{n} graph view{'s' if n != 1 else ''} in the report"
-            if n
-            else "No graph views yet: use Analysis > Add View To Report."
-        )
+        if n == 1:
+            text = tr("{0} graph view in the report").format(n)
+        elif n:
+            text = tr("{0} graph views in the report").format(n)
+        else:
+            text = tr("No graph views yet: use Analysis > Add View To Report.")
+        self.views_label.setText(text)
 
     def _manage(self) -> None:
         ManageReportViewsDialog(self.main.report_views, self).exec()
@@ -175,6 +178,8 @@ class ReportGeneratorDialog(QDialog):
             self.main.report_views,
             self.visibility(),
             self.title.text(),
+            translate=translator(),
+            lang=current_language(),
         )
 
     def generate(self, path: str | Path, open_browser: bool = False) -> Path:
@@ -184,9 +189,9 @@ class ReportGeneratorDialog(QDialog):
         return written
 
     def _generate_clicked(self) -> None:
-        title = self.title.text().strip() or report.UNTITLED
+        title = self.title.text().strip() or tr("Untitled Project")
         suggested = "".join(c if c.isalnum() or c in " -_" else "_" for c in title).strip() or "report"
-        path, _ = QFileDialog.getSaveFileName(self, "Generate report", f"{suggested}.html", "HTML report (*.html)")
+        path, _ = QFileDialog.getSaveFileName(self, tr("Generate report"), f"{suggested}.html", tr("HTML report (*.html)"))
         if not path:
             return
         if not path.lower().endswith((".html", ".htm")):
@@ -194,6 +199,6 @@ class ReportGeneratorDialog(QDialog):
         try:
             written = self.generate(path, open_browser=self.open_after.isChecked())
         except OSError as exc:
-            QMessageBox.warning(self, "Report", str(exc))
+            QMessageBox.warning(self, tr("Report"), str(exc))
             return
-        self.main.statusBar().showMessage(f"Report written to {written}", 8000)
+        self.main.statusBar().showMessage(tr("Report written to {0}").format(written), 8000)

@@ -22,23 +22,30 @@ from PySide6.QtWidgets import (
 
 from ..core import fitting
 from ..core.fitting import DIRECT, LEVENBERG_MARQUARDT, LINEAR, SIMPLEX, TRIAXIAL
+from .i18n import tr
 
-_DATA_LABELS = {
-    TRIAXIAL: ("sigma3 (MPa)", "sigma1 (MPa)"),
-    DIRECT: ("normal stress (MPa)", "shear stress (MPa)"),
-}
 
-_METHODS = {
-    "Linear regression": LINEAR,
-    "Levenberg-Marquardt": LEVENBERG_MARQUARDT,
-    "Simplex": SIMPLEX,
-}
+def _data_labels() -> dict[str, tuple[str, str]]:
+    return {
+        TRIAXIAL: ("sigma3 (MPa)", "sigma1 (MPa)"),
+        DIRECT: (tr("normal stress (MPa)"), tr("shear stress (MPa)")),
+    }
+
+
+def _methods() -> dict[str, str]:
+    """Visible label -> method key."""
+
+    return {
+        tr("Linear regression"): LINEAR,
+        "Levenberg-Marquardt": LEVENBERG_MARQUARDT,
+        "Simplex": SIMPLEX,
+    }
 
 
 class FitDialog(QDialog):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Fit strength criterion to lab data")
+        self.setWindowTitle(tr("Fit strength criterion to lab data"))
         self.resize(760, 560)
         self._result: fitting.FitResult | None = None
 
@@ -56,13 +63,13 @@ class FitDialog(QDialog):
         self._table = QTableWidget(8, 2)
         self._table.setHorizontalHeaderLabels(["x", "y"])
 
-        paste_button = QPushButton("Paste from clipboard")
+        paste_button = QPushButton(tr("Paste from clipboard"))
         paste_button.clicked.connect(self._paste)
-        add_button = QPushButton("Add row")
+        add_button = QPushButton(tr("Add row"))
         add_button.clicked.connect(lambda: self._table.insertRow(self._table.rowCount()))
-        fit_button = QPushButton("Fit")
+        fit_button = QPushButton(tr("Fit"))
         fit_button.clicked.connect(self._run_fit)
-        self._apply_button = QPushButton("Apply to material")
+        self._apply_button = QPushButton(tr("Apply to material"))
         self._apply_button.setEnabled(False)
         self._apply_button.clicked.connect(self._apply)
 
@@ -70,9 +77,9 @@ class FitDialog(QDialog):
         self._output.setReadOnly(True)
 
         options = QFormLayout()
-        options.addRow("Criterion", self._criterion)
-        options.addRow("Data type", self._data_kind)
-        options.addRow("Method", self._method)
+        options.addRow(tr("Criterion"), self._criterion)
+        options.addRow(tr("Data type"), self._data_kind)
+        options.addRow(tr("Method"), self._method)
         options.addRow(self._fixed)
 
         table_box = QVBoxLayout()
@@ -90,7 +97,7 @@ class FitDialog(QDialog):
         layout.addLayout(options)
         layout.addLayout(table_box)
         layout.addLayout(actions)
-        layout.addWidget(QLabel("Result"))
+        layout.addWidget(QLabel(tr("Result")))
         layout.addWidget(self._output, stretch=1)
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
@@ -109,13 +116,13 @@ class FitDialog(QDialog):
         self._data_kind.blockSignals(True)
         self._data_kind.clear()
         for kind in kinds:
-            self._data_kind.addItem("Triaxial" if kind == TRIAXIAL else "Direct shear", kind)
+            self._data_kind.addItem("Triaxial" if kind == TRIAXIAL else tr("Direct shear"), kind)  # i18n: ignore
         if current_kind in kinds:
             self._data_kind.setCurrentIndex(kinds.index(current_kind))
         self._data_kind.blockSignals(False)
 
         kind = self._data_kind.currentData()
-        x_label, y_label = _DATA_LABELS.get(kind, ("x", "y"))
+        x_label, y_label = _data_labels().get(kind, ("x", "y"))
         self._table.setHorizontalHeaderLabels([x_label, y_label])
 
         current_method = self._method.currentData()
@@ -126,7 +133,7 @@ class FitDialog(QDialog):
             ("mohr_coulomb", DIRECT),
             ("hoek_brown", TRIAXIAL),
         )
-        for label, value in _METHODS.items():
+        for label, value in _methods().items():
             if value == LINEAR and not has_linear:
                 continue
             self._method.addItem(label, value)
@@ -147,9 +154,9 @@ class FitDialog(QDialog):
 
     def _fixed_fields(self, key: str) -> list[tuple[str, str, float]]:
         if key == "generalized_hoek_brown":
-            return [("sigci, fixed (MPa)", "sigci_mpa", 30.0), ("D, fixed", "disturbance", 0.0)]
+            return [(tr("sigci, fixed (MPa)"), "sigci_mpa", 30.0), (tr("D, fixed"), "disturbance", 0.0)]
         if key == "barton_bandis":
-            return [("phi_b, fixed (deg)", "phi_b_deg", 30.0)]
+            return [(tr("phi_b, fixed (deg)"), "phi_b_deg", 30.0)]
         return []
 
     # ---------------------------------------------------------------- data
@@ -188,16 +195,16 @@ class FitDialog(QDialog):
         try:
             result = fitting.fit(key, kind, x, y, method, fixed)
         except (ValueError, KeyError) as exc:
-            self._output.setPlainText(f"Fit failed: {exc}")
+            self._output.setPlainText(tr("Fit failed: {0}").format(exc))
             self._apply_button.setEnabled(False)
             return
         self._result = result
-        lines = [f"method: {result.method}", f"residuals: {result.residuals:.6g}", ""]
+        lines = [tr("method: {0}").format(result.method), tr("residuals: {0}").format(f"{result.residuals:.6g}"), ""]
         for name, value in result.parameters.items():
             lines.append(f"{name} = {value:.6g}")
         if key == "generalized_hoek_brown":
             lines.append("")
-            lines.append("Note: apply fills the classic Hoek-Brown criterion (mb, s; a is fixed to 0.5 there).")
+            lines.append(tr("Note: apply fills the classic Hoek-Brown criterion (mb, s; a is fixed to 0.5 there)."))
         self._output.setPlainText("\n".join(lines))
         self._apply_button.setEnabled(True)
 

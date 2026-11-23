@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout,
 
 from ..core import simulation as sm
 from ..core.project import SYMBOLS
+from .i18n import tr
 from .states_dialog import _ItemsDialog
 
 
@@ -20,7 +21,7 @@ class TestSimulationsDialog(_ItemsDialog):
     noun = "Test"
 
     def __init__(self, parent, material_name: str, tests: list, unit: str, initial: int = 0) -> None:
-        super().__init__(parent, f"Define Test Simulations - {material_name}", tests, unit, initial)
+        super().__init__(parent, tr("Define Test Simulations - {0}").format(material_name), tests, unit, initial)
         self.resize(680, 460)
 
     def _build_editor(self, layout: QVBoxLayout) -> None:
@@ -30,7 +31,7 @@ class TestSimulationsDialog(_ItemsDialog):
             widget = QComboBox()
             items = options.items() if isinstance(options, dict) else ((o, o) for o in options)
             for key, label in items:
-                widget.addItem(label, key)
+                widget.addItem(tr(label), key)  # i18n: registry
             return widget
 
         self._symbol = combo(SYMBOLS)
@@ -51,7 +52,7 @@ class TestSimulationsDialog(_ItemsDialog):
         self._max_strain.setSingleStep(0.01)
         self._steps = QSpinBox()
         self._steps.setRange(1, 100000)
-        self._cyclic = QCheckBox("Cyclic Loading Cycles:")
+        self._cyclic = QCheckBox(tr("Cyclic Loading Cycles:"))
         self._cycles = QSpinBox()
         self._cycles.setRange(1, 1000)
         self._cyclic.toggled.connect(self._cycles.setEnabled)
@@ -73,15 +74,15 @@ class TestSimulationsDialog(_ItemsDialog):
             grid.addWidget(spin, i // 3 * 2 + 1, i % 3)
             self._ratios.append(spin)
         self._test_type.currentIndexChanged.connect(self._config_changed)
-        form.addRow("Symbol:", self._symbol)
-        form.addRow("Test Type:", self._test_type)
-        form.addRow("Seepage Condition:", self._seepage)
-        form.addRow("Loading Direction:", self._loading_dir)
-        form.addRow(f"Initial Effective Lateral Stress ({self._unit}):", self._confining)
-        form.addRow("Initial Effective K0:", self._k0)
-        form.addRow("Strain direction:", self._ratio_box)
-        form.addRow("Maximum Strain:", self._max_strain)
-        form.addRow("Number of Steps:", self._steps)
+        form.addRow(tr("Symbol:"), self._symbol)
+        form.addRow(tr("Test Type:"), self._test_type)
+        form.addRow(tr("Seepage Condition:"), self._seepage)
+        form.addRow(tr("Loading Direction:"), self._loading_dir)
+        form.addRow(tr("Initial Effective Lateral Stress ({0}):").format(self._unit), self._confining)
+        form.addRow(tr("Initial Effective K0:"), self._k0)
+        form.addRow(tr("Strain direction:"), self._ratio_box)
+        form.addRow(tr("Maximum Strain:"), self._max_strain)
+        form.addRow(tr("Number of Steps:"), self._steps)
         form.addRow(cyclic_row)
         self._form = form
         layout.addLayout(form)
@@ -98,13 +99,15 @@ class TestSimulationsDialog(_ItemsDialog):
         self._form.setRowVisible(self._ratio_box, test.test_type == "general")
         notes = {
             "uniaxial": "",
-            "triaxial": "Initial axial stress = lateral stress / K0.",
-            "biaxial": "Biaxial: plane strain (no strain in the second lateral direction); initial axial stress = lateral / K0.",
-            "simple_shear": (
+            "triaxial": tr("Initial axial stress = lateral stress / K0."),
+            "biaxial": tr(
+                "Biaxial: plane strain (no strain in the second lateral direction); initial axial stress = lateral / K0."
+            ),
+            "simple_shear": tr(
                 "Simple Shear: imposed shear strain (Maximum Strain = gamma), no lateral strains; the initial "
                 "vertical stress (lateral / K0) is kept constant when drained."
             ),
-            "general": (
+            "general": tr(
                 "General Test (OGR Data; RSData does not document its inputs): proportional strain path in the given "
                 "direction, Maximum Strain on its largest component. Undrained keeps the volume (normal components "
                 "made deviatoric); pore pressure = change of the mean effective stress."

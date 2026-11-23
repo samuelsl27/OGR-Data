@@ -33,11 +33,85 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import database as mdb
+from .i18n import tr
 
-HELP = (
-    "Enter your search key words below. You can use wildcards * to match partial words, "
-    'or include words in double quotes " to match an exact phrase.'
-)
+
+def _help() -> str:
+    return tr(
+        "Enter your search key words below. You can use wildcards * to match partial words, "
+        'or include words in double quotes " to match an exact phrase.'
+    )
+
+
+def _field_label(label: str) -> str:
+    """A field label of core.database on screen (interface); record values are data."""
+
+    labels = {
+        # record
+        "Rock Name": tr("Rock Name"),
+        "Rock Name Prefix": tr("Rock Name Prefix"),
+        "Unit Weight (MN/m3)": tr("Unit Weight (MN/m3)"),
+        "Density (Mg/m3)": tr("Density (Mg/m3)"),
+        "Porosity (%)": tr("Porosity (%)"),
+        "Fabric": tr("Fabric"),
+        "Notes": tr("Notes"),
+        # location
+        "Region": tr("Region"),
+        "Country": tr("Country"),
+        "Town/City/State": tr("Town/City/State"),
+        "Latitude": tr("Latitude"),
+        "Longitude": tr("Longitude"),
+        "Depth (m)": tr("Depth (m)"),
+        # reference
+        "Reference Type": tr("Reference Type"),
+        "Title": tr("Title"),
+        "Author": tr("Author"),
+        "Publisher": tr("Publisher"),
+        "Year Published": tr("Year Published"),
+        "Pages": tr("Pages"),
+        "Volume": tr("Volume"),
+        "Edition": tr("Edition"),
+        "Table / figure": tr("Table / figure"),
+        # test blocks
+        "Test Type": tr("Test Type"),
+        "Core Diameter": tr("Core Diameter"),
+        "Core Length": tr("Core Length"),
+        "Confining Stress": tr("Confining Stress"),
+        "Angle to Fabric Normal": tr("Angle to Fabric Normal"),
+        "Compressive Strength": tr("Compressive Strength"),
+        "Compressive Strength range": tr("Compressive Strength range"),
+        "Young's Modulus, Tangent at 50%": tr("Young's Modulus, Tangent at 50%"),
+        "Young's Modulus": tr("Young's Modulus"),
+        "Poisson Ratio": tr("Poisson Ratio"),
+        "Number of specimens": tr("Number of specimens"),
+        "Information Quality (1-10)": tr("Information Quality (1-10)"),
+        "Tensile Strength": tr("Tensile Strength"),
+        "s (intact)": tr("s (intact)"),
+        "r² (intact fit)": tr("r² (intact fit)"),
+        "r² (residual fit)": tr("r² (residual fit)"),
+        "Confining stress range of the fit": tr("Confining stress range of the fit"),
+        "Modulus ratio MR (Ei/sigci)": tr("Modulus ratio MR (Ei/sigci)"),
+        "P-wave velocity": tr("P-wave velocity"),
+        "P-wave velocity (dry)": tr("P-wave velocity (dry)"),
+        "S-wave velocity": tr("S-wave velocity"),
+        # test block names (core.database.TEST_LABELS)
+        "Compression": tr("Compression"),
+        "Tensile": tr("Tensile"),
+        "Velocity": tr("Velocity"),
+    }
+    return labels.get(label, label)  # symbols (sigci, mi, m residual...) stay
+
+
+def _block_title(block: str) -> str:
+    """Tab / heading of a test block: "Compression Data"..."""
+
+    titles = {
+        "compression": tr("Compression Data"),
+        "tensile": tr("Tensile Data"),
+        "hoek_brown": tr("Hoek-Brown Data"),
+        "velocity": tr("Velocity Data"),
+    }
+    return titles.get(block, f"{mdb.TEST_LABELS[block]} Data")
 
 
 class RecordEditDialog(QDialog):
@@ -45,7 +119,7 @@ class RecordEditDialog(QDialog):
 
     def __init__(self, record: dict, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Material record")
+        self.setWindowTitle(tr("Material record"))
         self.resize(640, 640)
         self.record = copy.deepcopy(record)
         self._edits: dict[tuple, QLineEdit] = {}
@@ -59,20 +133,20 @@ class RecordEditDialog(QDialog):
                 value = self._get(path + (key,))
                 edit.setText("" if value in (None, "") else str(value))
                 self._edits[path + (key,)] = edit
-                form.addRow(f"{label}{f' ({unit[0]})' if unit and unit[0] else ''}", edit)
+                form.addRow(f"{_field_label(label)}{f' ({unit[0]})' if unit and unit[0] else ''}", edit)
             return widget
 
-        tabs.addTab(page(mdb.RECORD_FIELDS, ()), "Record")
-        tabs.addTab(page(mdb.LOCATION_FIELDS, ("location",)), "Location")
-        tabs.addTab(page(mdb.REFERENCE_FIELDS, ("reference",)), "Reference *")
+        tabs.addTab(page(mdb.RECORD_FIELDS, ()), tr("Record"))
+        tabs.addTab(page(mdb.LOCATION_FIELDS, ("location",)), tr("Location"))
+        tabs.addTab(page(mdb.REFERENCE_FIELDS, ("reference",)), tr("Reference *"))
         for block in mdb.TEST_BLOCKS:
-            tabs.addTab(page(mdb.BLOCK_FIELDS[block], ("tests", block)), f"{mdb.TEST_LABELS[block]} Data")
+            tabs.addTab(page(mdb.BLOCK_FIELDS[block], ("tests", block)), _block_title(block))
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout = QVBoxLayout(self)
         layout.addWidget(tabs)
-        layout.addWidget(QLabel("* Reference title and author are required: a record without source is not saved."))
+        layout.addWidget(QLabel(tr("* Reference title and author are required: a record without source is not saved.")))
         layout.addWidget(buttons)
 
     def _get(self, path: tuple):
@@ -114,7 +188,7 @@ class RecordEditDialog(QDialog):
         try:
             mdb.validate(record)
         except ValueError as exc:
-            QMessageBox.warning(self, "Material record", str(exc))
+            QMessageBox.warning(self, tr("Material record"), str(exc))
             return
         self.record = record
         super().accept()
@@ -123,7 +197,7 @@ class RecordEditDialog(QDialog):
 class DatabaseDialog(QDialog):
     def __init__(self, database: mdb.MaterialDatabase, parent=None, on_use=None, on_use_state=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Material Database")
+        self.setWindowTitle(tr("Material Database"))
         self.resize(1100, 700)
         self.db = database
         self.on_use = on_use  # callback(record): new material
@@ -135,17 +209,18 @@ class DatabaseDialog(QDialog):
         # search panel
         left = QWidget()
         left_layout = QVBoxLayout(left)
-        title = QLabel("<h2>Search</h2>")
-        help_label = QLabel(HELP)
+        title = QLabel("<h2>{0}</h2>".format(tr("Search")))
+        help_label = QLabel(_help())
         help_label.setWordWrap(True)
         self.query = QLineEdit()
         self.query.returnPressed.connect(self.search)
         self.origin = QComboBox()
-        self.origin.addItems(["All records", "Built-in (bibliography)", "My records", "Favourites"])
+        # by index (search): All / Built-in / My records / Favourites
+        self.origin.addItems([tr("All records"), tr("Built-in (bibliography)"), tr("My records"), tr("Favourites")])
         self.origin.currentIndexChanged.connect(self.search)
-        reset = QPushButton("Reset")
+        reset = QPushButton(tr("Reset"))
         reset.clicked.connect(self.reset)
-        go = QPushButton("Search")
+        go = QPushButton(tr("Search"))
         go.clicked.connect(self.search)
         row = QHBoxLayout()
         row.addWidget(reset)
@@ -153,10 +228,10 @@ class DatabaseDialog(QDialog):
         for widget in (title, help_label, self.query, self.origin):
             left_layout.addWidget(widget)
         left_layout.addLayout(row)
-        new = QPushButton("New Record…")
+        new = QPushButton(tr("New Record…"))
         new.clicked.connect(self.new_record)
         left_layout.addWidget(new)
-        export = QPushButton("Export Results to Excel (CSV)…")
+        export = QPushButton(tr("Export Results to Excel (CSV)…"))
         export.clicked.connect(lambda: self.export_results())
         left_layout.addWidget(export)
         left_layout.addStretch(1)
@@ -186,21 +261,21 @@ class DatabaseDialog(QDialog):
         self.view = QTextBrowser()
         right_layout.addWidget(self.view, stretch=1)
         buttons = QHBoxLayout()
-        self.copy_new = QPushButton("Copy to New Record…")
+        self.copy_new = QPushButton(tr("Copy to New Record…"))
         self.copy_new.clicked.connect(self.copy_to_new)
-        self.edit = QPushButton("Edit this Record…")
+        self.edit = QPushButton(tr("Edit this Record…"))
         self.edit.clicked.connect(self.edit_record)
-        self.delete = QPushButton("Delete this Record")
+        self.delete = QPushButton(tr("Delete this Record"))
         self.delete.clicked.connect(lambda: self.delete_record())
-        self.copy = QPushButton("Copy to Clipboard")
+        self.copy = QPushButton(tr("Copy to Clipboard"))
         self.copy.clicked.connect(self.copy_to_clipboard)
-        self.use = QPushButton("Use as Material")
+        self.use = QPushButton(tr("Use as Material"))
         self.use.clicked.connect(self.use_record)
-        self.use_state = QPushButton("Use as Failure State")
+        self.use_state = QPushButton(tr("Use as Failure State"))
         self.use_state.clicked.connect(self.use_record_state)
-        self.favourite = QPushButton("☆ Favourite")
+        self.favourite = QPushButton(tr("☆ Favourite"))
         self.favourite.clicked.connect(self.toggle_favourite)
-        self.print_button = QPushButton("Print / PDF…")
+        self.print_button = QPushButton(tr("Print / PDF…"))
         self.print_button.clicked.connect(lambda: self.print_record())
         for b in (self.favourite, self.copy_new, self.edit, self.delete):
             buttons.addWidget(b)
@@ -245,9 +320,10 @@ class DatabaseDialog(QDialog):
         self.list.blockSignals(True)
         self.list.clear()
         for record in items:
-            tests = ", ".join(mdb.available_tests(record)) or "none"
+            tests = ", ".join(_field_label(t) for t in mdb.available_tests(record)) or tr("none")
             star = "★ " if record["record_id"] in self.db.favourites else ""
-            item = QListWidgetItem(f"{star}{mdb.title(record)}\n   Record ID {record['record_id']},  Available test data: {tests}")
+            details = tr("Record ID {0},  Available test data: {1}").format(record["record_id"], tests)
+            item = QListWidgetItem(f"{star}{mdb.title(record)}\n   {details}")
             item.setData(Qt.ItemDataRole.UserRole, record["record_id"])
             self.list.addItem(item)
         self.list.blockSignals(False)
@@ -255,8 +331,10 @@ class DatabaseDialog(QDialog):
         last = self.page * mdb.PAGE_SIZE + len(items)
         q = self.query.text().strip()
         shown = html.escape(q if q.startswith('"') else f'"{q}"')
-        self.summary.setText(f'<b>Search Records{f" for {shown}" if q else ""}</b> — Showing Results {first} - {last} of {len(self.results)}')
-        self.page_label.setText(f"Page {self.page + 1} of {pages}")
+        heading = tr("Search Records for {0}").format(shown) if q else tr("Search Records")
+        showing = tr("Showing Results {0} - {1} of {2}").format(first, last, len(self.results))
+        self.summary.setText(f"<b>{heading}</b> — {showing}")
+        self.page_label.setText(tr("Page {0} of {1}").format(self.page + 1, pages))
         self.prev.setEnabled(self.page > 0)
         self.next.setEnabled(self.page < pages - 1)
         if items:
@@ -275,12 +353,13 @@ class DatabaseDialog(QDialog):
         for b in (self.copy_new, self.copy, self.use, self.favourite, self.print_button):
             b.setEnabled(record is not None)
         self.use_state.setEnabled(record is not None and bool(mdb.specimen_points(record)))
-        self.favourite.setText("★ Favourite" if record is not None and record["record_id"] in self.db.favourites else "☆ Favourite")
+        favourite = record is not None and record["record_id"] in self.db.favourites
+        self.favourite.setText(tr("★ Favourite") if favourite else tr("☆ Favourite"))
         user = record is not None and record.get("origin") == "user"
         self.edit.setEnabled(user)
         self.delete.setEnabled(user)
         if record is None:
-            self.html = "<i>No record.</i>"
+            self.html = "<i>{0}</i>".format(tr("No record."))
             self.view.setHtml(self.html)
             return
         e = html.escape
@@ -288,24 +367,26 @@ class DatabaseDialog(QDialog):
         def rows(pairs):
             return "".join(f"<tr><td><b>{e(label)}</b></td><td>{e(str(value))}</td></tr>" for label, value in pairs if value not in (None, ""))
 
-        head = [(label, record.get(key)) for key, label in mdb.RECORD_FIELDS] + [("Record ID", record.get("record_id")),
-                ("Origin", "built-in (bibliography, read-only)" if record.get("origin") == "builtin" else "my records")]
+        origin = tr("built-in (bibliography, read-only)") if record.get("origin") == "builtin" else tr("my records")
+        head = [(_field_label(label), record.get(key)) for key, label in mdb.RECORD_FIELDS] + [
+            (tr("Record ID"), record.get("record_id")), (tr("Origin"), origin)]
         parts = [f"<h3>{e(mdb.title(record))}</h3><table>{rows(head)}</table>"]
-        loc = rows((label, record.get("location", {}).get(key)) for key, label in mdb.LOCATION_FIELDS)
+        loc = rows((_field_label(label), record.get("location", {}).get(key)) for key, label in mdb.LOCATION_FIELDS)
         if loc:
-            parts.append(f"<h4>Location Information</h4><table>{loc}</table>")
-        parts.append(f"<h4>Reference Information</h4><table>{rows((label, record.get('reference', {}).get(key)) for key, label in mdb.REFERENCE_FIELDS)}</table>")
+            parts.append(f"<h4>{tr('Location Information')}</h4><table>{loc}</table>")
+        ref = rows((_field_label(label), record.get("reference", {}).get(key)) for key, label in mdb.REFERENCE_FIELDS)
+        parts.append(f"<h4>{tr('Reference Information')}</h4><table>{ref}</table>")
         for block in mdb.TEST_BLOCKS:
             data = record.get("tests", {}).get(block, {})
-            body = rows((f"{label}{f' ({unit})' if unit else ''}", data.get(key)) for key, label, unit in mdb.BLOCK_FIELDS[block])
+            body = rows((f"{_field_label(label)}{f' ({unit})' if unit else ''}", data.get(key)) for key, label, unit in mdb.BLOCK_FIELDS[block])
             if body:
-                parts.append(f"<h4>{mdb.TEST_LABELS[block]} Data</h4><table>{body}</table>")
+                parts.append(f"<h4>{_block_title(block)}</h4><table>{body}</table>")
         specimens = record.get("specimens") or []
         if specimens:
             keys = [k for k in specimens[0].keys()]
             header = "".join(f"<th>{e(k)}</th>" for k in keys)
             body = "".join("<tr>" + "".join(f"<td>{e(str(sp.get(k, '')))}</td>" for k in keys) + "</tr>" for sp in specimens)
-            parts.append(f"<h4>Specimens ({len(specimens)})</h4><table border='1' cellspacing='0' cellpadding='2'><tr>{header}</tr>{body}</table>")
+            parts.append(f"<h4>{tr('Specimens ({0})').format(len(specimens))}</h4><table border='1' cellspacing='0' cellpadding='2'><tr>{header}</tr>{body}</table>")
         self.html = "".join(parts)
         self.view.setHtml(self.html)
 
@@ -328,7 +409,7 @@ class DatabaseDialog(QDialog):
         try:
             stored = self.db.save_record(record)
         except ValueError as exc:
-            QMessageBox.warning(self, "Material Database", str(exc))
+            QMessageBox.warning(self, tr("Material Database"), str(exc))
             return None
         self._select(stored["record_id"])
         return stored
@@ -351,7 +432,8 @@ class DatabaseDialog(QDialog):
     def delete_record(self, confirm: bool = True) -> None:
         if self.current is None or self.current.get("origin") != "user":
             return
-        if confirm and QMessageBox.question(self, "Delete record", f"Delete record {self.current['record_id']}?") != QMessageBox.StandardButton.Yes:
+        question = tr("Delete record {0}?").format(self.current["record_id"])
+        if confirm and QMessageBox.question(self, tr("Delete record"), question) != QMessageBox.StandardButton.Yes:
             return
         self.db.delete(self.current["record_id"])
         self.search()
@@ -374,7 +456,7 @@ class DatabaseDialog(QDialog):
         if path is None:
             from PySide6.QtWidgets import QFileDialog
 
-            path, _ = QFileDialog.getSaveFileName(self, "Export results to Excel (CSV)", "materials.csv", "CSV (*.csv)")
+            path, _ = QFileDialog.getSaveFileName(self, tr("Export results to Excel (CSV)"), "materials.csv", "CSV (*.csv)")  # i18n: ignore
             if not path:
                 return 0
         return mdb.export_csv(path, self.results)
@@ -403,7 +485,7 @@ class DatabaseDialog(QDialog):
         try:
             self.on_use_state(self.current)
         except ValueError as exc:
-            QMessageBox.warning(self, "Use as Failure State", str(exc))
+            QMessageBox.warning(self, tr("Use as Failure State"), str(exc))
 
     def use_record(self) -> None:
         if self.current is None or self.on_use is None:
@@ -411,4 +493,4 @@ class DatabaseDialog(QDialog):
         try:
             self.on_use(self.current)
         except ValueError as exc:
-            QMessageBox.warning(self, "Use as Material", str(exc))
+            QMessageBox.warning(self, tr("Use as Material"), str(exc))

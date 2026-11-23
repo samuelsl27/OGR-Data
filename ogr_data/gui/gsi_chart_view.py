@@ -36,6 +36,12 @@ SHORT_NAMES = {
     "flysch_2000": "Marinos & Hoek (2000), flysch",
     "heterogeneous_marinos_2007": "V. Marinos (2007), heterogeneous",
 }
+# the notes window follows the chart language (its own selector), like the chart texts
+SHORT_NAMES_ES = {
+    "general_2000": "Hoek & Marinos (2000)",
+    "flysch_2000": "Marinos & Hoek (2000), flysch",
+    "heterogeneous_marinos_2007": "V. Marinos (2007), heterogénea",
+}
 
 
 class DigitizedGsiChart(FigureCanvasQTAgg):
@@ -215,9 +221,9 @@ class DigitizedGsiPage(QWidget):
     def _retranslate(self) -> None:
         es = self.lang == "es"
         if hasattr(self, "_type_label"):
-            self._type_label.setText("Tipo:" if es else "Type:")
+            self._type_label.setText("Tipo:" if es else "Type:")  # i18n: ignore (chart language)
             self._type.setItemText(0, "(clic en la carta)" if es else "(click on the chart)")
-        self._notes_button.setText("Notas de la carta…" if es else "Chart notes…")
+        self._notes_button.setText("Notas de la carta…" if es else "Chart notes…")  # i18n: ignore (chart language)
         self._reset_hover()
         self._show_details()
 
@@ -236,7 +242,7 @@ class DigitizedGsiPage(QWidget):
         self._hover.setText(f"GSI ≈ {value}  ·  {result.summary(self.lang)}")
 
     def _reset_hover(self) -> None:
-        self._hover.setText("Clic en la carta para leer el GSI." if self.lang == "es" else "Click on the chart to read GSI.")
+        self._hover.setText("Clic en la carta para leer el GSI." if self.lang == "es" else "Click on the chart to read GSI.")  # i18n: ignore (chart language)
 
     def _picked(self, result: gsi_charts.ChartPick) -> None:
         self.result = result
@@ -310,7 +316,7 @@ class DigitizedGsiPage(QWidget):
 
     def show_notes(self) -> None:
         dlg = QDialog(self)
-        dlg.setWindowTitle(SHORT_NAMES.get(self.chart_id, self.chart_id))
+        dlg.setWindowTitle((SHORT_NAMES_ES if self.lang == "es" else SHORT_NAMES).get(self.chart_id, self.chart_id))
         dlg.resize(720, 560)
         browser = QTextBrowser()
         browser.setHtml(self.notes_html())
