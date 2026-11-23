@@ -98,3 +98,13 @@ def test_equivalent_mc_recovers_linear_envelope() -> None:
     mc = equivalent_mc(inp, mb, s, a)
     assert mc.cohesion > 0.0
     assert 0.0 < mc.friction_deg < 90.0
+
+
+def test_ormas_sigci_150_case() -> None:
+    # ORMAS V2.0 interface, sigci = 150 MPa, rest default (ORMAS_analisis, 2026-11-23)
+    result = compute(HbInput(sigci=150.0))
+    approx(result.mc.cohesion, 2.7805, tol=1e-4)
+    approx(result.mc.friction_deg, 43.78, tol=1e-3)
+    approx(result.sigcm, 26.1500, tol=1e-4)
+    approx(result.sigt, -0.3458, tol=1e-3)
+    approx(result.sigc, 9.0341, tol=1e-4)

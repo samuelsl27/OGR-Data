@@ -35,7 +35,6 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTableWidget,
     QTableWidgetItem,
-    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -85,6 +84,34 @@ class PointTable(QWidget):
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.table)
+
+    def reconfigure(self, headers: list[str], column_scales: list[float], flag_header: str = "") -> None:
+        """Change the columns (test type / direction), keeping the values by position."""
+
+        kept = []
+        for r in range(self.table.rowCount()):
+            row = []
+            for c in range(self._numeric):
+                item = self.table.item(r, c)
+                try:
+                    row.append(float(item.text().replace(",", ".")) / self._scales[c] if item and item.text().strip() else 0.0)
+                except ValueError:
+                    row.append(0.0)
+            if self._flag:
+                item = self.table.item(r, self._numeric)
+                row.append(item is not None and item.checkState() == Qt.CheckState.Checked)
+            kept.append(row)
+        self._numeric = len(column_scales)
+        self._scales = list(column_scales)
+        flag_values = [row[-1] for row in kept] if self._flag else [False] * len(kept)
+        self._flag = bool(flag_header)
+        self.table.setRowCount(0)
+        self.table.setColumnCount(self._numeric + (1 if self._flag else 0))
+        self.table.setHorizontalHeaderLabels(list(headers) + ([flag_header] if self._flag else []))
+        for row, flag in zip(kept, flag_values):
+            numbers = [v for v in row if not isinstance(v, bool)][: self._numeric]
+            numbers += [0.0] * (self._numeric - len(numbers))
+            self._append(numbers + ([flag] if self._flag else []))
 
     # ------------------------------------------------------------- values
 
@@ -402,6 +429,8 @@ class _ItemsDialog(QDialog):
 
 
 class FailureStatesDialog(_ItemsDialog):
+    """One point table per state, columns per Test Type (RSData 1.009)."""
+
     noun = "State"
 
     def __init__(self, parent, material_name: str, failure_states: list, unit: str, initial: int = 0) -> None:
@@ -419,43 +448,46 @@ class FailureStatesDialog(_ItemsDialog):
         self._test_type.currentIndexChanged.connect(self._test_type_changed)
         form.addRow("Test Type:", self._test_type)
         layout.addLayout(form)
-        self._tabs = QTabWidget()
-        self._peak = self._make_table("triaxial")
-        self._residual = self._make_table("triaxial")
-        self._tabs.addTab(self._peak, "Peak Points")
-        self._tabs.addTab(self._residual, "Residual Points")
-        layout.addWidget(self._tabs, stretch=1)
+        self._points = PointTable([], [self._kpa_scale, self._kpa_scale], "Exclude")
+        layout.addWidget(self._points, stretch=1)
+        self._configure("triaxial")
 
-    def _headers(self, test_type: str) -> list[str]:
-        x, y = ("Normal Stress", "Shear Stress") if test_type == "direct_shear" else ("Sigma3", "Sigma1")
-        return [f"{x} ({self._unit})", f"{y} ({self._unit})"]
-
-    def _make_table(self, test_type: str) -> PointTable:
-        return PointTable(self._headers(test_type), [self._kpa_scale, self._kpa_scale], "Exclude")
+    def _configure(self, test_type: str) -> None:
+        columns = st.FailureState(test_type=test_type).columns
+        headers = [f"{c} ({self._unit})" for c in columns]
+        flag = "" if test_type == "general" else "Exclude"
+        self._points.reconfigure(headers, [self._kpa_scale] * len(columns), flag)
 
     def _test_type_changed(self) -> None:
-        headers = self._headers(self._test_type.currentData()) + ["Exclude"]
-        for table in (self._peak, self._residual):
-            table.table.setHorizontalHeaderLabels(headers)
+        self._configure(self._test_type.currentData())
 
     def _new_item(self, name: str, color: str):
         return st.FailureState(name=name, color=color)
 
     def _load(self, item: st.FailureState) -> None:
         self._symbol.setCurrentIndex(max(0, self._symbol.findData(item.symbol)))
+        self._test_type.blockSignals(True)
         self._test_type.setCurrentIndex(max(0, self._test_type.findData(item.test_type)))
-        self._test_type_changed()
-        self._peak.set_rows([p.to_list() for p in item.peak])
-        self._residual.set_rows([p.to_list() for p in item.residual])
+        self._test_type.blockSignals(False)
+        self._configure(item.test_type)
+        if item.test_type == "general":
+            self._points.set_rows(item.tensors)
+        else:
+            self._points.set_rows([p.to_list() for p in item.points])
 
     def _store(self, item: st.FailureState) -> None:
         item.symbol = self._symbol.currentData()
         item.test_type = self._test_type.currentData()
-        item.peak = [st.TestPoint(*row) for row in self._peak.rows()]
-        item.residual = [st.TestPoint(*row) for row in self._residual.rows()]
+        rows = self._points.rows()
+        if item.test_type == "general":
+            item.tensors = [tuple(row[:6]) for row in rows]
+        else:
+            item.points = [st.TestPoint(*row) for row in rows]
 
 
 class StressPathsDialog(_ItemsDialog):
+    """Fields and columns per configuration, as verified in RSData 1.009."""
+
     noun = "Path"
 
     def __init__(self, parent, material_name: str, stress_paths: list, unit: str, initial: int = 0) -> None:
@@ -475,7 +507,6 @@ class StressPathsDialog(_ItemsDialog):
             return widget
 
         self._test_type = combo(st.PATH_TEST_TYPES)
-        self._test_type.currentIndexChanged.connect(self._test_type_changed)
         self._seepage = combo(st.SEEPAGE_CONDITIONS)
         self._loading_dir = combo(st.LOADING_DIRECTIONS)
         self._lateral = QDoubleSpinBox()
@@ -486,69 +517,84 @@ class StressPathsDialog(_ItemsDialog):
         self._k0.setRange(0.0, 100.0)
         self._k0.setDecimals(4)
         self._strain_type = combo(st.STRAIN_TYPES)
-        self._loading_dir.currentIndexChanged.connect(self._update_columns)
-        self._strain_type.currentIndexChanged.connect(self._update_columns)
+        for widget in (self._test_type, self._seepage, self._loading_dir, self._strain_type):
+            widget.currentIndexChanged.connect(self._config_changed)
         form.addRow("Test Type:", self._test_type)
         form.addRow("Seepage Condition:", self._seepage)
         form.addRow("Loading Direction:", self._loading_dir)
         form.addRow("Initial Effective Lateral Stress:", self._lateral)
         form.addRow("Initial Effective K0:", self._k0)
         form.addRow("Strain Type:", self._strain_type)
+        self._form = form
         layout.addLayout(form)
         self._note = QLabel()
         self._note.setWordWrap(True)
         layout.addWidget(self._note)
-        self._steps = PointTable(["EpsilonZZ", f"SigmaZZ ({self._unit})", "EpsilonXX"], [1.0, self._kpa_scale, 1.0])
+        self._steps = PointTable([], [1.0, 1.0, 1.0])
         layout.addWidget(self._steps, stretch=1)
+        self._config_changed()
 
     def _config(self) -> st.StressPath:
         return st.StressPath(
             test_type=self._test_type.currentData(),
+            seepage=self._seepage.currentData(),
             loading=self._loading_dir.currentData(),
             strain_type=self._strain_type.currentData(),
         )
 
-    def _update_columns(self) -> None:
-        """Table headers of the RSData dialog for the current configuration."""
-
-        eps, stress, strain = self._config().columns()
-        self._steps.table.setHorizontalHeaderLabels([eps, f"{stress} ({self._unit})", strain])
-
-    def _test_type_changed(self) -> None:
-        test_type = self._test_type.currentData()
-        triaxial = test_type == "triaxial"
-        # RSData: seepage, loading direction, initial lateral stress and K0
-        # for the triaxial test; strain type for the uniaxial test
-        for widget in (self._seepage, self._loading_dir, self._lateral, self._k0):
-            widget.setEnabled(triaxial)
-        self._strain_type.setEnabled(test_type == "uniaxial")
-        if test_type in ("uniaxial", "triaxial"):
+    def _config_changed(self) -> None:
+        config = self._config()
+        test_type = config.test_type
+        # RSData 1.009: seepage and loading direction for triaxial/biaxial;
+        # sigma'h0 and K0 also for simple shear; strain type for uniaxial.
+        triaxial_like = test_type in ("triaxial", "biaxial")
+        visible = {
+            self._seepage: triaxial_like,
+            self._loading_dir: triaxial_like,
+            self._lateral: triaxial_like or test_type == "simple_shear",
+            self._k0: triaxial_like or test_type == "simple_shear",
+            self._strain_type: test_type == "uniaxial",
+        }
+        for widget, shown in visible.items():
+            widget.setEnabled(shown)
+            self._form.setRowVisible(widget, shown)
+        # stress columns in the display unit (RSData shows no units here)
+        headers = [
+            f"{name} ({self._unit})" if is_stress else name
+            for name, is_stress in zip(config.columns(), config.stress_columns())
+        ]
+        scales = [self._kpa_scale if is_stress else 1.0 for is_stress in config.stress_columns()]
+        self._steps.reconfigure(headers, scales)
+        if config.drawable:
             note = ""
-            if triaxial:
-                note = (
-                    "Triaxial paths: the stress column varies and the other principal stress keeps its "
-                    "initial effective value (provisional interpretation, spec 021)."
-                )
-        else:
+            if test_type == "uniaxial":
+                note = "Uniaxial: the radial stress is zero (RSData 1.009 plots p and q with a hidden 100 kPa)."
+        elif triaxial_like and config.loading == "Lateral":
             note = (
-                "The RSData inputs of this test type are not verified yet (spec 021); "
-                "the path is kept but not drawn."
+                "Loading Direction Lateral: RSData 1.009 overwrites SigmaXX with the initial lateral stress and "
+                "plots no axial stress; the path is kept but not drawn (spec 021)."
             )
+        else:
+            note = "Kept but not drawn: the stress invariants of this configuration are not verified (spec 021)."
         self._note.setText(note)
-        self._update_columns()
 
     def _new_item(self, name: str, color: str):
         return st.StressPath(name=name, color=color)
 
     def _load(self, item: st.StressPath) -> None:
+        widgets = (self._test_type, self._seepage, self._loading_dir, self._strain_type)
+        for widget in widgets:
+            widget.blockSignals(True)
         self._test_type.setCurrentIndex(max(0, self._test_type.findData(item.test_type)))
         self._seepage.setCurrentIndex(max(0, self._seepage.findData(item.seepage)))
         self._loading_dir.setCurrentIndex(max(0, self._loading_dir.findData(item.loading)))
+        self._strain_type.setCurrentIndex(max(0, self._strain_type.findData(item.strain_type)))
+        for widget in widgets:
+            widget.blockSignals(False)
         self._lateral.setValue(item.lateral_stress * self._kpa_scale)
         self._k0.setValue(item.k0)
-        self._strain_type.setCurrentIndex(max(0, self._strain_type.findData(item.strain_type)))
-        self._test_type_changed()
-        self._steps.set_rows([s.to_list() for s in item.steps])
+        self._config_changed()
+        self._steps.set_rows(item.steps)
 
     def _store(self, item: st.StressPath) -> None:
         item.test_type = self._test_type.currentData()
@@ -557,4 +603,4 @@ class StressPathsDialog(_ItemsDialog):
         item.lateral_stress = self._lateral.value() / self._kpa_scale
         item.k0 = self._k0.value()
         item.strain_type = self._strain_type.currentData()
-        item.steps = [st.PathStep(*row) for row in self._steps.rows()]
+        item.steps = [list(row) for row in self._steps.rows()]

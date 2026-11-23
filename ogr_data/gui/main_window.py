@@ -640,10 +640,10 @@ class MainWindow(QMainWindow):
     def _draw_test_data(self) -> None:
         """Failure-state points, Mohr circles and stress paths of visible materials.
 
-        RocData 3.0 guide pp. 13, 47-48: triaxial data as points in principal
-        space and Mohr circles in shear space; direct shear data as points in
-        shear space. Peak points are filled, residual hollow (residual circles
-        dashed); excluded points are drawn faded.
+        As RSData 1.009 (capture 71) and the RocData 3.0 guide (pp. 13, 47-48):
+        triaxial and general states as filled points in sigma1-sigma3 and Mohr
+        circles in tau-sigma; direct shear states as points in tau-sigma.
+        Excluded points are not drawn (RSData removes them from the plots).
         """
 
         principal, shear = [], []
@@ -655,43 +655,22 @@ class MainWindow(QMainWindow):
             for state in material.failure_states:
                 if not state.visible:
                     continue
-                x_name, y_name = state.columns
-                for kind, points, filled in (("peak", state.peak, True), ("residual", state.residual, False)):
-                    label = f"{prefix}{state.name}" + ("" if kind == "peak" else " (residual)")
-                    for excluded in (False, True):
-                        group = [p for p in points if p.exclude == excluded]
-                        if not group:
-                            continue
-                        alpha = 0.35 if excluded else 1.0
-                        x = np.array([p.x for p in group]) / 1000.0  # kPa -> MPa
-                        y = np.array([p.y for p in group]) / 1000.0
-                        tag = f"{label} excluded" if excluded else label
-                        layer = {
-                            "x": x,
-                            "y": y,
-                            "color": state.color,
-                            "marker": state.symbol,
-                            "filled": filled,
-                            "alpha": alpha,
-                            "legend": "" if excluded else label,
-                            "export": (f"{tag} {x_name}", f"{tag} {y_name}"),
-                        }
-                        if state.test_type == "direct_shear":
-                            shear.append(layer)
-                            continue
-                        principal.append(layer)
-                        for sig3, sig1 in zip(x, y):
-                            normal, tau = st.mohr_circle(float(sig3), float(sig1))
-                            shear.append(
-                                {
-                                    "x": normal,
-                                    "y": tau,
-                                    "color": state.color,
-                                    "linestyle": "-" if kind == "peak" else "--",
-                                    "linewidth": 0.9,
-                                    "alpha": alpha,
-                                }
-                            )
+                label = f"{prefix}{state.name}"
+                layer = {"color": state.color, "marker": state.symbol, "legend": label}
+                direct = state.shear_points()
+                if direct is not None:
+                    if len(direct[0]):
+                        shear.append({**layer, "x": direct[0] / 1000.0, "y": direct[1] / 1000.0,
+                                      "export": (f"{label} SigmaN", f"{label} Tau")})
+                    continue
+                sig3, sig1 = state.principal_points()
+                if not len(sig3):
+                    continue
+                x, y = sig3 / 1000.0, sig1 / 1000.0  # kPa -> MPa
+                principal.append({**layer, "x": x, "y": y, "export": (f"{label} Sigma3", f"{label} Sigma1")})
+                for s3, s1 in zip(x, y):
+                    normal, tau = st.mohr_circle(float(s3), float(s1))
+                    shear.append({"x": normal, "y": tau, "color": state.color, "linestyle": "-", "linewidth": 0.9})
             for path in material.stress_paths:
                 if not path.visible:
                     continue

@@ -133,3 +133,12 @@ Fuentes guardadas: ayuda online oficial de RSData
   dibujan. El diálogo lo indica.
 - Verificación en la interfaz: prompt para Claude Desktop en
   `Data/Promps/2026_11_23_Prompt_Claude-Desktop_RSData-ORMAS.md`.
+
+## Tercera iteración (2026-11-23): sustituida en parte por la spec 021
+
+La verificación en la interfaz de RSData 1.009 (documento 07) corrigió
+el modelo: sin pestañas Peak/Residual (una tabla por estado), tipos de
+estado Triaxial / Direct Shear / General, rutas sin "General", Loading
+Direction None/Axial/Lateral, columnas por combinación y semántica
+numérica. Implementado en la **spec 021**; ver allí las decisiones donde
+RSData se comporta de forma dudosa.

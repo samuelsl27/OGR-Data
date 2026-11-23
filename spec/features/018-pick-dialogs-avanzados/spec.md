@@ -19,8 +19,8 @@ inventar datos):
    con tablas típicas) y se documentará en Bibliografia antes de
    implementar. Con ello, el clasificador USCS (spec 004) podrá proponer
    valores iniciales numéricos y crear el material.
-3. **D (disturbance factor)**: tabla/figura de Hoek 2002 §7 (ya en
-   Bibliografia) como pick del factor D.
+3. ~~**D (disturbance factor)**~~: pasa a la spec 022 (estimación sin
+   ensayos), junto con GSI, mi y Ei (revisión 2026-11-23).
 
 ## Criterios de aceptación
 

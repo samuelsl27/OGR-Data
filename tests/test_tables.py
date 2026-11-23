@@ -82,3 +82,12 @@ def test_picker_dialogs_offscreen():
     dlg._surface.setCurrentIndex(idx_vg)
     assert dlg.gsi() is None
     dlg.reject()
+
+
+def test_sigci_pick_values_match_rsdata_and_ormas() -> None:
+    from ogr_data.core import tables
+
+    data = tables.rock_strength_grades()
+    key = next(k for k, v in data.items() if isinstance(v, list))
+    picks = [g["ucs_pick_mpa"] for g in data[key]]
+    assert picks == [250.0, 175.0, 75.0, 35.0, 15.0, 3.0, 0.6]

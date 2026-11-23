@@ -2,60 +2,60 @@
 
 ## Qué se construye
 
-Completar los objetos de la spec 012 con la disposición exacta de RSData
-para todos sus tipos de ensayo, una vez verificada en la interfaz:
+Rehacer los objetos de la spec 012 con la disposición verificada en la
+interfaz de RSData 1.009 (`Referencias/Ejemplos/RSData_analisis/
+07_estados_y_rutas_verificado.md`, capturas 44–74, exportaciones Excel):
 
-1. **Failure States**: tipos oficiales Triaxial, Simple Shear y General
-   (ayuda online de RSData). Hoy OGR-Data solo tiene Triaxial (σ3, σ1,
-   verificado) y su extensión Direct Shear (RocData). Falta saber qué
-   columnas/campos piden Simple Shear y General, si todos llevan pestañas
-   Peak/Residual y qué hace *Exclude* exactamente; y dibujarlos (Simple
-   Shear: presumiblemente τ–σn; General: tensor completo → principales).
-2. **Stress Paths**: columnas por combinación (Uniaxial × Strain Type
-   Lateral/Volumetric; Triaxial × Loading Direction Lateral/Axial ×
-   Drained/Undrained; Biaxial; Simple Shear; General) y la **semántica
-   de Loading Direction** (qué tensión varía, cuál se mantiene y cómo
-   entra K0). Hoy OGR-Data usa una interpretación provisional:
-   - Triaxial/Axial: varía SigmaZZ, la lateral se mantiene en σ'h0.
-   - Triaxial/Lateral: varía SigmaXX (columna verificada en la figura
-     oficial), la axial se mantiene en σ'v0 = σ'h0/K0.
-   - Biaxial, Simple Shear, General: se guardan pero no se dibujan.
-3. **Stress Path Graphs**: segunda gráfica según la condición (Volumetric
-   Strain en drenado, Pore Water Pressure en no drenado — requiere saber
-   si/cómo la ruta aporta presión de poro), lista de variables de eje
-   seleccionables con clic derecho (como RSData) y convención de signos.
+1. **Failure States**: Test Type = Triaxial (Sigma3, Sigma1, Exclude) ·
+   Direct Shear (SigmaN, Tau, Exclude) · General (StressXX, StressYY,
+   StressZZ, TauXY, TauYZ, TauXZ; sin Exclude). **Una sola tabla por
+   estado** (no hay pestañas Peak/Residual). *Exclude* quita el punto de
+   la calibración y de las gráficas.
+2. **Stress Paths**: Test Type = Uniaxial · Triaxial · Biaxial · Simple
+   Shear (no hay General). Campos y columnas por combinación (tabla del
+   documento 07): Strain Type None/Volumetric/Lateral (uniaxial);
+   Seepage, Loading Direction None/Axial/Lateral, σ'h0 (100) y K0 (1)
+   (triaxial/biaxial); σ'h0 y K0 (simple shear). En no drenado la última
+   columna es Pore Water Pressure.
+3. **Semántica verificada numéricamente** (Loading Direction = Axial):
+   SigmaZZ es la tensión axial impuesta; la radial se mantiene en σ'h0;
+   K0 no influye; q sin signo; εq = εa − εv/3; en no drenado se grafican
+   tensiones efectivas σ − u.
 
-## Motivación
+## Decisiones de OGR-Data donde RSData muestra comportamientos dudosos
 
-La 012 dejó estos puntos anotados porque la ayuda oficial no documenta
-las columnas ni la semántica y el código de RSData no se decompila. Son
-la base de la calibración (014) y de la simulación (013): sin la
-disposición exacta, los datos introducidos en OGR-Data no serían
-intercambiables con RSData.
-
-## Fuentes y verificación
-
-- Hecho: ayuda online oficial guardada en
-  `Referencias/Ejemplos/RSData_analisis/ayuda_online/` y resumida en
-  `06_ayuda_online.md`; nombres internos de los ensamblados (sin
-  decompilar).
-- Pendiente: verificación en la interfaz con Claude Desktop (computer
-  use) según `Data/Promps/2026_11_23_Prompt_Claude-Desktop_RSData-ORMAS.md`,
-  que deja el resultado en `RSData_analisis/07_estados_y_rutas_verificado.md`.
-  **Esta spec se desarrolla cuando ese documento exista.**
+- **Uniaxial**: RSData calcula p y q con una tensión radial oculta de
+  100 kPa; OGR usa radial 0 (definición del ensayo) y lo indica en el
+  diálogo.
+- **Loading Direction = Lateral**: RSData sobrescribe la columna SigmaXX
+  con σ'h0 y grafica la axial como 0; OGR guarda la columna tal cual y no
+  dibuja la ruta (significado no verificable). Igual para None, Biaxial
+  (invariantes de deformación plana no verificados) y Simple Shear.
+- **Strain Type = Lateral**: RSData reescribe EpsilonXX como −εa/2; OGR
+  conserva los datos del usuario.
+- **Rutas en las Strength Graphs**: RSData no las dibuja; OGR sí (puntos
+  de tensión en σ1–σ3 y cimas de Mohr en τ–σn), petición expresa del
+  propietario.
+- Columnas de tensión con unidad en la cabecera (RSData no la pone en
+  rutas ni en "Tau").
 
 ## Criterios de aceptación
 
-- Cada combinación tipo/dirección del diálogo de OGR-Data muestra los
-  mismos campos, defectos y columnas que RSData (tabla del documento 07).
-- La interpretación provisional de la 012 se sustituye por la deducida
-  numéricamente en RSData (mismos p, q y tensión axial para la misma
-  ruta); tests con esos números.
-- Los estados Simple Shear y General se introducen, guardan y dibujan.
-- Ficheros `.ogrdata` de la 012 siguen cargando (migración si cambian
-  claves o columnas).
+- Cada combinación muestra los campos y columnas de la tabla verificada.
+- Los números de la verificación (TX_Axial K1/K0,5, σ'h0 150, no
+  drenado con u, UX_Volumetric) se reproducen en tests.
+- Exclude: la calibración MC de RSData con el punto anómalo excluido
+  (c = 10,4788 kPa, φ = 34,9894°) se reproduce con el ajuste de la 006.
+- Ficheros de la 012 cargan: los puntos residuales pasan a un estado
+  propio "<nombre> (residual)"; Compression/Extension → Lateral; ruta
+  "General" → Uniaxial.
 
-## Fuera de alcance
+## Fuera de alcance (pendiente)
 
-- Simular las rutas con el modelo constitutivo (013).
-- Calibración (014).
+- Selección de variables de eje en las Stress Path Graphs (RSData: Graph
+  Editor → Axis Type, 27 variables: componentes, p, q, σ1–σ3, presión de
+  poro, totales…) → ampliación de la spec 016.
+- Que la 2.ª gráfica pase a Pore Water Pressure cuando todas las rutas
+  son no drenadas (no verificado en RSData).
+- Uso interno de K0 en RSData (posiblemente inicialización de la
+  simulación, spec 013).

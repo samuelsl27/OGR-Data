@@ -6,8 +6,14 @@ USCS · contrato de portapapeles · ajuste a datos de ensayo · proyectos
 e importación `.roc`. Después: 020 (línea de diseño), 008, 009, 017,
 016, 011 (proyectos multi-material, formato `.ogrdata` v2) y 012
 (estados de fallo y rutas de tensión, con la pestaña Stress Path
-Graphs). Nueva **021** (estados y rutas fieles a RSData) pendiente de la
-verificación en la interfaz de RSData.
+Graphs) y **021** (estados y rutas verificados en la interfaz de RSData
+1.009).
+
+**Siguiente propuesta: 022 — Estimación sin ensayos** (selectores
+visibles de σci, GSI con clic sobre la carta y calculadora, mi con
+filtros, D, Ei/MR y método de Erm): requisito clave del propietario
+(`Referencias/Ejemplos/RSData_analisis/08_estimacion_sin_ensayos.md`).
+Después 014 (calibración, opciones ya verificadas).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Mapping, Union
 
 from .models import CRITERIA, defaults
-from .states import FailureState, StressPath
+from .states import FailureState, StressPath, failure_states_from_dicts
 
 FORMAT_V1 = "ogr-data-project/1"
 FORMAT = "ogr-data-project/2"
@@ -148,7 +148,7 @@ class Material:
             color=str(data.get("color", "")),
             symbol=str(data.get("symbol", "o")),
             visible=bool(data.get("visible", True)),
-            failure_states=[FailureState.from_dict(s) for s in data.get("failure_states", [])],
+            failure_states=failure_states_from_dicts(data.get("failure_states", [])),
             stress_paths=[StressPath.from_dict(p) for p in data.get("stress_paths", [])],
         )
 

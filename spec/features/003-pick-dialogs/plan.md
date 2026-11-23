@@ -24,3 +24,13 @@ renderizada porque la extracción de texto la corrupta: Gneiss 28±5, Breccias
 
 - Lectura de celdas GSI aproximada → se etiqueta como tal en el diálogo y
   en el JSON ("contour reading, indicative").
+
+## Revisión 2026-11-23 (análisis de RSData 1.009 y ORMAS)
+
+- Valores que escribe el pick de σci: los de RSData y ORMAS (250, 175,
+  75, 35, 15, 3, 0,6 MPa); antes R3 = 37,5 y R0 = 0,625 (puntos medios).
+  Hecho, con test.
+- mi: la tabla (Hoek, Tabla 3) coincide con RSData en las nueve rocas en
+  que ORMAS difiere: la fuente es correcta; ORMAS tiene erratas.
+- La ampliación (clic sobre la carta GSI, calculadora, filtros de mi, D,
+  Ei/MR, un solo clic) pasa a la **spec 022**.

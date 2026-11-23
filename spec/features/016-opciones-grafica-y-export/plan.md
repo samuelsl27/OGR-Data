@@ -30,3 +30,14 @@ spec es la capa de UI y persistencia.
   aplicación en canvas offscreen (propiedades de la figura: título,
   rejilla, límites, estilos de series), zoom extents, guardar imagen,
   editor (aplicar/cancelar) y persistencia en proyecto.
+
+## Ampliaciones detectadas (análisis RSData 2026-11-23)
+
+- Graph Editor → **Axis Type**: en las Stress Path Graphs cada eje puede
+  mostrar cualquiera de 27 variables (componentes de deformación y
+  tensión, Axial Strain/Stress, Volumetric/Deviatoric Strain, p, q,
+  σ1–σ3, Pore Water Pressure y totales); el editor permite añadir
+  gráficas (+). Pendiente (spec 021).
+- Botón **Export To Excel** de la barra: libro con todo el proyecto
+  (materiales, estados, ensayos, rutas y datos de todas las gráficas)
+  con selección por grupos. Candidato para la 015/016.
