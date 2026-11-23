@@ -8,9 +8,12 @@ test data blocks Compression, Tensile, Hoek-Brown and Velocity, each with
 an Information Quality (1-10).
 
 The RocProp data are proprietary and are NOT used. OGR's built-in records
-are generated from the sourced tables of the program (Hoek's mi table,
-the MR table of Practical Rock Engineering 2023 and the field estimates of
-UCS); user records live in a separate JSON file. Every record needs a
+come from the sourced tables of the program (Hoek's mi table, the MR table
+of Practical Rock Engineering 2023, the field estimates of UCS) and from
+open official test data: CANMET 1995 "Geotechnical Properties of Rock"
+(Natural Resources Canada, 77 Canadian rocks) and MnDOT 2018 "Development
+of a Rock Strength Database" (Minnesota DOT, individual specimens); see
+core/db_sources.py. User records live in a separate JSON file. Every record needs a
 reference: a record without source is not saved.
 
 Search (as RocProp): key words must all match (AND), case-insensitive;
@@ -45,7 +48,9 @@ COMPRESSION_FIELDS = (
     ("ucs_mpa", "Compressive Strength", "MPa"),
     ("ucs_range_mpa", "Compressive Strength range", "MPa"),
     ("e50_mpa", "Young's Modulus, Tangent at 50%", "MPa"),
+    ("e_mpa", "Young's Modulus", "MPa"),
     ("poisson", "Poisson Ratio", ""),
+    ("n_specimens", "Number of specimens", ""),
     ("information_quality", "Information Quality (1-10)", ""),
 )
 TENSILE_FIELDS = (
@@ -57,11 +62,18 @@ HOEK_BROWN_FIELDS = (
     ("sigci_mpa", "sigci", "MPa"),
     ("mi", "mi", ""),
     ("mi_std", "mi ±", ""),
+    ("s", "s (intact)", ""),
+    ("r2", "r² (intact fit)", ""),
+    ("m_residual", "m residual", ""),
+    ("s_residual", "s residual", ""),
+    ("r2_residual", "r² (residual fit)", ""),
+    ("confining_range_mpa", "Confining stress range of the fit", "MPa"),
     ("modulus_ratio", "Modulus ratio MR (Ei/sigci)", ""),
     ("information_quality", "Information Quality (1-10)", ""),
 )
 VELOCITY_FIELDS = (
     ("vp_m_s", "P-wave velocity", "m/s"),
+    ("vp_dry_m_s", "P-wave velocity (dry)", "m/s"),
     ("vs_m_s", "S-wave velocity", "m/s"),
     ("information_quality", "Information Quality (1-10)", ""),
 )
@@ -82,6 +94,17 @@ REFERENCE_FIELDS = (
 )
 
 
+RECORD_FIELDS = (
+    ("rock_name", "Rock Name"),
+    ("rock_name_prefix", "Rock Name Prefix"),
+    ("unit_weight_mn_m3", "Unit Weight (MN/m3)"),
+    ("density_mg_m3", "Density (Mg/m3)"),
+    ("porosity_pct", "Porosity (%)"),
+    ("fabric", "Fabric"),
+    ("notes", "Notes"),
+)
+
+
 def empty_record() -> dict[str, Any]:
     return {
         "record_id": None,
@@ -89,11 +112,14 @@ def empty_record() -> dict[str, Any]:
         "rock_name": "",
         "rock_name_prefix": "",
         "unit_weight_mn_m3": None,
+        "density_mg_m3": None,
+        "porosity_pct": None,
         "fabric": "",
         "notes": "",
         "location": {key: "" for key, _ in LOCATION_FIELDS},
         "reference": {key: "" for key, _ in REFERENCE_FIELDS},
         "tests": {},
+        "specimens": [],  # individual tests: sigma3_mpa, sigma1_mpa (+ optional fields)
     }
 
 
@@ -169,11 +195,13 @@ class MaterialDatabase:
         self.user_path = Path(user_path) if user_path else None
         self.builtin = [copy.deepcopy(r) for r in (builtin if builtin is not None else builtin_records())]
         self.user: list[dict] = []
+        self.favourites: set[int] = set()
         if self.user_path and self.user_path.exists():
             data = json.loads(self.user_path.read_text(encoding="utf-8"))
             if data.get("format") != FORMAT:
                 raise ValueError(f"unsupported materials database {data.get('format')!r}")
             self.user = list(data.get("records", []))
+            self.favourites = {int(i) for i in data.get("favourites", [])}
 
     @property
     def records(self) -> list[dict]:
@@ -221,17 +249,76 @@ class MaterialDatabase:
         if any(r.get("record_id") == record_id for r in self.builtin):
             raise ValueError("built-in records cannot be deleted")
         self.user = [r for r in self.user if r.get("record_id") != record_id]
+        self.favourites.discard(record_id)
         self._write()
+
+    def toggle_favourite(self, record_id: int) -> bool:
+        """Add or remove a favourite (RocProp Favorites); returns the new state."""
+
+        if record_id in self.favourites:
+            self.favourites.discard(record_id)
+        else:
+            self.favourites.add(record_id)
+        self._write()
+        return record_id in self.favourites
 
     def _write(self) -> None:
         if self.user_path is None:
             return
         self.user_path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {"format": FORMAT, "records": self.user}
+        payload = {"format": FORMAT, "records": self.user, "favourites": sorted(self.favourites)}
         self.user_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 # ----------------------------------------------------------- conversions
+
+
+def specimen_points(record: dict) -> list[tuple[float, float, bool]]:
+    """(sigma3, sigma1) in kPa of the individual specimens with both values, and
+    whether the source flags them (they enter a failure state as excluded)."""
+
+    out = []
+    for sp in record.get("specimens", []):
+        s3, s1 = sp.get("sigma3_mpa"), sp.get("sigma1_mpa")
+        if s3 not in (None, "") and s1 not in (None, ""):
+            out.append((float(s3) * 1000.0, float(s1) * 1000.0, bool(sp.get("exclude", False))))
+    return out
+
+
+EXPORT_COLUMNS = (
+    ("record_id", "Record ID"), ("origin", "Origin"), ("rock_name", "Rock Name"), ("rock_name_prefix", "Prefix"),
+    ("location.region", "Region"), ("location.country", "Country"), ("location.place", "Town/City/State"),
+    ("location.latitude", "Latitude"), ("location.longitude", "Longitude"), ("location.depth_m", "Depth (m)"),
+    ("density_mg_m3", "Density (Mg/m3)"), ("unit_weight_mn_m3", "Unit Weight (MN/m3)"), ("porosity_pct", "Porosity (%)"),
+    ("tests.compression.ucs_mpa", "UCS (MPa)"), ("tests.compression.e_mpa", "E (MPa)"), ("tests.compression.e50_mpa", "E50 (MPa)"),
+    ("tests.compression.poisson", "Poisson"), ("tests.tensile.tensile_strength_mpa", "Tensile (MPa)"),
+    ("tests.hoek_brown.sigci_mpa", "sigci (MPa)"), ("tests.hoek_brown.mi", "mi"), ("tests.hoek_brown.s", "s"),
+    ("tests.hoek_brown.m_residual", "m residual"), ("tests.hoek_brown.s_residual", "s residual"),
+    ("tests.velocity.vp_m_s", "Vp (m/s)"), ("reference.author", "Author"), ("reference.year", "Year"),
+    ("reference.title", "Title"), ("reference.location_in_source", "Table / figure"),
+)
+
+
+def _dig(record: dict, dotted: str):
+    node: Any = record
+    for key in dotted.split("."):
+        node = node.get(key) if isinstance(node, dict) else None
+    return "" if node is None else node
+
+
+def export_csv(path: str | Path, records: Iterable[dict]) -> int:
+    """Search results as CSV for Excel (RocProp "Export to Excel")."""
+
+    import csv
+
+    rows = 0
+    with Path(path).open("w", newline="", encoding="utf-8-sig") as handle:
+        writer = csv.writer(handle)
+        writer.writerow([label for _, label in EXPORT_COLUMNS])
+        for record in records:
+            writer.writerow([_dig(record, key) for key, _ in EXPORT_COLUMNS])
+            rows += 1
+    return rows
 
 
 def to_material_parameters(record: dict) -> dict:
@@ -255,7 +342,7 @@ def clipboard_text(record: dict) -> str:
     """Tab-separated listing of a record (RocProp "Copy to Clipboard")."""
 
     lines = [f"Record ID\t{record.get('record_id')}", f"Rock Name\t{record.get('rock_name', '')}"]
-    for key, label in (("rock_name_prefix", "Rock Name Prefix"), ("unit_weight_mn_m3", "Unit Weight (MN/m3)"), ("fabric", "Fabric"), ("notes", "Notes")):
+    for key, label in RECORD_FIELDS[1:]:
         if record.get(key) not in (None, ""):
             lines.append(f"{label}\t{record[key]}")
     for key, label in LOCATION_FIELDS:
@@ -320,6 +407,11 @@ def builtin_records() -> list[dict]:
             "location_in_source": "Table 2: field estimates of uniaxial compressive strength (grades after Brown 1981)",
         })
         out.append(record)
+    # open official sources (transcribed tables, see data/db_sources/README.md)
+    from .db_sources import canmet_records, mndot_records
+
+    out += [copy.deepcopy(r) for r in canmet_records()]
+    out += [copy.deepcopy(r) for r in mndot_records()]
     for i, record in enumerate(out, start=1):
         record["record_id"] = i
     return out

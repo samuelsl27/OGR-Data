@@ -15,8 +15,8 @@ método de Erm; pendientes las cartas de flysch/heterogénea).
 **014 — Calibración** hecha (varios estados, MC/GHB/Power Curve/
 Barton-Bandis, lab o macizo, LR/LM/Simplex, error absoluto/relativo;
 contrastada con RSData) y **010 — Base de datos de materiales** (estilo
-RocProp, registros propios con fuente; pendiente ampliar con datos de
-ensayo reales de fuentes abiertas). Siguiente del orden propuesto:
+RocProp, 150 registros con fuente: tablas de Hoek, CANMET 1995 y MnDOT
+2018; favoritos, CSV, PDF, probetas → estado de fallo). Siguiente del orden propuesto:
 **018** (pick dialogs avanzados: Barton y c/φ numéricos).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al

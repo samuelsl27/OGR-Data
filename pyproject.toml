@@ -23,4 +23,4 @@ ogr-data = "ogr_data.__main__:main"
 include = ["ogr_data*"]
 
 [tool.setuptools.package-data]
-ogr_data = ["py.typed", "data/*.json"]
+ogr_data = ["py.typed", "data/*.json", "data/db_sources/*.csv", "data/db_sources/*.md"]

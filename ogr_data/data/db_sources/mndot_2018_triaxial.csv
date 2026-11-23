@@ -1,0 +1,30 @@
+table,group,sample_id,hole_or_unique,depth_from_ft,depth_to_ft,member,formation_or_stratigraphy,diameter_mm,length_mm,mass_g,density_g_cm3,vp_m_s,sigma3_mpa,sigma1_mpa,friction_deg,doubt
+5.1/5.2,Fig5.1:A;Fig5.2:C,x1,T06,74.4,74.825,Magnolia,Platteville,44.83,91.95,372.1,2.564,4123,5.0,174.5,,
+5.1/5.2,Fig5.1:A;Fig5.2:C,x2,T06,84.0,84.425,Hidden Falls,Platteville,44.65,93.15,355.5,2.437,3833,10.0,181.2,,
+5.1/5.2,Fig5.1:A;Fig5.2:D,x3,T06,85.9,86.325,Mifflin,Platteville,44.70,96.35,395.5,2.616,4700,20.0,274.4,,
+5.1/5.2,Fig5.1:B;Fig5.2:D,x4,T06,95.8,96.225,Mifflin,Platteville,44.70,94.25,387.3,2.619,4736,5.0,220.4,,
+5.1/5.2,Fig5.1:B;Fig5.2:D,x5,T06,99.0,99.425,Pecatonica,Platteville,44.68,95.4,390.4,2.610,5021,10.0,231.2,,
+5.1/5.2,Fig5.1:B;Fig5.2:C,x6,T06,100.6,101.025,,Glenwood Shale,44.40,94.9,336.0,2.287,2166,20.0,100.0,,Member N/A in source
+5.3/5.4,1,9,80240,69.1,69.5,,Cretaceous Sediments,44.0,93.4,300.7,2.12,2245,5.0,50.4,25.5,
+5.3/5.4,1,19,80241,68.9,69.3,,Cretaceous Sediments,44.2,95.0,311.2,2.13,2273,2.5,40.4,25.5,
+5.3/5.4,1,22,80243,70.3,70.7,,Cretaceous Sediments,44.1,91.7,297.1,2.12,2215,10.0,60.0,25.5,
+5.3/5.4,2,12,80241,42.45,42.85,,Cretaceous Sediments,44.2,96.2,294.2,1.99,2069,2.5,34.9,34.4,
+5.3/5.4,2,13,80241,43.1,43.5,,Cretaceous Sediments,44.3,95.1,293,2.00,2366,5.0,52.5,34.4,
+5.3/5.4,2,14,80241,43.9,44.3,,Cretaceous Sediments,44.3,96.1,299,2.02,2403,10.0,63.6,34.4,
+5.3/5.4,3,7,80240,40.3,40.7,,Cretaceous Sediments,43.7,69.7,220.8,2.11,2099,2.5,30.0,52.1,group friction 52.1 deg (merged cell) inconsistent with Fig. 5.5 fit y=3.6676x+32.928 (R2=0.161) which implies ~34.9 deg
+5.3/5.4,3,10,80241,40.5,40.9,,Cretaceous Sediments,43.7,93.4,306.6,2.19,2359,2.5,54.2,52.1,group friction 52.1 deg (merged cell) inconsistent with Fig. 5.5 fit y=3.6676x+32.928 (R2=0.161) which implies ~34.9 deg
+5.3/5.4,3,18,80241,61.2,61.6,,Cretaceous Sediments,44.0,88.2,277.2,2.07,1991,5.0,51.3,52.1,group friction 52.1 deg (merged cell) inconsistent with Fig. 5.5 fit y=3.6676x+32.928 (R2=0.161) which implies ~34.9 deg
+5.3/5.4,4,8,80240,62.0,62.4,,Cretaceous Sediments,44.6,64.4,202,2.01,1328,10.0,64.3,18.9,
+5.3/5.4,4,11,80241,41.1,41.5,,Cretaceous Sediments,44.3,59.2,185.7,2.04,2368,2.5,48.9,18.9,
+5.3/5.4,4,15,80241,44.8,45.2,,Cretaceous Sediments,44.1,89.5,284.7,2.08,2096,5.0,57.4,18.9,
+5.3/5.4,5,20,80241,73.6,74.0,,Cretaceous Sediments,44.3,81.1,246.3,1.97,1191,2.5,33.7,19.2,
+5.3/5.4,5,23,80243,72.6,73.0,,Cretaceous Sediments,44.2,68.9,208.3,1.97,1298,7.5,45.9,19.2,
+5.3/5.4,5,24,80243,76.7,77.1,,Cretaceous Sediments,44.2,89.1,269.5,1.97,1700,5.0,38.7,19.2,
+5.3/5.4,5,25,80243,77.3,77.8,,Cretaceous Sediments,43.3,93.7,266.7,1.93,2002,10.0,47.8,19.2,
+5.3/5.4,6,26,80243,77.9,78.3,,Cretaceous Sediments,43.4,96.4,281,1.97,1890,2.5,25.9,28.6,
+5.3/5.4,6,27,80243,78.5,78.9,,Cretaceous Sediments,43.8,94.9,283.2,1.98,2086,5.0,41.0,28.6,
+5.3/5.4,6,28,80243,79.5,79.9,,Cretaceous Sediments,44.2,95.3,281.2,1.92,2032,10.0,47.1,28.6,
+5.3/5.4,6,29,80243,80.0,80.4,,Cretaceous Sediments,44.1,66.4,205.1,2.02,2082,7.5,48.3,28.6,
+5.3/5.4,7,16,80241,46.8,47.2,,Cretaceous Sediments,43.4,90.1,273.2,2.05,1713,2.5,26.5,,friction N/A in source
+5.3/5.4,7,17,80241,47.3,47.7,,Cretaceous Sediments,42.5,91.0,243.6,1.89,1628,0.0,21.6,,friction N/A in source; sigma3 = 0.0: Appendix C/F captions say confining pressure 'leaked'
+5.3/5.4,7,21,80242,87.0,87.4,,Cretaceous Sediments,45.3,90.9,282.7,1.93,1416,0.0,24.3,,friction N/A in source; sigma3 = 0.0: Appendix C/F captions say confining pressure 'leaked'

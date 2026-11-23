@@ -665,7 +665,25 @@ class MainWindow(QMainWindow):
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Material Database", str(exc))
             return
-        DatabaseDialog(database, self, on_use=self.use_database_record).exec()
+        DatabaseDialog(database, self, on_use=self.use_database_record, on_use_state=self.use_database_specimens).exec()
+
+    def use_database_specimens(self, record: dict) -> None:
+        """Failure state of the selected material from the record's specimens (sigma3, sigma1)."""
+
+        from ..core import database as mdb
+
+        points = mdb.specimen_points(record)
+        if not points:
+            raise ValueError("the record has no specimens with sigma3 and sigma1")
+        material = self._current_material()
+        name = st.unique_name(mdb.title(record) or "Database", (s.name for s in material.failure_states))
+        state = st.FailureState(
+            name=name,
+            color=st.next_color(s.color for s in material.failure_states),
+            points=[st.TestPoint(s3, s1, exclude) for s3, s1, exclude in points],
+        )
+        self.set_failure_states(material.failure_states + [state])
+        self.statusBar().showMessage(f"Failure state '{name}' added to {material.name} ({len(points)} points from record {record.get('record_id')}).")
 
     def use_database_record(self, record: dict) -> int:
         """New Generalized Hoek-Brown material from a database record (sigci, mi)."""
