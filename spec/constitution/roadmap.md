@@ -14,8 +14,10 @@ con carta cuantificada 2013 y calculadora, mi con filtros, D, Ei/MR y
 método de Erm; pendientes las cartas de flysch/heterogénea).
 **014 — Calibración** hecha (varios estados, MC/GHB/Power Curve/
 Barton-Bandis, lab o macizo, LR/LM/Simplex, error absoluto/relativo;
-contrastada con RSData). Siguiente del orden propuesto: **010** (base de
-datos de materiales).
+contrastada con RSData) y **010 — Base de datos de materiales** (estilo
+RocProp, registros propios con fuente; pendiente ampliar con datos de
+ensayo reales de fuentes abiertas). Siguiente del orden propuesto:
+**018** (pick dialogs avanzados: Barton y c/φ numéricos).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

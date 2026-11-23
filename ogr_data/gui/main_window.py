@@ -294,6 +294,8 @@ class MainWindow(QMainWindow):
         self._overlay_mogi_act = QAction("Overlay Mogi Line", self, checkable=True)
         analysis_menu.addAction(self._overlay_mc_act)
         analysis_menu.addAction(self._overlay_mogi_act)
+        analysis_menu.addSeparator()
+        analysis_menu.addAction("Material Database…", self._open_database)  # spec 010 (RSData: Open RocProp)
         self._stress_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._mc_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._overlay_mc_act.toggled.connect(self.refresh)
@@ -639,6 +641,53 @@ class MainWindow(QMainWindow):
         self._current_material().stress_paths = list(stress_paths)
         self._populate_tree()
         self.refresh()
+
+    # ------------------------------------------------- spec 010: material database
+
+    database_path = None  # tests set a temporary file
+
+    def _database_file(self):
+        from pathlib import Path
+
+        from PySide6.QtCore import QStandardPaths
+
+        if self.database_path is not None:
+            return Path(self.database_path)
+        base = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.GenericDataLocation)
+        return Path(base) / "OpenGeoRock" / "OGR-Data" / "materials_db.json"
+
+    def _open_database(self) -> None:
+        from ..core.database import MaterialDatabase
+        from .database_dialog import DatabaseDialog
+
+        try:
+            database = MaterialDatabase(self._database_file())
+        except (ValueError, OSError) as exc:
+            QMessageBox.warning(self, "Material Database", str(exc))
+            return
+        DatabaseDialog(database, self, on_use=self.use_database_record).exec()
+
+    def use_database_record(self, record: dict) -> int:
+        """New Generalized Hoek-Brown material from a database record (sigci, mi)."""
+
+        from ..core import database as mdb
+
+        params = defaults("generalized_hoek_brown")
+        params.update(mdb.to_material_parameters(record))
+        material = projects.Material(
+            name=mdb.title(record) or "Material",
+            criterion="generalized_hoek_brown",
+            parameters=params,
+            sig3max_mpa=self._current_material().sig3max_mpa,
+        )
+        self._store_current()
+        index = self._project.append(material)
+        self._load_material(index)
+        self._populate_tree()
+        self.statusBar().showMessage(
+            f"Material created from database record {record.get('record_id')}: GSI and D keep their defaults; set them for the rock mass."
+        )
+        return index
 
     # ------------------------------------------------- spec 014: calibration
 
