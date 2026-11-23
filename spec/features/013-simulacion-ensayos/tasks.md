@@ -12,12 +12,19 @@
 - [x] Tests contra soluciones cerradas (criterio de aceptación: meseta triaxial CD MC al 1 %)
 - [x] Roadmap; suite en verde; commit
 
-## 13b (pendiente)
+## 13b
 
-- [ ] Drucker-Prager, Cam-Clay, Modified Cam-Clay, Softening-Hardening, NorSand (manuales oficiales en Bibliografia)
-- [ ] Simple Shear (rotación de ejes principales) y General Test
-- [ ] Cortes a tracción (Peak/Residual Tensile Strength)
-- [ ] Comparación documentada con los tutoriales de RSData
+- [x] Leer los manuales RS2/RSData (DP, CC/MCC, SH, MC, HB) desde las páginas renderizadas
+- [x] Motor en tensores con retorno espectral; superficies genéricas y conjunto activo robusto
+- [x] Corte a tracción (pico/residual) en MC, DP y Softening-Hardening
+- [x] Drucker-Prager (frágil, no asociado); corregir el signo de qφ en su envolvente (spec 002)
+- [x] Cam-Clay y Modified Cam-Clay (elasticidad no lineal, OCR, endurecimiento, vértice de CC)
+- [x] Softening-Hardening, mecanismo desviador hiperbólico con las dos opciones de dilatancia
+- [x] Simple Shear (drenado / no drenado)
+- [x] Verificación: soluciones cerradas, integración de referencia MCC, ejemplos de los manuales (comparación documentada)
+- [x] Plan, roadmap; suite en verde; commit
+- [ ] NorSand (sin manual público); General Test (entradas sin documentar)
+- [ ] Softening-Hardening: casquete vertical / elíptico y endurecimiento tabular
 
 ## 13c (pendiente)
 

@@ -63,11 +63,16 @@ def principal_curve(key: str, params: Params, sig3max_mpa: float, points: int = 
         return sig3, major_principal_stress(inp, mb, s, a, sig3)
 
     if key == "drucker_prager":
-        # Fs = sqrt(J2) + (q_phi/3) I1 - k = 0 -> q = sqrt(3) (k - q_phi p)
+        # Fs = sqrt(J2) + q_phi I1/3 - k = 0 with I1 tension positive (RS2
+        # manual eq. 4.1), i.e. q = sqrt(3) (k + q_phi p) with p compression
+        # positive (manual Fig. 4.2: q_phi = 0.5, k = 3 kPa, p0 = 100 kPa ->
+        # q_f = 129 kPa). Spec 013b fix: spec 002 had the q_phi sign reversed.
         t = math.sqrt(3.0) * _f(params, "peak_q")
         k = _f(params, "peak_k") * KPA_TO_MPA
-        slope = (1.0 - 2.0 * t / 3.0) / (1.0 + t / 3.0)
-        intercept = math.sqrt(3.0) * k / (1.0 + t / 3.0)
+        if t >= 3.0:
+            raise ValueError("Drucker-Prager q parameter must be below sqrt(3) for a triaxial envelope")
+        slope = (1.0 + 2.0 * t / 3.0) / (1.0 - t / 3.0)
+        intercept = math.sqrt(3.0) * k / (1.0 - t / 3.0)
         return sig3, intercept + slope * sig3
 
     if key in ("cam_clay", "modified_cam_clay"):

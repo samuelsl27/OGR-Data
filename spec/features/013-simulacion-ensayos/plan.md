@@ -75,8 +75,75 @@ Stress Path Graphs (decisión propia, anotada).
 - Informe (spec 015): Defined Test Simulations con configuración, rigidez
   y resumen calculado.
 
-## Fases siguientes
+## Fase 13b (hecha)
 
-- **13b**: Drucker-Prager, Cam-Clay/MCC, Softening-Hardening y NorSand
-  como modelos constitutivos; Simple Shear y General; cortes a tracción.
+Fuentes: manuales de teoría RS2/RSData en `Referencias/Bibliografia/Suelos/`
+(Drucker-Prager, Cam-Clay y Modified Cam-Clay, Softening-Hardening) y
+`Rocas/` (Mohr-Coulomb, Hoek-Brown/GHB); ecuaciones leídas de las páginas
+renderizadas (el texto extraído pierde los símbolos).
+
+- **Motor en tensores 3×3** (deformaciones ingenieriles en el orden
+  a, x, y, a-x, x-y, a-y): retorno espectral para los modelos isótropos
+  (la tensión de prueba conserva sus ejes principales con elasticidad
+  isótropa), válido con ejes que giran. Superficies como objetos (cara de
+  la pirámide, cono DP, corte a tracción) en un mismo conjunto activo de
+  hasta tres superficies, con búsqueda exhaustiva de respaldo antes del
+  vértice; las iteraciones de Hoek-Brown se mantienen por encima de su
+  vértice a tracción. Newton del control mixto amortiguado (búsqueda
+  lineal); el paso de rotura frágil se resuelve en la rama residual si la
+  prueba supera el pico.
+- **Corte a tracción** (ecs. 4.3, 0.7, 0.8 y 11.11 de los manuales,
+  asociado) en MC, DP y Softening-Hardening con su Tensile Strength
+  (pico/residual). Lectura literal: **T = 0 = sin tracción** (sentido RS2).
+  Cambia el ensayo de tracción uniaxial de MC por defecto de 13a (antes
+  llegaba a −2c/√Nφ). HB y GHB conservan su resistencia a tracción propia
+  (no tienen campo en RSData).
+- **Drucker-Prager** (ecs. 4.1-4.2): √J2 = k + qφ p, potencial
+  √J2 − qψ p (qψ = Dilation Parameter), frágil con k y q residuales.
+  Ejemplo del manual (Fig. 4.2: qφ = 0,5, k = 3 kPa, p0 = 100 kPa):
+  q_f = 129,05 kPa, igual que la figura. **Corregido de paso** el signo de
+  qφ en la envolvente de la spec 002 (`criteria_envelopes.py` daba q
+  decreciente con p).
+- **Cam-Clay y Modified Cam-Clay** (§8): superficies q + M p ln(p/pc) y
+  q² + M² p (p − pc), flujo asociado, pc_{n+1} = pc_n exp(v Δεv^p/(λ−κ)),
+  K = v p/κ integrado exactamente en el paso, ν de la pestaña Stiffness
+  (el manual pide G o ν; E no se usa), inicio isótropo p0 = confinamiento,
+  pc0 = OCR·p0, v0 sobre la línea de hinchamiento que pasa por pc0 en la
+  virgen v = N − λ ln p (N = Specific Volume at Unit Pressure, kPa).
+  Retorno implícito en (p, q, pc, Δλ); el pico de la curva de Cam-Clay
+  original (q = 0, p = pc) es una esquina: retorno al vértice.
+  Verificación: integración independiente de las ecuaciones de velocidad
+  con 200 000 pasos — error < 0,5 % con 1000 pasos y < 1 % con los 100 de
+  RSData. **Comparación con el manual** (Fig. 8.5, Tabla 8.1, leída de la
+  gráfica): RSData da q ≈ 385-390 kPa y εv ≈ 0,051 (analítica) / 0,055
+  (RS2) a εa = 0,2; OGR da q = 374,6 kPa (−3 %) y εv = 0,062. La
+  diferencia no se explica con v constante (probado: q = 377,7); las dos
+  curvas del propio manual también difieren entre sí. Se documenta, no se
+  ajusta. OCR 2 y OCR 5 reproducen el comportamiento de las Figs. 8.7-8.8
+  (elástico hasta la superficie; lado seco con pico y ablandamiento hacia
+  la CSL); no drenado termina en q = M p'.
+- **Softening-Hardening** (§11.1), mecanismo desviador: superficie de
+  Mohr-Coulomb con φ movilizado, tan φ = tan φf εq^p/(εq^p + A) (ec. 11.4,
+  Cone Hardening «Hyperbolic»), cohesión movilizada que mantiene el
+  vértice en c/tan φf (ec. 11.3), endurecimiento implícito (raíz acotada,
+  Brent). Cone Dilation «Mohr-Coulomb»: ψ = ψf φ/φf (ecs. 11.5-11.6);
+  «Compaction-Dilation» (ec. 11.7): dilatancia d = M_ψ − η con M_ψ de
+  compresión triaxial y η al inicio del paso, convertida al flujo de las
+  caras de la pirámide. Ejemplo del manual (Fig. 11.4, arena de Hostun
+  suelta): q ≈ 774 kPa a εa = 0,15 (figura ≈ 760) y εv que sube a ≈ 0,012
+  y luego baja (figura ≈ 0,0105). Opciones de los combos con los nombres
+  del manual (RSData no los mostró en las capturas); los archivos con
+  «default» se leen como la primera opción.
+- **Simple Shear**: γ impuesta, sin deformación lateral, σ'v = confinamiento
+  (drenado) o εv = 0 y u = σc − σ'v (no drenado), inicio isótropo.
+  Verificación: τ/σ'v → sin φ cos ψ/(1 − sin φ sin ψ) (Davis 1968) y
+  τ = G γ en el tramo elástico.
+- Rendimiento: 100 pasos en 0,02-0,6 s según el modelo (MCC el más lento).
+
+## Pendiente
+
+- NorSand: sin manual de teoría público (spec 002).
+- General Test: RSData no documenta sus entradas.
+- Softening-Hardening: casquete (vertical y elíptico) y endurecimiento
+  tabular; Cam-Clay con G constante (el manual lo permite).
 - **13c**: modelos cíclicos y pestaña Animation.

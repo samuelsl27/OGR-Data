@@ -1,4 +1,4 @@
-"""Spec 013 (phase 13a): test simulations with elastoplastic MC / HB / GHB."""
+"""Spec 013 (phases 13a and 13b): test simulations."""
 
 from __future__ import annotations
 
@@ -32,9 +32,10 @@ def test_triaxial_cd_mohr_coulomb_plateau() -> None:
     assert abs(r.peak_q - q_f) / q_f < 0.01 and abs(r.q[-1] - q_f) / q_f < 1e-6
     assert abs(sm.failure_deviator("mohr_coulomb", MC, r.test) - q_f) < 1e-9
     # 100 steps + start; lateral effective stress kept at the confining stress
-    assert r.stress.shape == (101, 3) and np.allclose(r.stress[:, 1:], 100.0, atol=1e-6)
+    assert r.stress.shape == (101, 6) and np.allclose(r.stress[:, 1:3], 100.0, atol=1e-6)
+    assert np.allclose(r.stress[:, 3:], 0.0) and np.allclose(r.strain[:, 3:], 0.0)
     # elastic branch: slope E (axial stress vs axial strain under constant lateral stress)
-    assert abs((r.axial_stress[1] - r.axial_stress[0]) / r.axial_strain[1] - 20000.0) < 1e-6
+    assert abs((r.axial_stress[1] - r.axial_stress[0]) / r.axial_strain[1] / 20000.0 - 1.0) < 1e-8
     # p' rises along the 1:3 drained path, q = 3 (p' - sigma_c)
     assert np.allclose(r.q, 3.0 * (r.p - 100.0), atol=1e-6)
     # psi = 0: no plastic volume change, the volumetric strain stays at its value at failure
@@ -45,9 +46,12 @@ def test_triaxial_cd_mohr_coulomb_plateau() -> None:
 def test_mohr_coulomb_other_tests_against_closed_forms() -> None:
     n = _n(35.0)
     sc = 2.0 * 10.5 * math.sqrt(n)
-    # uniaxial compression and tension
+    # uniaxial compression and tension; tension cut-off sigma >= -T (RS2 manual eq. 0.7),
+    # T = 0 (RSData default) means no tension, a large T leaves the intrinsic -2c/sqrt(N)
     assert abs(_run(test_type="uniaxial").peak_q - sc) < 1e-6
-    tension = _run(test_type="uniaxial", loading="Tension")
+    assert abs(_run(test_type="uniaxial", loading="Tension").axial_stress.min()) < 1e-9
+    assert abs(_run(dict(MC, peak_tensile=5.0), test_type="uniaxial", loading="Tension").axial_stress.min() + 5.0) < 1e-9
+    tension = _run(dict(MC, peak_tensile=1000.0), test_type="uniaxial", loading="Tension")
     assert abs(tension.axial_stress.min() + 2.0 * 10.5 / math.sqrt(n)) < 1e-6
     # triaxial extension: the lateral stress is major, sigma_a = (sigma_c - sc) / N
     ext = _run(test_type="triaxial", loading="Tension", confining=100.0)
@@ -57,11 +61,11 @@ def test_mohr_coulomb_other_tests_against_closed_forms() -> None:
     q_u = 3.0 * ((n - 1.0) * 100.0 + sc) / (2.0 + n)
     assert abs(und.peak_q - q_u) < 1e-6 and np.allclose(und.eps_v, 0.0, atol=1e-15)
     assert np.allclose(und.p, 100.0, atol=1e-6)
-    assert abs(und.pore_pressure[-1] - (100.0 - und.stress[-1, 2])) < 1e-9 and und.pore_pressure[-1] > 0.0
-    # biaxial (plane strain): eps_2 = 0, sigma'_3 = confining; failure on sigma'1 = N sigma'3 + sc
+    assert abs(und.pore_pressure[-1] - (100.0 - und.stress[-1, 1])) < 1e-9 and und.pore_pressure[-1] > 0.0
+    # biaxial (plane strain): e_y = 0, sigma'_x = confining; failure on sigma'1 = N sigma'3 + sc
     bi = _run(test_type="biaxial", confining=100.0)
-    assert np.allclose(bi.strain[:, 1], 0.0) and abs(bi.stress[-1, 0] - (n * 100.0 + sc)) < 1e-6
-    assert abs(bi.stress[-1, 2] - 100.0) < 1e-6 and 100.0 < bi.stress[-1, 1] < bi.stress[-1, 0]  # sigma2 intermediate
+    assert np.allclose(bi.strain[:, 2], 0.0) and abs(bi.stress[-1, 0] - (n * 100.0 + sc)) < 1e-6
+    assert abs(bi.stress[-1, 1] - 100.0) < 1e-6 and 100.0 < bi.stress[-1, 2] < bi.stress[-1, 0]  # sigma2 intermediate
 
 
 def test_dilatancy_brittle_and_cyclic() -> None:
@@ -102,9 +106,9 @@ def test_hoek_brown_and_generalized() -> None:
 
 def test_errors_and_unsupported() -> None:
     for kwargs, message in (
-        ({"test_type": "simple_shear"}, "013b"),
-        ({"test_type": "general"}, "013b"),
+        ({"test_type": "general"}, "not documented"),
         ({"max_strain": 0.0}, "Maximum Strain"),
+        ({"test_type": "uniaxial", "params": dict(defaults("modified_cam_clay")), "criterion": "modified_cam_clay"}, "confining"),
     ):
         try:
             _run(**kwargs)
@@ -112,11 +116,11 @@ def test_errors_and_unsupported() -> None:
             assert message in str(exc), exc
         else:
             raise AssertionError(kwargs)
-    for criterion in ("cam_clay", "norsand", "barton_bandis"):
+    for criterion, message in (("norsand", "no public theory manual"), ("barton_bandis", "not available"), ("power_curve", "not available")):
         try:
             sm.simulate(criterion, defaults(criterion), None, sm.TestSimulation())
         except sm.SimulationError as exc:
-            assert "13b" in str(exc)
+            assert message in str(exc), exc
         else:
             raise AssertionError(criterion)
     try:
@@ -169,13 +173,13 @@ def test_window_tests_dialog_compute_and_graphs() -> None:
             assert dlg._form.isRowVisible(dlg._confining)
             dlg._confining.setValue(150.0)
             dlg.add_item()
-            dlg._test_type.setCurrentIndex(dlg._test_type.findData("simple_shear"))
-            assert "013b" in dlg._note.text() and not dlg._form.isRowVisible(dlg._confining)
+            dlg._test_type.setCurrentIndex(dlg._test_type.findData("general"))
+            assert "not documented" in dlg._note.text() and not dlg._form.isRowVisible(dlg._confining)
             dlg.store_current()
             items = dlg.items
         finally:
             dlg.deleteLater()
-        assert [(t.test_type, t.confining) for t in items] == [("triaxial", 150.0), ("simple_shear", 100.0)]
+        assert [(t.test_type, t.confining) for t in items] == [("triaxial", 150.0), ("general", 100.0)]
         w.set_test_simulations(items)
         app.processEvents()
         problems = w.compute(report_problems=False)

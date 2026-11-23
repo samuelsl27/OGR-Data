@@ -158,8 +158,8 @@ def test_two_material_report_is_valid_and_self_contained() -> None:
     assert "Uniaxial Test" in tests and "<th>Peak deviator q</th><td>0.0403406 MPa</td>" in tests
     assert "Young&#x27;s Modulus</th><td>20 MPa" in tests
     # a test that cannot be simulated is listed with the reason
-    proj.materials[0].test_simulations.append(report.sm.TestSimulation(name="SS", test_type="simple_shear"))
-    assert "Not simulated: Simple Shear Test is simulated from spec 013b" in report.build_html(proj)
+    proj.materials[0].test_simulations.append(report.sm.TestSimulation(name="GT", test_type="general"))
+    assert "Not simulated: General Test: RSData&#x27;s inputs for it are not documented" in report.build_html(proj)
 
 
 def test_section_visibility_and_empty_sections() -> None:

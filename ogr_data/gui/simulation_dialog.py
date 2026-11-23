@@ -75,9 +75,14 @@ class TestSimulationsDialog(_ItemsDialog):
         test = sm.TestSimulation(test_type=self._test_type.currentData())
         self._form.setRowVisible(self._confining, test.confined)
         if not test.simulated:
-            self._note.setText(f"{sm.TEST_TYPES[test.test_type]}: kept in the project; its simulation comes in spec 013b.")
+            self._note.setText(f"{sm.TEST_TYPES[test.test_type]}: RSData's inputs for it are not documented; kept in the project but not simulated.")
         elif test.test_type == "biaxial":
             self._note.setText("Biaxial: plane strain (no strain in the second lateral direction).")
+        elif test.test_type == "simple_shear":
+            self._note.setText(
+                "Simple Shear: imposed shear strain (Maximum Strain = gamma), no lateral strains; "
+                "the Confining Stress is the initial (isotropic) and, drained, the constant vertical stress."
+            )
         else:
             self._note.setText("")
 

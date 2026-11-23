@@ -26,8 +26,11 @@ parámetros y resultados, secciones vacías omitidas). **013a —
 Simulación de ensayos** hecha (Tests / Compute: uniaxial, triaxial y
 biaxial, drenado/no drenado, compresión/extensión, cíclico básico;
 elastoplástico MC/HB/GHB con residual frágil; rigidez lineal isótropa;
-verificado contra soluciones cerradas). Siguiente: **013b** (modelos de
-suelo avanzados, Simple Shear y General) o **019** (API y MCP).
+verificado contra soluciones cerradas) y **013b** (Drucker-Prager,
+Cam-Clay/MCC, Softening-Hardening, cortes a tracción y Simple Shear,
+contrastados con los manuales de RS2/RSData; NorSand y General Test
+sin fuente). Siguiente: **019** (API y MCP) o **013c** (cíclicos y
+animación).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad
