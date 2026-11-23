@@ -65,9 +65,12 @@ de RSData 1.009 y ORMAS V2.0 (`../../Referencias/Ejemplos/RSData_analisis/05_pro
 
 Siguientes (spec.md redactadas el 23-11-2026; plan y tasks al desarrollarlas):
 
-13. **023 — Deshacer y rehacer**: historial de ediciones del proyecto
-    (núcleo sin Qt), Edit > Undo/Redo con atajos y aviso de cambios sin
-    guardar. Requisito del modo `--attach` del servidor MCP.
+13. **023 — Deshacer y rehacer** (hecha): historial de ediciones del
+    proyecto en `core/history.py` (instantáneas comparadas; el texto del
+    paso se deduce del cambio), Edit > Undo/Redo con atajos, asterisco y
+    Guardar / Descartar / Cancelar; en la API, un paso por operación que
+    edita y `project_history`. Requisito del modo `--attach` del servidor
+    MCP.
 14. **024 — Interfaz en inglés y español**: selector de idioma, ventana e
     informe traducidos; código, API y ficheros siguen en inglés.
 

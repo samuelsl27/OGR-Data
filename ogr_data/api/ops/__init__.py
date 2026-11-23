@@ -11,7 +11,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-from ..errors import unknown
+from ...core import history as hist
+from ..errors import OgrApiError, unknown
+
+#: Operations that edit but are not undo steps: they create, open or close a
+#: project (a new history), write a file, or move in the history itself.
+UNRECORDED = {"project_new", "project_open", "project_close", "project_save", "project_history"}
 
 
 @dataclass(frozen=True)
@@ -48,7 +53,19 @@ def call(ws, op_name: str, /, **kwargs):
     op = REGISTRY.get(op_name)
     if op is None:
         raise unknown("operation", op_name, sorted(REGISTRY))
-    return op.func(ws, **kwargs)
+    if not op.mutates or op_name in UNRECORDED:
+        return op.func(ws, **kwargs)
+    # spec 023: every operation that edits a project is one undo step of it
+    handle = None
+    try:
+        handle = ws.get(kwargs.get("project_id"))
+    except OgrApiError:
+        pass  # the operation says what is wrong (or creates the project)
+    result = op.func(ws, **kwargs)
+    if handle is not None and ws.projects.get(handle.id) is handle:
+        handle.history.close_group()
+        handle.history.record(hist.snapshot(handle.project))
+    return result
 
 
 # registration happens on import

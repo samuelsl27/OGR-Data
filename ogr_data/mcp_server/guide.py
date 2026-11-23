@@ -28,6 +28,7 @@ Rules that change the number:
 - GSI charts: u = 0..1 from VERY GOOD to VERY POOR, v = 0..1 from the top
   structure row down; a value in an N/A cell is null.
 material_copy gives the text other OGR programs paste (Slip2D, FEM2D).
+Every editing call is one undo step: project_history('undo').
 Full guide: resource ogr-data://guide.
 """
 
@@ -92,6 +93,11 @@ confining_kpa is the initial effective LATERAL stress; axial = lateral / k0.
 database_search / database_get / database_use: built-in records (Hoek
 tables, CANMET 1995, MnDOT 2018) and the user's own; use 'material'
 creates a GHB material (sigci, mi), 'failure_state' adds the specimens.
+
+## Undo
+Every tool call that edits a project is one step of its history:
+project_history lists the steps and undoes or redoes them (steps = n).
+project_summary says whether there are unsaved changes.
 
 ## Outputs
 render_envelope returns a PNG; report_generate writes the HTML report

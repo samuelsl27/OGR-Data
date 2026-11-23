@@ -99,7 +99,7 @@ def test_units_window_offscreen() -> None:
 
         # project title drives the window title
         w._title_edit.setText("Portal tunnel")
-        assert w.windowTitle() == "OGR Data - Portal tunnel"
+        assert w.windowTitle().replace("[*]", "") == "OGR Data - Portal tunnel"  # [*]: unsaved mark (spec 023)
 
         # save keeps the display unit and title; loading applies them
         import tempfile
@@ -114,12 +114,12 @@ def test_units_window_offscreen() -> None:
             data = project.load_project(path)
             w2 = MainWindow()
             try:
-                assert w2.windowTitle() == "OGR Data"
+                assert w2.windowTitle() == "OGR Data[*]"
                 w2.open_project(data)
                 app.processEvents()
                 assert w2._stress_unit == "MPa"
                 assert abs(w2._widgets["sigci"].value() - 100.0) < 1e-6
-                assert w2.windowTitle() == "OGR Data - Portal tunnel"
+                assert w2.windowTitle() == "OGR Data - Portal tunnel[*]" and not w2.isWindowModified()
             finally:
                 w2._set_stress_unit("kPa")
                 w2.deleteLater()

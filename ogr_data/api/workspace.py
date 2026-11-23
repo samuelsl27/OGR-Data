@@ -7,6 +7,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..core import history as hist
 from ..core.database import MaterialDatabase
 from ..core.project import Material, Project
 from .errors import Conflict, InvalidArgument, NotFound, unknown
@@ -35,6 +36,11 @@ class Handle:
     id: str
     project: Project
     path: Path | None = None
+    history: hist.History | None = None  # spec 023: one undo history per project
+
+    def __post_init__(self) -> None:
+        if self.history is None:
+            self.history = hist.History(hist.snapshot(self.project))
 
     @property
     def name(self) -> str:

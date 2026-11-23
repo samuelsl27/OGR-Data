@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 
 from ...core import project as projects
+from ...core import history as hist
 from ...core import units
 from ..errors import Conflict, InvalidArgument, NotFound, choice
 from . import operation
-from ._common import material_index, project_summary
+from ._common import material_index, number, project_summary
 
 SUFFIX = ".ogrdata"
 
@@ -55,6 +56,8 @@ def project_save(ws, project_id: str | None = None, path: str | None = None, ove
     target.parent.mkdir(parents=True, exist_ok=True)
     projects.save_project(target, handle.project)
     handle.path = target
+    handle.history.rebase(hist.snapshot(handle.project))
+    handle.history.mark_saved()
     return {"project_id": handle.id, "saved_to": str(target)}
 
 
@@ -95,3 +98,25 @@ def project_set(ws, project_id: str | None = None, title: str | None = None, dis
     if selected_material is not None:
         p.selected = material_index(p, selected_material)
     return project_summary(handle)
+
+
+@operation("project_history", toolset="project", mutates=True)
+def project_history(ws, project_id: str | None = None, action: str = "list", steps: int = 1) -> dict:
+    """Undo or redo edits of a project, or list them; every editing operation is one step (spec 023)."""
+
+    handle = ws.get(project_id)
+    choice("action", action, ("list", "undo", "redo"))
+    h = handle.history
+    done = 0
+    if action != "list":
+        for _ in range(int(number("steps", steps, lo=1, hi=1000))):
+            state = h.undo() if action == "undo" else h.redo()
+            if state is None:
+                break
+            unit = handle.project.stress_unit  # a preference, not an edit
+            handle.project = projects.Project.from_dict(state)
+            handle.project.stress_unit = unit
+            done += 1
+    texts = h.texts()
+    return {"project_id": handle.id, "action": action, "steps_done": done, "undo": texts["undo"],
+            "redo": texts["redo"], "unsaved_changes": h.modified}

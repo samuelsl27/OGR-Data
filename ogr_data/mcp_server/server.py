@@ -149,6 +149,13 @@ def build_server(ws) -> MCPServer:
         return run("project_set", project_id=project_id, title=title, display_stress_unit=display_stress_unit,
                    selected_material=selected_material)
 
+    @tool("project_history", _EDIT)
+    def project_history(project_id: ProjectId = None,
+                        action: Annotated[Literal["list", "undo", "redo"], Field(description="What to do.")] = "list",
+                        steps: Annotated[int, Field(description="How many steps to undo or redo.")] = 1) -> dict[str, Any]:
+        """Undo or redo edits of a project, or list them. Every editing tool call is one step."""
+        return run("project_history", project_id=project_id, action=action, steps=steps)
+
     # ------------------------------------------------------------ materials
     @tool("material_add", _EDIT)
     def material_add(project_id: ProjectId = None,

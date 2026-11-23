@@ -292,3 +292,30 @@ def test_window_applies_a_fit_in_the_display_unit() -> None:
     finally:
         w._set_stress_unit("kPa")
         w.deleteLater()
+
+
+def test_project_history_undo_redo() -> None:
+    """Spec 023: every editing operation is one undo step of its project."""
+
+    ws = _ws()
+    pid = _ghb(ws)  # project_new (not a step) + material_set (one step)
+    call(ws, "material_add", template="rock", name="Granite")
+    call(ws, "material_set", material="Granite", parameters={"gsi": 30.0})
+    call(ws, "material_compute")  # reading is not a step
+    hist_list = call(ws, "project_history")
+    assert len(hist_list["undo"]) == 3 and hist_list["undo"][0] == "Change GSI" and hist_list["redo"] == []
+    out = call(ws, "project_history", action="undo", steps=2)
+    assert out["steps_done"] == 2 and len(call(ws, "project_summary")["materials"]) == 1
+    assert call(ws, "project_history", action="redo")["steps_done"] == 1
+    assert call(ws, "material_get", material="Granite")["parameters"]["gsi"] == 50.0
+    assert call(ws, "project_history", action="undo", steps=10)["steps_done"] == 2  # only what there is
+    assert call(ws, "material_get")["criterion"] == "mohr_coulomb"
+    _raises(InvalidArgument, call, ws, "project_history", action="rewind")
+    with tempfile.TemporaryDirectory() as tmp:
+        ws.workdir = Path(tmp)
+        call(ws, "project_history", action="redo", steps=3)
+        assert call(ws, "project_summary")["unsaved_changes"]
+        call(ws, "project_save", path="h")
+        assert not call(ws, "project_summary")["unsaved_changes"]
+        call(ws, "project_history", action="undo")
+        assert call(ws, "project_summary", project_id=pid)["unsaved_changes"]

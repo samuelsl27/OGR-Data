@@ -145,6 +145,8 @@ def project_summary(handle) -> dict:
         "path": str(handle.path) if handle.path else None,
         "display_stress_unit": p.stress_unit,
         "materials": [material_summary(p, i) for i in range(len(p.materials))],
+        "unsaved_changes": handle.history.modified if handle.history is not None else None,
+        "undo": handle.history.undo_text if handle.history is not None else "",
         "units": UNITS,
     }
 

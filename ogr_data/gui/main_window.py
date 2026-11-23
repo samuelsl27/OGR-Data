@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 from PySide6.QtCore import QSettings, Qt
-from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QPixmap
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -40,6 +40,7 @@ from PySide6.QtWidgets import (
 from ..core import material_factory as factory
 from ..core import material_results as mr
 from ..core import criteria_envelopes as ce
+from ..core import history as hist
 from ..core import project as projects
 from ..core import report
 from ..core import samplers
@@ -87,6 +88,12 @@ class MainWindow(QMainWindow):
         self.report_visibility = report.default_visibility()
         # spec 013: simulated tests, cached by (model, stiffness, test) inputs
         self._sim_cache: dict[str, object] = {}
+        # spec 023: undo / redo. Created once the window is built; _history_hold
+        # > 0 while the window itself changes the form (loading a material,
+        # restoring a state, switching the display unit): no step then.
+        self._history: hist.History | None = None
+        self._history_hold = 0
+        self.ask_unsaved = None  # tests: callable -> "save" | "discard" | "cancel"
         from PySide6.QtWidgets import QApplication
 
         apply_theme(QApplication.instance(), self._theme)
@@ -106,6 +113,7 @@ class MainWindow(QMainWindow):
         self._sig3max.setSingleStep(0.5 * self._scale())
         self._sig3max.setSuffix(f" {self._stress_unit}")
         self._sig3max.valueChanged.connect(self.refresh)
+        self._sig3max.editingFinished.connect(self._close_history_group)
 
         # spec 009: sigma3max by application (tunnel / slope)
         self._application_combo = QComboBox()
@@ -119,11 +127,13 @@ class MainWindow(QMainWindow):
         self._unit_weight.setSingleStep(0.001)
         self._unit_weight.setSuffix(" MN/m3")
         self._unit_weight.valueChanged.connect(self.refresh)
+        self._unit_weight.editingFinished.connect(self._close_history_group)
         self._app_depth = QDoubleSpinBox()
         self._app_depth.setRange(0.1, 10000.0)
         self._app_depth.setValue(50.0)
         self._app_depth.setSuffix(" m")
         self._app_depth.valueChanged.connect(self.refresh)
+        self._app_depth.editingFinished.connect(self._close_history_group)
         self._app_fields = QWidget()
         app_form = QFormLayout(self._app_fields)
         app_form.setContentsMargins(0, 0, 0, 0)
@@ -141,6 +151,8 @@ class MainWindow(QMainWindow):
 
         self._stiffness_box = StiffnessPanel(self._kpa_scale(), self._stress_unit, self.use_erm_as_young)
         self._stiffness_box.changed.connect(self.refresh)
+        for spin in self._stiffness_box.spins.values():
+            spin.editingFinished.connect(self._close_history_group)
         self._poisson = self._stiffness_box.spins["poisson"]
         self._young = self._stiffness_box.spins["young"]
         self._use_erm = self._stiffness_box.use_erm
@@ -165,6 +177,7 @@ class MainWindow(QMainWindow):
         self._name_edit.setText(self._project.materials[0].name)
         self._name_edit.textChanged.connect(self._name_edited)
         self._name_edit.editingFinished.connect(self._name_edit_finished)
+        self._name_edit.editingFinished.connect(self._close_history_group)
         sidebar.addWidget(self._name_edit)
         # spec 017: display stress unit and project title
         unit_row = QHBoxLayout()
@@ -178,6 +191,7 @@ class MainWindow(QMainWindow):
         self._title_edit = QLineEdit()
         self._title_edit.setPlaceholderText("Project title")
         self._title_edit.textChanged.connect(self._update_window_title)
+        self._title_edit.editingFinished.connect(self._title_edited)
         sidebar.addWidget(self._title_edit)
         copy_row = QHBoxLayout()
         copy_material = QPushButton("Copy material")
@@ -269,6 +283,8 @@ class MainWindow(QMainWindow):
         self._loading = False
         self._populate_tree()
         self.refresh()
+        self._history = hist.History(self._state())
+        self._update_history_ui()
 
     # ----------------------------------------------------------------- menus
 
@@ -285,6 +301,16 @@ class MainWindow(QMainWindow):
         file_menu.addAction("Exit", self.close)
 
         edit_menu = bar.addMenu("Edit")
+        # spec 023
+        self._undo_act = QAction("Undo", self)
+        self._undo_act.setShortcut(QKeySequence(QKeySequence.StandardKey.Undo))
+        self._undo_act.triggered.connect(self.undo)
+        self._redo_act = QAction("Redo", self)
+        self._redo_act.setShortcuts([QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z")])
+        self._redo_act.triggered.connect(self.redo)
+        edit_menu.addAction(self._undo_act)
+        edit_menu.addAction(self._redo_act)
+        edit_menu.addSeparator()
         edit_menu.addAction("Copy material", self._copy_material)
         edit_menu.addAction("Copy data", self._copy_data)
 
@@ -462,6 +488,15 @@ class MainWindow(QMainWindow):
     def _load_material(self, index: int) -> None:
         """Show material `index` in the form and plots."""
 
+        self._checkpoint()  # the action that changed the material (add, delete, import...)
+        self._history_hold += 1
+        try:
+            self._show_material(index)
+        finally:
+            self._history_hold -= 1
+        self._absorb()
+
+    def _show_material(self, index: int) -> None:
         self._current = index
         material = self._current_material()
         self._loading = True
@@ -587,6 +622,7 @@ class MainWindow(QMainWindow):
     def _set_material_symbol(self, symbol: str) -> None:
         if symbol in projects.SYMBOLS:
             self._current_material().symbol = symbol
+            self._checkpoint()
 
     def _tree_menu(self, pos) -> None:
         item = self._tree.itemAt(pos)
@@ -974,7 +1010,12 @@ class MainWindow(QMainWindow):
 
     def _update_window_title(self) -> None:
         title = self._title_edit.text().strip()
-        self.setWindowTitle(f"OGR Data - {title}" if title else "OGR Data")
+        # [*]: Qt shows "*" there while the project has unsaved changes (spec 023)
+        self.setWindowTitle(f"OGR Data - {title}[*]" if title else "OGR Data[*]")
+
+    def _title_edited(self) -> None:
+        self._checkpoint()
+        self._close_history_group()
 
     def _set_plot_labels(self) -> None:
         u = self._stress_unit
@@ -994,6 +1035,14 @@ class MainWindow(QMainWindow):
 
         if unit == self._stress_unit or unit not in units.STRESS_FACTORS:
             return
+        self._history_hold += 1
+        try:
+            self._rescale_to(unit)
+        finally:
+            self._history_hold -= 1
+        self._absorb()
+
+    def _rescale_to(self, unit: str) -> None:
         old_scale = self._scale()
         self._stress_unit = unit
         self._settings.setValue("stress_unit", unit)
@@ -1019,6 +1068,7 @@ class MainWindow(QMainWindow):
         from .graph_editor import GraphEditorDialog
 
         GraphEditorDialog(self).exec()
+        self._checkpoint()
 
     def _on_canvas_menu(self, canvas, kind: str) -> None:
         from PySide6.QtWidgets import QApplication, QFileDialog
@@ -1325,22 +1375,35 @@ class MainWindow(QMainWindow):
         }
         return self._project
 
-    def _save_project(self) -> None:
+    def _save_project(self) -> bool:
         from PySide6.QtWidgets import QFileDialog
 
         path, _ = QFileDialog.getSaveFileName(self, "Save project", "", "OGR Data project (*.ogrdata)")
         if not path:
-            return
+            return False
+        return self.save_project_to(path)
+
+    def save_project_to(self, path: str) -> bool:
+        """Write the project; marks the saved point of the undo history (spec 023)."""
+
         if not path.endswith(".ogrdata"):
             path += ".ogrdata"
+        self._checkpoint()
         try:
             projects.save_project(path, self._project_for_save())
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Save failed", str(exc))
+            return False
+        if self._history is not None:
+            self._history.mark_saved()
+            self._update_history_ui()
+        return True
 
     def _load_project(self) -> None:
         from PySide6.QtWidgets import QFileDialog
 
+        if not self._confirm_discard():
+            return
         path, _ = QFileDialog.getOpenFileName(self, "Load project", "", "OGR Data project (*.ogrdata)")
         if not path:
             return
@@ -1352,23 +1415,34 @@ class MainWindow(QMainWindow):
         self.open_project(loaded)
 
     def open_project(self, loaded: projects.Project) -> None:
-        """Replace the window's project (spec 011; v1 files arrive migrated)."""
+        """Replace the window's project (spec 011; v1 files arrive migrated).
 
-        self._load_settings_into_window({"stress_unit": loaded.stress_unit})
-        self._project = loaded
-        self.report_views.clear()  # views belong to the project they were taken from
-        self._title_edit.setText(loaded.title)
+        A new undo history starts here, saved at this state (spec 023).
+        """
+
+        self._history_hold += 1
+        try:
+            self._load_settings_into_window({"stress_unit": loaded.stress_unit})
+            self.report_views.clear()  # views belong to the project they were taken from
+            self._show_project(loaded)
+        finally:
+            self._history_hold -= 1
+        if self._history is not None:
+            self._history.reset(self._state())
+            self._update_history_ui()
+
+    def _show_project(self, project: projects.Project) -> None:
+        self._project = project
+        self._title_edit.setText(project.title)
         for name, canvas in (("principal", self._principal), ("shear", self._shear)):
-            raw = loaded.graph_options.get(name)
+            raw = project.graph_options.get(name)
             canvas.apply_options(PlotOptions.from_dict(raw) if raw else PlotOptions())
-        self._load_material(loaded.selected)
+        self._load_material(project.selected)
         self._populate_tree()
 
     def _new_project(self, confirm: bool = True) -> None:
-        if confirm:
-            answer = QMessageBox.question(self, "New project", "Discard the current project and start a new one?")
-            if answer != QMessageBox.StandardButton.Yes:
-                return
+        if confirm and not self._confirm_discard():
+            return
         fresh = projects.Project.new()
         fresh.stress_unit = self._stress_unit  # the display unit is a user setting
         self.open_project(fresh)
@@ -1434,6 +1508,102 @@ class MainWindow(QMainWindow):
         if sig3max_mpa is not None:
             self._sig3max.setValue(float(sig3max_mpa) * self._scale())
 
+    # ------------------------------------------------------------ spec 023: undo / redo
+
+    def _state(self) -> dict:
+        """The project as the undo history sees it (title and graph options of the window included)."""
+
+        self._project.selected = self._current
+        self._project.title = self._title_edit.text()
+        self._project.graph_options = {
+            "principal": self._principal.options.to_dict(),
+            "shear": self._shear.options.to_dict(),
+        }
+        return hist.snapshot(self._project)
+
+    def _checkpoint(self) -> None:
+        """Record the project as one step if an edit changed it."""
+
+        if self._history is None or self._history_hold or self._loading:
+            return
+        self._history.record(self._state())
+        self._update_history_ui()
+
+    def _absorb(self) -> None:
+        """Take the current project as the history's state without a step."""
+
+        if self._history is not None and not self._history_hold:
+            self._history.rebase(self._state())
+            self._update_history_ui()
+
+    def _close_history_group(self) -> None:
+        if self._history is not None:
+            self._history.close_group()
+
+    def _update_history_ui(self) -> None:
+        h = self._history
+        if h is None:
+            return
+        self._undo_act.setEnabled(h.can_undo)
+        self._redo_act.setEnabled(h.can_redo)
+        self._undo_act.setText(f"Undo {h.undo_text}" if h.can_undo else "Undo")
+        self._redo_act.setText(f"Redo {h.redo_text}" if h.can_redo else "Redo")
+        self._update_window_title()
+        self.setWindowModified(h.modified)
+
+    def undo(self) -> None:
+        if self._history is None:
+            return
+        self._checkpoint()  # an edit not recorded yet (title being typed) comes first
+        state = self._history.undo()
+        if state is not None:
+            self._restore(state)
+
+    def redo(self) -> None:
+        if self._history is None:
+            return
+        self._checkpoint()
+        state = self._history.redo()
+        if state is not None:
+            self._restore(state)
+
+    def _restore(self, state: dict) -> None:
+        """Show a state of the history; the display unit is a preference and stays."""
+
+        project = projects.Project.from_dict(state)
+        project.stress_unit = self._stress_unit
+        self._history_hold += 1
+        try:
+            self._show_project(project)
+        finally:
+            self._history_hold -= 1
+        self._absorb()
+
+    def _confirm_discard(self) -> bool:
+        """True to go on (nothing unsaved, saved, or discarded); False to stay."""
+
+        self._checkpoint()
+        if self._history is None or not self._history.modified:
+            return True
+        if self.ask_unsaved is not None:
+            choice = self.ask_unsaved()
+        else:
+            buttons = QMessageBox.StandardButton
+            answer = QMessageBox.question(
+                self, "Unsaved changes", "The project has unsaved changes. Save them?",
+                buttons.Save | buttons.Discard | buttons.Cancel, buttons.Save,
+            )
+            choice = {buttons.Save: "save", buttons.Discard: "discard"}.get(answer, "cancel")
+        if choice == "save":
+            return self._save_project()
+        return choice == "discard"
+
+    def closeEvent(self, event) -> None:  # noqa: N802 (Qt)
+        if self._confirm_discard():
+            event.accept()
+        else:
+            event.ignore()
+
     # ------------------------------------------------------------------ form
 
     def _criterion(self) -> Criterion:
@@ -1474,6 +1644,7 @@ class MainWindow(QMainWindow):
                 elif field.unit == "kPa":
                     widget.setSuffix(f" {self._stress_unit}")
                 widget.valueChanged.connect(self.refresh)
+                widget.editingFinished.connect(self._close_history_group)
             self._widgets[field.key] = widget
 
             editor: QWidget = widget
@@ -1726,6 +1897,12 @@ class MainWindow(QMainWindow):
     # --------------------------------------------------------------- refresh
 
     def refresh(self) -> None:
+        """Redraw from the form and record the edit that led here (spec 023)."""
+
+        self._redraw()
+        self._checkpoint()
+
+    def _redraw(self) -> None:
         key = self._criterion_combo.currentData()
         if key is None or not self._widgets:
             return
