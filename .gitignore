@@ -16,3 +16,6 @@ Thumbs.db
 
 # Matplotlib cache (created if MPLCONFIGDIR is not set)
 matplotlib-*/
+
+# Claude Code: personal settings (the project skills in .claude/skills are versioned)
+.claude/settings.local.json

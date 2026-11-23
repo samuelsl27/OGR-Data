@@ -76,5 +76,17 @@ Siguientes (spec.md redactadas el 23-11-2026; plan y tasks al desarrollarlas):
     los diálogos y el informe HTML en español; código, API, MCP y
     ficheros siguen en inglés; contenido bibliográfico en su idioma.
 
+Siguientes (24-11-2026):
+
+15. **025 — Revisión de UX**: la
+    [revisión](../features/025-revision-ux/revision.md) de toda la
+    interfaz contra la nueva [guía de UX](ux-guidelines.md), en seis
+    specs ([índice](../features/025-revision-ux/README.md)): **025a**
+    errores visibles (hecha), **025b** ventana principal con los
+    resultados en un panel a la derecha (opciones exploradas), **025c**
+    menús y convenciones, **025d** estados vacíos y confirmaciones,
+    **025e** notación, decimales y unidades, **025f** ayuda,
+    accesibilidad y progreso (borradores).
+
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.

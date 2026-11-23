@@ -14,7 +14,7 @@ propietario — ver `../../Promps/`):
 | **Datos bibliográficos** | Tablas en JSON/CSV versionados dentro del repo, con cita de fuente por fila (NRCS, Hoek). |
 | **Idioma** | Código y docs del repo en inglés (regla de la suite); notas privadas en español. |
 | **Licencia** | AGPL-3.0-or-later, como los demás programas. |
-| **Metodología SDD** (github.com/mouredev/hello-sdd) | Igual que el resto de la suite: spec/constitution + spec/features (spec.md, plan.md, tasks.md). |
+| **Metodología SDD** (github.com/mouredev/hello-sdd) | Igual que el resto de la suite: spec/constitution + spec/features (spec.md, plan.md, tasks.md). Contrato con agentes en `AGENTS.md` (`CLAUDE.md` lo importa); fases como *skills* en `.claude/skills/` (2026-11-24). |
 
 ## Separaciones que no deben romperse
 

@@ -31,6 +31,13 @@ complejidad de interfaz.
 
 ## No objetivos (de momento)
 
-- Simulación constitutiva completa de ensayos (test simulations de RSData).
-- Estados de fallo, rutas de tensión, calibración multi-ensayo.
 - Integración con el formato privado de portapapeles de Rocscience.
+
+Los otros dos no objetivos del arranque —simulación de ensayos y estados
+de fallo, rutas y calibración— pasaron a objetivos con las specs 012,
+013, 014 y 021 (ver `roadmap.md`).
+
+## Principios y UX
+
+Los principios innegociables están en [`principles.md`](principles.md) y
+la guía de interfaz en [`ux-guidelines.md`](ux-guidelines.md).

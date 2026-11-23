@@ -36,7 +36,9 @@ parameters of every criterion.
 ## Status
 
 Early development. The SDD constitution lives in `spec/constitution/`
-(methodology: [hello-sdd](https://github.com/mouredev/hello-sdd)).
+(methodology: [hello-sdd](https://github.com/mouredev/hello-sdd)),
+including the UX guidelines (`spec/constitution/ux-guidelines.md`). Rules
+for AI agents and contributors: [AGENTS.md](AGENTS.md).
 
 ## License
 
