@@ -20,6 +20,7 @@ def project_dict(
     sig3max_mpa: float,
     stress_unit: str = "kPa",
     title: str = "",
+    graph_options: dict | None = None,
 ) -> dict:
     if criterion_key not in CRITERIA:
         raise ValueError(f"unknown criterion {criterion_key!r}")
@@ -30,6 +31,7 @@ def project_dict(
         "criterion": criterion_key,
         "sig3max_mpa": float(sig3max_mpa),
         "stress_unit": stress_unit,
+        "graph_options": dict(graph_options or {}),
         "parameters": dict(params),
     }
 
@@ -42,10 +44,11 @@ def save_project(
     sig3max_mpa: float,
     stress_unit: str = "kPa",
     title: str = "",
+    graph_options: dict | None = None,
 ) -> None:
     Path(path).write_text(
         json.dumps(
-            project_dict(name, criterion_key, params, sig3max_mpa, stress_unit, title),
+            project_dict(name, criterion_key, params, sig3max_mpa, stress_unit, title, graph_options),
             indent=2,
             sort_keys=True,
         ),

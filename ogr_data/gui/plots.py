@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import numpy as np
 
+from ..core.graph_options import PlotOptions
 from .themes import mpl_colors
 
 _EMPTY_OFFSETS = np.empty((0, 2))
@@ -15,13 +16,17 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
     """Single-axes canvas; call redraw(sig3, sig1, normal, shear, mc).
 
     space is "principal" (x is sigma3) or "shear" (x is normal stress);
-    the sampler handler receives (space, kind, x_data) on mouse events.
+    the sampler handler receives (space, kind, x_data) on mouse events and
+    the menu handler receives (canvas, kind) from the context menu.
     """
 
     def __init__(self, title: str, xlabel: str, ylabel: str, theme: str = "light", space: str = "principal") -> None:
         self._theme = theme
         self.space = space
+        self._default_title = title
+        self.options = PlotOptions()
         self.sampler_handler = None  # set by MainWindow: fn(space, kind, x)
+        self.menu_handler = None  # set by MainWindow: fn(canvas, kind)
         self.figure = Figure(figsize=(4.0, 4.0), tight_layout=True)
         super().__init__(self.figure)
         self.axes = self.figure.add_subplot(111)
@@ -55,10 +60,36 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
     def _on_release(self, event) -> None:
         self._dispatch("release", event)
 
+    def contextMenuEvent(self, event) -> None:
+        if self.menu_handler is None:
+            return
+        from PySide6.QtWidgets import QMenu
+
+        menu = QMenu(self)
+        menu.addAction("Copy Graph as Image", lambda: self.menu_handler(self, "copy"))
+        menu.addAction("Save Graph as Image…", lambda: self.menu_handler(self, "save"))
+        menu.addAction("Export Graph to Excel (CSV)…", lambda: self.menu_handler(self, "export"))
+        menu.addSeparator()
+        menu.addAction("Zoom Extents", lambda: self.menu_handler(self, "zoom"))
+        menu.addAction("Graph Editor…", lambda: self.menu_handler(self, "editor"))
+        menu.exec(event.globalPos())
+
     # --------------------------------------------------------------- theme
 
+    def _series_artists(self):
+        return {
+            "envelope": self._line,
+            "mc": self._mc_line,
+            "tangent": self._tangent_line,
+            "mogi": self._mogi_line,
+        }
+
     def apply_theme(self, theme: str) -> None:
-        """Recolor figure, axes, grid and series with the theme palette."""
+        """Recolor figure, axes, grid and series with the theme palette.
+
+        Series with a user-chosen color in the options keep it; theme
+        switches only reset series that follow the theme default.
+        """
 
         self._theme = theme
         colors = mpl_colors(theme)
@@ -69,16 +100,58 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self.axes.tick_params(colors=colors["axes"], labelcolor=colors["axes"])
         for spine in self.axes.spines.values():
             spine.set_color(colors["axes"])
-        self.axes.grid(True, alpha=0.6, color=colors["grid"])
-        self._line.set_color(colors["envelope"])
-        self._line.set_label("envelope")
-        self._mc_line.set_color(colors["mc"])
-        self._tangent_line.set_color(colors["point"])
         self._marker.set_facecolor(colors["point"])
         self._marker.set_edgecolor(colors["figure"])
         self._vline.set_color(colors["point"])
-        self._mogi_line.set_color(colors["mogi"])
-        self._mogi_line.set_label("Mogi line")
+        self._apply_style()
+        self.draw_idle()
+
+    # -------------------------------------------------------------- options
+
+    def apply_options(self, options: PlotOptions) -> None:
+        """Store and apply display options (spec 016); reflects live."""
+
+        self.options = options
+        self._apply_style()
+        self.draw_idle()
+
+    def _apply_style(self) -> None:
+        options = self.options
+        self.axes.set_title(options.title or self._default_title)
+        colors = mpl_colors(self._theme)
+        if options.grid:
+            self.axes.grid(True, alpha=0.6, color=colors["grid"])
+        else:
+            self.axes.grid(False)
+        self.axes.set_aspect("equal" if options.square_axis else "auto")
+        if options.x_range:
+            self.axes.set_xlim(*options.x_range)
+        if options.y_range:
+            self.axes.set_ylim(*options.y_range)
+        pad = -16 if options.labels_inside else 4
+        direction = "in" if options.labels_inside else "out"
+        self.axes.tick_params(axis="both", pad=pad, direction=direction, colors=colors["axes"], labelcolor=colors["axes"])
+        default_colors = {
+            "envelope": colors["envelope"],
+            "mc": colors["mc"],
+            "tangent": colors["point"],
+            "mogi": colors["mogi"],
+        }
+        for key, artist in self._series_artists().items():
+            style = self.options.styles[key]
+            artist.set_visible(style.visible)
+            artist.set_color(style.color or default_colors[key])
+            artist.set_linewidth(self.options.linewidth(key))
+            artist.set_linestyle(self.options.linestyle(key))
+
+    def zoom_extents(self) -> None:
+        """Scale back to the natural envelope limits (RocData)."""
+
+        self.options.x_range = None
+        self.options.y_range = None
+        self.axes.set_autoscale_on(True)
+        self.axes.relim()
+        self.axes.autoscale_view()
         self.draw_idle()
 
     # ------------------------------------------------------------ overlays
@@ -95,6 +168,10 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self._mc_line.set_data(x_mc if x_mc is not None else [], y_mc if y_mc is not None else [])
         self.axes.relim()
         self.axes.autoscale_view()
+        if self.options.x_range:
+            self.axes.set_xlim(*self.options.x_range)
+        if self.options.y_range:
+            self.axes.set_ylim(*self.options.y_range)
         self.draw_idle()
 
     def show_mogi(self, x, y) -> None:
@@ -134,6 +211,21 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self._tangent_line.set_data([], [])
         self._marker.set_offsets(_EMPTY_OFFSETS)
         self.draw_idle()
+
+    # --------------------------------------------------------------- export
+
+    def series_data(self) -> dict[str, tuple[np.ndarray, np.ndarray]]:
+        """Current (x, y) arrays per series, for CSV export."""
+
+        data = {}
+        for key, artist in self._series_artists().items():
+            x, y = artist.get_data()
+            if len(x):
+                data[key] = (np.asarray(x, dtype=float), np.asarray(y, dtype=float))
+        return data
+
+    def save_image(self, path: str) -> None:
+        self.figure.savefig(path)
 
     def line_color(self, kind: str) -> str:
         return mpl_colors(self._theme)[kind]

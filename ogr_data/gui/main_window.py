@@ -31,6 +31,7 @@ from ..core import application
 from ..core import criteria_envelopes as ce
 from ..core import samplers
 from ..core import units
+from ..core.graph_options import PlotOptions
 from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
 from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas
@@ -181,6 +182,7 @@ class MainWindow(QMainWindow):
         self._shear = EnvelopeCanvas("Shear - Normal Stresses", f"normal stress ({self._stress_unit})", f"shear stress ({self._stress_unit})", self._theme, space="shear")
         for canvas in (self._principal, self._shear):
             canvas.sampler_handler = self._on_plot_event
+            canvas.menu_handler = self._on_canvas_menu
 
         plots = QSplitter(Qt.Orientation.Horizontal)
         plots.addWidget(self._principal)
@@ -238,6 +240,8 @@ class MainWindow(QMainWindow):
         theme_menu = view_menu.addMenu("Theme")
         for name in THEMES:
             theme_menu.addAction(name.capitalize(), lambda _=False, n=name: self._set_theme(n))
+        view_menu.addSeparator()
+        view_menu.addAction("Graph Editor…", self._open_graph_editor)
 
         help_menu = bar.addMenu("Help")
         help_menu.addAction("About OGR Data", self._about)
@@ -303,6 +307,66 @@ class MainWindow(QMainWindow):
         self._sig3max.blockSignals(False)
         self._set_plot_labels()
         self.refresh()
+
+    # ---------------------------------------------------------- spec 016: graph options and export
+
+    def _open_graph_editor(self) -> None:
+        from .graph_editor import GraphEditorDialog
+
+        GraphEditorDialog(self).exec()
+
+    def _on_canvas_menu(self, canvas, kind: str) -> None:
+        from PySide6.QtWidgets import QApplication, QFileDialog
+
+        if kind == "copy":
+            QApplication.clipboard().setPixmap(canvas.grab())
+        elif kind == "save":
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Save graph as image", "", "PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)"
+            )
+            if path:
+                canvas.save_image(path)
+        elif kind == "export":
+            self._export_canvas_csv(canvas)
+        elif kind == "zoom":
+            canvas.zoom_extents()
+        elif kind == "editor":
+            self._open_graph_editor()
+
+    def _export_canvas_csv(self, canvas) -> None:
+        """Export the plot series to CSV, ready to open in Excel (spec 016)."""
+
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        from ..core import export as series_export
+
+        path, _ = QFileDialog.getSaveFileName(self, "Export graph to CSV", "", "CSV (*.csv)")
+        if not path:
+            return
+        if not path.endswith(".csv"):
+            path += ".csv"
+        series = canvas.series_data()
+        if canvas.space == "principal":
+            labels = {
+                "envelope": ("sigma3", "sigma1"),
+                "mc": ("MC sigma3", "MC sigma1"),
+                "mogi": ("Mogi sigma3", "Mogi sigma1"),
+            }
+        else:
+            labels = {
+                "envelope": ("sigma_n", "tau"),
+                "mc": ("MC sigma_n", "MC tau"),
+            }
+        scale = self._scale()
+        columns = []
+        for key, (x_label, y_label) in labels.items():
+            data = series.get(key)
+            if data is not None:
+                columns.append((x_label, y_label, data[0] * scale, data[1] * scale))
+        if not columns:
+            QMessageBox.information(self, "Export", "There is no series to export on this plot.")
+            return
+        series_export.write_series_csv(path, columns, unit=self._stress_unit)
 
     def _about(self) -> None:
         from .. import __version__
@@ -439,7 +503,19 @@ class MainWindow(QMainWindow):
         if not path.endswith(".ogrdata"):
             path += ".ogrdata"
         try:
-            project.save_project(path, self._material_name(), self._criterion_combo.currentData(), self._params(), self._sig3max_mpa(), stress_unit=self._stress_unit, title=self._title_edit.text())
+            project.save_project(
+                path,
+                self._material_name(),
+                self._criterion_combo.currentData(),
+                self._params(),
+                self._sig3max_mpa(),
+                stress_unit=self._stress_unit,
+                title=self._title_edit.text(),
+                graph_options={
+                    "principal": self._principal.options.to_dict(),
+                    "shear": self._shear.options.to_dict(),
+                },
+            )
         except ValueError as exc:
             QMessageBox.warning(self, "Save failed", str(exc))
 
@@ -460,6 +536,10 @@ class MainWindow(QMainWindow):
         self._apply_project(data["criterion"], data["parameters"], data.get("sig3max_mpa"))
         self._name_edit.setText(data.get("name", ""))
         self._title_edit.setText(data.get("title", ""))
+        for name, canvas in (("principal", self._principal), ("shear", self._shear)):
+            raw = data.get("graph_options", {}).get(name)
+            if raw:
+                canvas.apply_options(PlotOptions.from_dict(raw))
 
     def _load_settings_into_window(self, data: dict) -> None:
         """Apply the display unit saved in the project (spec 017)."""
