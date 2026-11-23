@@ -12,9 +12,11 @@ Color por defecto de un estado o ruta nuevo en RSData: **#800000**
 - `FailureState`: nombre, color, símbolo, Test Type, `peak` y `residual`
   (listas de `TestPoint(x, y, exclude)` en kPa).
 - `StressPath`: nombre, color, Test Type, Seepage Condition (Drained/
-  Undrained), Loading Direction (Compression/Extension, tercera pasada
-  de RSData), Initial Effective Lateral Stress (kPa), Initial Effective
-  K0, Strain Type y pasos `PathStep(EpsilonZZ, SigmaZZ, EpsilonXX)`.
+  Undrained), Loading Direction (triaxial: Lateral/Axial), Strain Type
+  (uniaxial: Lateral/Volumetric), Initial Effective Lateral Stress
+  (defecto 100 kPa) y K0 (defecto 1) y pasos `PathStep(EpsilonZZ,
+  tensión, deformación)` cuyas columnas siguen al diálogo de RSData
+  (ver "Segunda iteración").
 - Viven **por material** (`Material.failure_states/stress_paths`), como
   pide la spec; en RSData se definen globalmente y se "aplican" a
   materiales. Claves aditivas en el `.ogrdata` v2 (ficheros de la 011 sin
@@ -97,3 +99,37 @@ gráficas (pico/excluido/residual, círculos, punto de corte directo),
 leyenda, visibilidad por estado y por material, diálogo de rutas (campos
 de triaxial, nota de no dibujable), polilínea y columnas de export,
 borrar desde el árbol, persistencia y reapertura.
+
+## Segunda iteración (2026-11-23): fuentes encontradas y aplicadas
+
+Fuentes guardadas: ayuda online oficial de RSData
+(`Referencias/Ejemplos/RSData_analisis/ayuda_online/`, resumen en
+`06_ayuda_online.md`) y `Referencias/Bibliografia/Ensayos/` (índice en
+`00_INDICE.md`).
+
+- **Correcciones con la ayuda oficial**: la "Loading Direction" de las
+  rutas es **Lateral/Axial** (Compression/Extension era de los Tests); el
+  uniaxial tiene **Strain Type Lateral/Volumetric**; defectos σ'h0 = 100
+  kPa y K0 = 1 (figura oficial). Columnas: Uniaxial → EpsilonZZ, SigmaZZ,
+  EpsilonXX|EpsilonV; Triaxial/Lateral → EpsilonZZ, SigmaXX, EpsilonV
+  (figura oficial); Triaxial/Axial → EpsilonZZ, SigmaZZ, EpsilonV
+  (provisional). Los tipos de estado de fallo oficiales son Triaxial,
+  Simple Shear y General; Direct Shear se mantiene como extensión
+  RocData (etiqueta "(RocData)"). Ficheros de la primera versión con
+  Compression/Extension cargan como Lateral.
+- **Pestaña Stress Path Graphs** (RSData: cuatro gráficas por defecto):
+  Axial Stress–Axial Strain, Volumetric Strain–Axial Strain (RSData
+  muestra Pore Water Pressure en no drenado; las tablas no traen presión
+  de poro), q–Deviatoric Strain y q–p. Definiciones (Machaček 2023,
+  "Triaxial test"): p' = (σa+2σr)/3, q = σa−σr, εv = εa+2εr,
+  εq = 2(εa−εr)/3; con columna EpsilonV, εr = (εv−εa)/2. Ejes de tensión
+  en la unidad de visualización; menú contextual copiar/guardar/CSV.
+- **Rutas en τ–σn**: puntos de tensión en la cima de cada círculo de
+  Mohr, (½(σ1+σ3), ½(σ1−σ3)) (UTM "Stress Paths and Strength Tests",
+  p. 2; Machaček, representación tradicional σm–τ).
+- **Interpretación provisional del triaxial** (a verificar, spec 021):
+  Axial → varía SigmaZZ con σr = σ'h0; Lateral → varía SigmaXX con
+  σa = σ'h0/K0 (K0 = σ'h/σ'v). Biaxial, Simple Shear y General no se
+  dibujan. El diálogo lo indica.
+- Verificación en la interfaz: prompt para Claude Desktop en
+  `Data/Promps/2026_11_23_Prompt_Claude-Desktop_RSData-ORMAS.md`.

@@ -12,5 +12,8 @@
       rutas como polilíneas, leyenda, export CSV
 - [x] Diálogo de ajuste (006) con el parser común
 - [x] tests/test_states.py; suite en verde; commit y push
-- [ ] Pendiente: pestaña Stress Path Graphs (εv, εq con fuente oficial) y
-      rutas en τ–σn — ver plan.md
+- [x] Segunda iteración: fuentes guardadas (ayuda RSData, Machaček 2023,
+      UTM); pestaña Stress Path Graphs; rutas en τ–σn; campos y defectos
+      oficiales de RSData en el diálogo de rutas
+- [ ] Verificación en RSData de columnas y semántica de Loading Direction
+      → spec 021 (prompt de Claude Desktop)

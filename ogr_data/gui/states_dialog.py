@@ -486,6 +486,8 @@ class StressPathsDialog(_ItemsDialog):
         self._k0.setRange(0.0, 100.0)
         self._k0.setDecimals(4)
         self._strain_type = combo(st.STRAIN_TYPES)
+        self._loading_dir.currentIndexChanged.connect(self._update_columns)
+        self._strain_type.currentIndexChanged.connect(self._update_columns)
         form.addRow("Test Type:", self._test_type)
         form.addRow("Seepage Condition:", self._seepage)
         form.addRow("Loading Direction:", self._loading_dir)
@@ -499,18 +501,41 @@ class StressPathsDialog(_ItemsDialog):
         self._steps = PointTable(["EpsilonZZ", f"SigmaZZ ({self._unit})", "EpsilonXX"], [1.0, self._kpa_scale, 1.0])
         layout.addWidget(self._steps, stretch=1)
 
+    def _config(self) -> st.StressPath:
+        return st.StressPath(
+            test_type=self._test_type.currentData(),
+            loading=self._loading_dir.currentData(),
+            strain_type=self._strain_type.currentData(),
+        )
+
+    def _update_columns(self) -> None:
+        """Table headers of the RSData dialog for the current configuration."""
+
+        eps, stress, strain = self._config().columns()
+        self._steps.table.setHorizontalHeaderLabels([eps, f"{stress} ({self._unit})", strain])
+
     def _test_type_changed(self) -> None:
         test_type = self._test_type.currentData()
         triaxial = test_type == "triaxial"
+        # RSData: seepage, loading direction, initial lateral stress and K0
+        # for the triaxial test; strain type for the uniaxial test
         for widget in (self._seepage, self._loading_dir, self._lateral, self._k0):
             widget.setEnabled(triaxial)
-        drawable = test_type in ("uniaxial", "triaxial")
-        self._note.setText(
-            ""
-            if drawable
-            else "This test type needs stress components the table does not hold; "
-            "the path is kept but not drawn on the strength plots."
-        )
+        self._strain_type.setEnabled(test_type == "uniaxial")
+        if test_type in ("uniaxial", "triaxial"):
+            note = ""
+            if triaxial:
+                note = (
+                    "Triaxial paths: the stress column varies and the other principal stress keeps its "
+                    "initial effective value (provisional interpretation, spec 021)."
+                )
+        else:
+            note = (
+                "The RSData inputs of this test type are not verified yet (spec 021); "
+                "the path is kept but not drawn."
+            )
+        self._note.setText(note)
+        self._update_columns()
 
     def _new_item(self, name: str, color: str):
         return st.StressPath(name=name, color=color)

@@ -354,3 +354,96 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
 
     def line_color(self, kind: str) -> str:
         return mpl_colors(self._theme)[kind]
+
+
+class PathCanvas(FigureCanvasQTAgg):
+    """One of the Stress Path Graphs (spec 012): series of (x, y) per path.
+
+    Stress axes hold internal MPa and show the display unit through a tick
+    formatter (spec 017); strain axes are plotted as given.
+    """
+
+    def __init__(self, title: str, xlabel: str, ylabel: str, x_stress: bool, y_stress: bool, theme: str = "light") -> None:
+        self._theme = theme
+        self.title = title
+        self._labels = (xlabel, ylabel)
+        self._stress_axes = (x_stress, y_stress)
+        self.menu_handler = None  # fn(canvas, kind)
+        self.figure = Figure(figsize=(4.0, 3.0), tight_layout=True)
+        super().__init__(self.figure)
+        self.axes = self.figure.add_subplot(111)
+        self._lines: list = []
+        self.set_display(1.0, "kPa")
+        self.apply_theme(theme)
+
+    def set_display(self, scale: float, unit: str) -> None:
+        """Display factor and unit of the stress axes."""
+
+        xlabel, ylabel = self._labels
+        self.axes.set_xlabel(f"{xlabel} ({unit})" if self._stress_axes[0] else xlabel)
+        self.axes.set_ylabel(f"{ylabel} ({unit})" if self._stress_axes[1] else ylabel)
+        for axis, is_stress in ((self.axes.xaxis, self._stress_axes[0]), (self.axes.yaxis, self._stress_axes[1])):
+            if is_stress:
+                axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: f"{v * k:g}"))
+        self.display_scale = scale
+        self.apply_theme(self._theme)
+
+    def apply_theme(self, theme: str) -> None:
+        self._theme = theme
+        colors = mpl_colors(theme)
+        self.figure.set_facecolor(colors["figure"])
+        self.axes.set_facecolor(colors["figure"])
+        self.axes.set_title(self.title, color=colors["axes"])
+        for label in (self.axes.xaxis.label, self.axes.yaxis.label):
+            label.set_color(colors["axes"])
+        self.axes.tick_params(colors=colors["axes"], labelcolor=colors["axes"])
+        for spine in self.axes.spines.values():
+            spine.set_color(colors["axes"])
+        self.axes.grid(True, alpha=0.6, color=colors["grid"])
+        self._legend()
+        self.draw_idle()
+
+    def set_series(self, series) -> None:
+        """Iterable of (label, x, y, color) with stress values in MPa."""
+
+        for line in self._lines:
+            line.remove()
+        self._lines = []
+        for label, x, y, color in series:
+            (line,) = self.axes.plot(x, y, color=color, marker=".", markersize=5.0, linewidth=1.4)
+            line.ogr_label = label
+            self._lines.append(line)
+        self.axes.relim()
+        self.axes.autoscale_view()
+        self._legend()
+        self.draw_idle()
+
+    def _legend(self) -> None:
+        legend = self.axes.get_legend()
+        if legend is not None:
+            legend.remove()
+        if not self._lines:
+            return
+        colors = mpl_colors(self._theme)
+        legend = self.axes.legend(self._lines, [l.ogr_label for l in self._lines], fontsize="small")
+        legend.get_frame().set_facecolor(colors["figure"])
+        legend.get_frame().set_edgecolor(colors["grid"])
+        for text in legend.get_texts():
+            text.set_color(colors["axes"])
+
+    def series_data(self) -> list[tuple[str, np.ndarray, np.ndarray]]:
+        return [(l.ogr_label, *(np.asarray(v, dtype=float) for v in l.get_data())) for l in self._lines]
+
+    def save_image(self, path: str) -> None:
+        self.figure.savefig(path)
+
+    def contextMenuEvent(self, event) -> None:
+        if self.menu_handler is None:
+            return
+        from PySide6.QtWidgets import QMenu
+
+        menu = QMenu(self)
+        menu.addAction("Copy Graph as Image", lambda: self.menu_handler(self, "copy"))
+        menu.addAction("Save Graph as Image…", lambda: self.menu_handler(self, "save"))
+        menu.addAction("Export Graph to Excel (CSV)…", lambda: self.menu_handler(self, "export"))
+        menu.exec(event.globalPos())

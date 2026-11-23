@@ -10,9 +10,17 @@ Stress Paths dialogs (captures 31_* and 32_* of the RSData analysis):
   as Mohr circles in shear-normal space; direct shear data only as points
   in shear-normal space.
 - StressPath: name, color, test type, seepage condition, loading
-  direction, initial effective lateral stress, initial effective K0,
-  strain type and a table of steps (EpsilonZZ, SigmaZZ, EpsilonXX). Here a
-  path is drawn data, not a simulation (that is spec 013).
+  direction (triaxial) or strain type (uniaxial), initial effective
+  lateral stress, initial effective K0 and a table of steps whose columns
+  depend on the configuration (RSData help "Define Stress Paths" and its
+  dialog figure). Here a path is drawn data, not a simulation (spec 013).
+  Paths are drawn in sigma1-sigma3, as stress points (Mohr circle tops)
+  in tau-sigma, and in the four Stress Path Graphs (axial stress, volumetric
+  strain, q-deviatoric strain, q-p).
+
+Official RSData option lists: rocscience.com/help/rsdata, Define Failure
+States / Define Stress Paths (saved in Referencias/Ejemplos/RSData_analisis/
+ayuda_online). Column layouts not shown there are pending (spec 021).
 
 Stresses are stored in kPa (registry units), strains as given.
 """
@@ -33,14 +41,16 @@ DEFAULT_COLOR = "#800000"
 # further states/paths of the same material
 PALETTE = ("#1f618d", "#117a65", "#b9770e", "#6c3483", "#a04000", "#2e4053")
 
-# "Triaxial Test" is the type observed in RSData's failure-state dialog;
-# "Direct Shear Test" is the other test data type of RocData's Use Lab
-# Data (guide p. 9), whose data plot only in shear-normal space.
+# RSData failure-state test types are Triaxial, Simple Shear and General
+# (official help); only Triaxial has a verified column layout (sigma3,
+# sigma1), the other two are pending (spec 021). "Direct Shear Test" is the
+# other test data type of RocData's Use Lab Data (guide p. 9), kept as an
+# OGR extension: its data plot only in shear-normal space.
 FAILURE_TEST_TYPES: dict[str, str] = {
     "triaxial": "Triaxial Test",
-    "direct_shear": "Direct Shear Test",
+    "direct_shear": "Direct Shear Test (RocData)",
 }
-# Test types of RSData's Define Test Simulations list (same family).
+# Test types of RSData's Define Stress Paths (official help).
 PATH_TEST_TYPES: dict[str, str] = {
     "uniaxial": "Uniaxial Test",
     "triaxial": "Triaxial Test",
@@ -49,8 +59,10 @@ PATH_TEST_TYPES: dict[str, str] = {
     "general": "General Test",
 }
 SEEPAGE_CONDITIONS = ("Drained", "Undrained")
-LOADING_DIRECTIONS = ("Compression", "Extension")
-STRAIN_TYPES = ("Lateral",)  # the only value observed in RSData
+# RSData help: "Lateral, Axial (for triaxial test, biaxial, and general
+# test)" and "Lateral, volumetric (for uniaxial test)".
+LOADING_DIRECTIONS = ("Lateral", "Axial")
+STRAIN_TYPES = ("Lateral", "Volumetric")
 
 
 def _choice(value, options, default):
@@ -119,12 +131,67 @@ class FailureState:
 
 @dataclass
 class PathStep:
+    """One row of a stress path table: (EpsilonZZ, stress, strain).
+
+    The meaning of the stress and strain columns follows the RSData dialog
+    for the path's test type and loading direction / strain type; see
+    StressPath.columns().
+    """
+
     eps_zz: float
-    sigma_zz: float  # kPa
-    eps_xx: float
+    stress: float  # kPa: SigmaZZ or SigmaXX
+    strain: float  # EpsilonXX or EpsilonV
 
     def to_list(self) -> list:
-        return [self.eps_zz, self.sigma_zz, self.eps_xx]
+        return [self.eps_zz, self.stress, self.strain]
+
+
+@dataclass
+class PathInvariants:
+    """Per-step stresses (kPa) and strains of a drawable path (triaxial geometry).
+
+    p, q: Roscoe invariants p' = (sa + 2 sr)/3, q = sa - sr; strains
+    ev = ea + 2 er, eq = 2 (ea - er)/3 (Machacek 2023, "Triaxial test");
+    s, t: centre and radius of the Mohr circle, the stress point drawn on
+    the tau-sigma plane (UTM "Stress Paths and Strength Tests", p. 2).
+    """
+
+    sigma_a: np.ndarray
+    sigma_r: np.ndarray
+    eps_a: np.ndarray
+    eps_r: np.ndarray
+
+    @property
+    def sigma1(self) -> np.ndarray:
+        return np.maximum(self.sigma_a, self.sigma_r)
+
+    @property
+    def sigma3(self) -> np.ndarray:
+        return np.minimum(self.sigma_a, self.sigma_r)
+
+    @property
+    def p(self) -> np.ndarray:
+        return (self.sigma_a + 2.0 * self.sigma_r) / 3.0
+
+    @property
+    def q(self) -> np.ndarray:
+        return self.sigma_a - self.sigma_r
+
+    @property
+    def eps_v(self) -> np.ndarray:
+        return self.eps_a + 2.0 * self.eps_r
+
+    @property
+    def eps_q(self) -> np.ndarray:
+        return 2.0 * (self.eps_a - self.eps_r) / 3.0
+
+    @property
+    def s(self) -> np.ndarray:
+        return (self.sigma1 + self.sigma3) / 2.0
+
+    @property
+    def t(self) -> np.ndarray:
+        return (self.sigma1 - self.sigma3) / 2.0
 
 
 @dataclass
@@ -133,36 +200,81 @@ class StressPath:
     color: str = DEFAULT_COLOR
     test_type: str = "uniaxial"
     seepage: str = "Drained"
-    loading: str = "Compression"
-    lateral_stress: float = 0.0  # initial effective lateral stress, kPa
-    k0: float = 1.0  # initial effective K0 (OGR default; RSData value not captured)
-    strain_type: str = "Lateral"
+    loading: str = "Lateral"  # triaxial: Loading Direction (Lateral | Axial)
+    lateral_stress: float = 100.0  # initial effective lateral stress, kPa (RSData default)
+    k0: float = 1.0  # initial effective K0 (RSData default)
+    strain_type: str = "Lateral"  # uniaxial: Strain Type (Lateral | Volumetric)
     steps: list[PathStep] = field(default_factory=list)
     visible: bool = True
 
     def __post_init__(self) -> None:
         self.test_type = _choice(self.test_type, PATH_TEST_TYPES, "uniaxial")
         self.seepage = _choice(self.seepage, SEEPAGE_CONDITIONS, "Drained")
-        self.loading = _choice(self.loading, LOADING_DIRECTIONS, "Compression")
+        # files of the first spec-012 version stored Compression/Extension
+        self.loading = _choice(self.loading, LOADING_DIRECTIONS, "Lateral")
         self.strain_type = _choice(self.strain_type, STRAIN_TYPES, "Lateral")
 
-    def principal_path(self) -> tuple[np.ndarray, np.ndarray] | None:
-        """(sigma3, sigma1) in kPa along the path, or None if not drawable.
+    def columns(self) -> tuple[str, str, str]:
+        """Table columns of the RSData dialog for this configuration.
 
-        Uniaxial test: lateral stress zero. Triaxial test (conventional):
-        lateral stress constant at the initial effective lateral stress
-        while SigmaZZ (the axial stress) varies. sigma1/sigma3 are the
-        larger/smaller of axial and lateral, so extension paths (axial
-        below lateral) swap them. Biaxial, simple shear and general tests
-        need stress components the table does not hold: not drawn.
+        Uniaxial: EpsilonZZ, SigmaZZ, EpsilonXX (capture 32, Strain Type
+        Lateral) or EpsilonV (Volumetric). Triaxial, Loading Direction
+        Lateral: EpsilonZZ, SigmaXX, EpsilonV (official RSData help figure);
+        Axial: EpsilonZZ, SigmaZZ, EpsilonV (provisional, spec 021).
         """
 
-        if not self.steps or self.test_type not in ("uniaxial", "triaxial"):
+        if self.test_type == "uniaxial":
+            return ("EpsilonZZ", "SigmaZZ", "EpsilonXX" if self.strain_type == "Lateral" else "EpsilonV")
+        if self.test_type == "triaxial":
+            return ("EpsilonZZ", "SigmaXX" if self.loading == "Lateral" else "SigmaZZ", "EpsilonV")
+        return ("EpsilonZZ", "SigmaZZ", "EpsilonXX")  # spec 021: not verified
+
+    @property
+    def drawable(self) -> bool:
+        return self.test_type in ("uniaxial", "triaxial")
+
+    def invariants(self) -> PathInvariants | None:
+        """Axial/radial stresses and strains per step, or None if not drawable.
+
+        Uniaxial: radial stress zero; radial strain is EpsilonXX, or
+        (EpsilonV - EpsilonZZ)/2 when the table gives volumetric strain.
+        Triaxial (provisional interpretation, spec 021): the stress column
+        varies while the other principal stress keeps its initial effective
+        value: Axial loading -> radial = initial effective lateral stress;
+        Lateral loading -> axial = initial effective vertical stress
+        sigma'h0 / K0 (K0 = sigma'h / sigma'v). Radial strain from EpsilonV.
+        Biaxial, simple shear and general tests: not drawable yet (spec 021).
+        """
+
+        if not self.steps or not self.drawable:
             return None
-        axial = np.array([s.sigma_zz for s in self.steps], dtype=float)
-        lateral_value = 0.0 if self.test_type == "uniaxial" else self.lateral_stress
-        lateral = np.full_like(axial, lateral_value)
-        return np.minimum(axial, lateral), np.maximum(axial, lateral)
+        eps_a = np.array([s.eps_zz for s in self.steps], dtype=float)
+        stress = np.array([s.stress for s in self.steps], dtype=float)
+        third = np.array([s.strain for s in self.steps], dtype=float)
+        if self.test_type == "uniaxial":
+            sigma_a, sigma_r = stress, np.zeros_like(stress)
+            eps_r = third if self.strain_type == "Lateral" else (third - eps_a) / 2.0
+        else:
+            if self.loading == "Axial":
+                sigma_a, sigma_r = stress, np.full_like(stress, self.lateral_stress)
+            else:
+                if self.k0 <= 0.0:
+                    return None
+                sigma_a, sigma_r = np.full_like(stress, self.lateral_stress / self.k0), stress
+            eps_r = (third - eps_a) / 2.0
+        return PathInvariants(sigma_a, sigma_r, eps_a, eps_r)
+
+    def principal_path(self) -> tuple[np.ndarray, np.ndarray] | None:
+        """(sigma3, sigma1) in kPa along the path, or None if not drawable."""
+
+        inv = self.invariants()
+        return None if inv is None else (inv.sigma3, inv.sigma1)
+
+    def shear_path(self) -> tuple[np.ndarray, np.ndarray] | None:
+        """Stress points (s, t) on the tau-sigma plane: tops of the Mohr circles, kPa."""
+
+        inv = self.invariants()
+        return None if inv is None else (inv.s, inv.t)
 
     def to_dict(self) -> dict:
         return {
@@ -185,8 +297,8 @@ class StressPath:
             color=str(data.get("color", DEFAULT_COLOR)) or DEFAULT_COLOR,
             test_type=str(data.get("test_type", "uniaxial")),
             seepage=str(data.get("seepage", "Drained")),
-            loading=str(data.get("loading", "Compression")),
-            lateral_stress=float(data.get("lateral_stress", 0.0)),
+            loading=str(data.get("loading", "Lateral")),
+            lateral_stress=float(data.get("lateral_stress", 100.0)),
             k0=float(data.get("k0", 1.0)),
             strain_type=str(data.get("strain_type", "Lateral")),
             steps=[PathStep(*(float(v) for v in list(s)[:3])) for s in data.get("steps", [])],

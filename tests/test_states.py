@@ -56,16 +56,55 @@ def test_stress_path_principal_mapping() -> None:
     uniaxial = st.StressPath(test_type="uniaxial", steps=steps)
     sig3, sig1 = uniaxial.principal_path()
     assert list(sig3) == [0.0, 0.0, 0.0] and list(sig1) == [0.0, 500.0, 900.0]
-    triaxial = st.StressPath(test_type="triaxial", lateral_stress=100.0, steps=steps[1:])
-    sig3, sig1 = triaxial.principal_path()
+    # triaxial, Axial loading: radial stress stays at the initial lateral stress
+    axial = st.StressPath(test_type="triaxial", loading="Axial", lateral_stress=100.0, steps=steps[1:])
+    sig3, sig1 = axial.principal_path()
     assert list(sig3) == [100.0, 100.0] and list(sig1) == [500.0, 900.0]
-    # extension: axial below lateral -> sigma1 is the lateral stress
-    ext = st.StressPath(test_type="triaxial", loading="Extension", lateral_stress=300.0, steps=[st.PathStep(0, 300, 0), st.PathStep(-0.01, 120, 0.004)])
-    sig3, sig1 = ext.principal_path()
-    assert list(sig3) == [300.0, 120.0] and list(sig1) == [300.0, 300.0]
-    # not drawable from (EpsilonZZ, SigmaZZ, EpsilonXX) alone, or empty
+    # triaxial, Lateral loading: SigmaXX varies, axial = sigma_h0 / K0
+    lateral = st.StressPath(
+        test_type="triaxial", loading="Lateral", lateral_stress=100.0, k0=0.5,
+        steps=[st.PathStep(0.0, 100.0, 0.0), st.PathStep(-0.01, 50.0, 0.002)],
+    )
+    sig3, sig1 = lateral.principal_path()
+    assert list(sig1) == [200.0, 200.0] and list(sig3) == [100.0, 50.0]
+    # not drawable (layout not verified) or empty
     assert st.StressPath(test_type="biaxial", steps=steps).principal_path() is None
     assert st.StressPath(test_type="triaxial").principal_path() is None
+
+
+def test_path_invariants_and_shear_points() -> None:
+    # uniaxial with lateral strain: ev = ea + 2 er, eq = 2 (ea - er)/3
+    path = st.StressPath(
+        test_type="uniaxial", strain_type="Lateral",
+        steps=[st.PathStep(0.0, 0.0, 0.0), st.PathStep(0.03, 600.0, -0.01)],
+    )
+    inv = path.invariants()
+    assert np.allclose(inv.eps_v, [0.0, 0.01]) and np.allclose(inv.eps_q, [0.0, 2.0 * 0.04 / 3.0])
+    assert np.allclose(inv.p, [0.0, 200.0]) and np.allclose(inv.q, [0.0, 600.0])
+    # a volumetric strain column gives the same radial strain back
+    vol = st.StressPath(
+        test_type="uniaxial", strain_type="Volumetric",
+        steps=[st.PathStep(0.0, 0.0, 0.0), st.PathStep(0.03, 600.0, 0.01)],
+    )
+    assert np.allclose(vol.invariants().eps_r, [0.0, -0.01])
+    # stress points on tau-sigma: Mohr circle tops ((s1+s3)/2, (s1-s3)/2)
+    s, t = path.shear_path()
+    assert np.allclose(s, [0.0, 300.0]) and np.allclose(t, [0.0, 300.0])
+    # axial stress below lateral: q negative, t (radius) positive
+    ext = st.StressPath(
+        test_type="triaxial", loading="Axial", lateral_stress=300.0,
+        steps=[st.PathStep(0.0, 300.0, 0.0), st.PathStep(-0.01, 120.0, 0.0)],
+    )
+    inv = ext.invariants()
+    assert np.allclose(inv.q, [0.0, -180.0]) and np.allclose(inv.t, [0.0, 90.0])
+
+
+def test_path_columns_follow_rsdata_dialog() -> None:
+    assert st.StressPath(test_type="uniaxial").columns() == ("EpsilonZZ", "SigmaZZ", "EpsilonXX")
+    assert st.StressPath(test_type="uniaxial", strain_type="Volumetric").columns() == ("EpsilonZZ", "SigmaZZ", "EpsilonV")
+    # official RSData help figure: triaxial, Loading Direction Lateral
+    assert st.StressPath(test_type="triaxial").columns() == ("EpsilonZZ", "SigmaXX", "EpsilonV")
+    assert st.StressPath(test_type="triaxial", loading="Axial").columns() == ("EpsilonZZ", "SigmaZZ", "EpsilonV")
 
 
 def test_defaults_and_validation() -> None:
@@ -74,7 +113,11 @@ def test_defaults_and_validation() -> None:
     assert state.columns == ("Sigma3", "Sigma1")
     assert st.FailureState(test_type="direct_shear").columns == ("Normal Stress", "Shear Stress")
     path = st.StressPath(test_type="bogus", seepage="x", loading="y", strain_type="z")
-    assert (path.test_type, path.seepage, path.loading, path.strain_type) == ("uniaxial", "Drained", "Compression", "Lateral")
+    assert (path.test_type, path.seepage, path.loading, path.strain_type) == ("uniaxial", "Drained", "Lateral", "Lateral")
+    # RSData defaults (official help figure): lateral stress 100 kPa, K0 = 1
+    assert (st.StressPath().lateral_stress, st.StressPath().k0) == (100.0, 1.0)
+    # files of the first 012 version (Compression/Extension) fall back to Lateral
+    assert st.StressPath.from_dict({"loading": "Compression"}).loading == "Lateral"
     assert st.next_color([]) == "#800000" and st.next_color(["#800000"]) == st.PALETTE[0]
     assert st.unique_name("State 1", ["State 1"]) == "State 1 2"
 
@@ -90,7 +133,7 @@ def test_templates_and_project_round_trip() -> None:
     rock.failure_states[0].residual = [st.TestPoint(5000.0, 40000.0)]
     rock.failure_states.append(st.FailureState("Shear box", "#123456", "s", "direct_shear", [st.TestPoint(100.0, 80.0)], visible=False))
     soil.stress_paths[0] = st.StressPath(
-        "CD 100", "#00aa00", "triaxial", "Undrained", "Extension", 100.0, 0.5, "Lateral",
+        "CD 100", "#00aa00", "triaxial", "Undrained", "Axial", 100.0, 0.5, "Lateral",
         [st.PathStep(0.0, 100.0, 0.0), st.PathStep(0.01, 250.0, -0.004)],
     )
     # duplicate copies states independently
@@ -229,22 +272,28 @@ def test_stress_paths_dialog_and_plot() -> None:
         try:
             assert dlg._name.text() == "Path 1" and dlg._test_type.currentData() == "uniaxial"
             assert not dlg._lateral.isEnabled()  # triaxial-only settings
+            assert dlg._strain_type.isEnabled()  # uniaxial-only setting
+            assert dlg._steps.table.horizontalHeaderItem(2).text() == "EpsilonXX"
             dlg._test_type.setCurrentIndex(dlg._test_type.findData("triaxial"))
-            assert dlg._lateral.isEnabled()
+            assert dlg._lateral.isEnabled() and not dlg._strain_type.isEnabled()
+            assert dlg._lateral.value() == 100.0  # RSData default
+            assert dlg._steps.table.horizontalHeaderItem(1).text() == "SigmaXX (kPa)"
+            dlg._loading_dir.setCurrentIndex(dlg._loading_dir.findData("Axial"))
+            assert dlg._steps.table.horizontalHeaderItem(1).text() == "SigmaZZ (kPa)"
             dlg._lateral.setValue(100.0)
             dlg._k0.setValue(0.5)
             dlg._seepage.setCurrentIndex(dlg._seepage.findData("Undrained"))
             dlg._steps.paste_text("EpsilonZZ\tSigmaZZ\tEpsilonXX\n0\t100\t0\n0.01\t250\t-0.004\n0.02\t320\t-0.007\n")
             dlg.add_item()
             dlg._test_type.setCurrentIndex(dlg._test_type.findData("general"))
-            assert "not drawn" in dlg._note.text()
+            assert "spec 021" in dlg._note.text()
             dlg._steps.paste_text("0\t50\t0\n")
             dlg.accept()
             items = dlg.items
         finally:
             dlg.deleteLater()
         first = items[0]
-        assert (first.test_type, first.seepage, first.lateral_stress, first.k0) == ("triaxial", "Undrained", 100.0, 0.5)
+        assert (first.test_type, first.seepage, first.loading, first.lateral_stress, first.k0) == ("triaxial", "Undrained", "Axial", 100.0, 0.5)
         assert first.steps[1] == st.PathStep(0.01, 250.0, -0.004)
         w.set_stress_paths(items)
         app.processEvents()
@@ -253,7 +302,28 @@ def test_stress_paths_dialog_and_plot() -> None:
         assert len(layers) == 1 and layers[0].get_linestyle() == "-"
         x, y = layers[0].get_data()
         assert np.allclose(x, [0.1, 0.1, 0.1]) and np.allclose(y, [0.1, 0.25, 0.32])
-        assert w._shear._layers == []
+        # stress points on the tau-sigma plot: ((s1+s3)/2, (s1-s3)/2)
+        s_layers = w._shear._layers
+        assert len(s_layers) == 1
+        assert np.allclose(s_layers[0].get_xdata(), [0.1, 0.175, 0.21])
+        assert np.allclose(s_layers[0].get_ydata(), [0.0, 0.075, 0.11])
+        # Stress Path Graphs tab: four graphs with one series each
+        graphs = w._path_canvases
+        assert w._graph_tabs.tabText(1) == "Stress Path Graphs"
+        assert all(len(c._lines) == 1 for c in graphs.values())
+        x, y = graphs["axial"]._lines[0].get_data()
+        assert np.allclose(x, [0.0, 0.01, 0.02]) and np.allclose(y, [0.1, 0.25, 0.32])
+        x, y = graphs["pq"]._lines[0].get_data()
+        assert np.allclose(x, [0.1, 0.15, 0.52 / 3.0]) and np.allclose(y, [0.0, 0.15, 0.22])
+        ev = graphs["volumetric"]._lines[0].get_ydata()
+        assert np.allclose(ev, [0.0, -0.004, -0.007])  # EpsilonV column as given
+        assert graphs["pq"].axes.get_xlabel() == "p (kPa)"
+        assert graphs["volumetric"].axes.get_ylabel() == "Volumetric Strain"
+        with tempfile.TemporaryDirectory() as tmp:
+            csv_path = Path(tmp) / "dev.csv"
+            w.export_path_graph(graphs["deviatoric"], str(csv_path))
+            header = csv_path.read_text(encoding="utf-8").splitlines()[0]
+            assert header == "Soil: Path 1 Deviatoric Strain,Soil: Path 1 q (kPa)"
         # exported with the plot (CSV columns per layer)
         series = w._principal.layer_series()
         assert series[0][0] == "Soil: Path 1 sigma3" and series[0][1] == "Soil: Path 1 sigma1"
@@ -261,6 +331,7 @@ def test_stress_paths_dialog_and_plot() -> None:
         w._delete_child("path", 0)
         assert [p.name for p in w._current_material().stress_paths] == ["Path 2"]
         assert w._principal._layers == []
+        assert all(c._lines == [] for c in graphs.values())
     finally:
         w.deleteLater()
 

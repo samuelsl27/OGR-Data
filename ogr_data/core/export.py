@@ -29,8 +29,9 @@ def write_series_csv(path: str | Path, columns: list[tuple[str, str, np.ndarray,
         y = np.asarray(y_values, dtype=float).ravel()
         if x.shape != y.shape:
             raise ValueError(f"series {x_label!r}/{y_label!r}: x and y lengths differ")
-        headers.append(f"{x_label} ({unit})")
-        headers.append(f"{y_label} ({unit})")
+        # unit "" = labels already carry their units (mixed stress/strain axes)
+        headers.append(f"{x_label} ({unit})" if unit else x_label)
+        headers.append(f"{y_label} ({unit})" if unit else y_label)
         table.append((x, y))
     rows = max(pair[0].shape[0] for pair in table)
     with Path(path).open("w", newline="", encoding="utf-8") as handle:

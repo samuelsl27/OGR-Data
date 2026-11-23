@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
+    QGridLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -26,6 +27,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSplitter,
+    QTabWidget,
     QToolButton,
     QTreeWidget,
     QTreeWidgetItem,
@@ -42,7 +44,7 @@ from ..core import units
 from ..core.graph_options import PlotOptions
 from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
 from ..core.models import CRITERIA, Criterion, defaults
-from .plots import EnvelopeCanvas
+from .plots import EnvelopeCanvas, PathCanvas
 from .themes import THEMES, apply_theme
 
 
@@ -208,9 +210,27 @@ class MainWindow(QMainWindow):
         plots.addWidget(self._principal)
         plots.addWidget(self._shear)
 
+        # spec 012: Stress Path Graphs tab (RSData's four default graphs; the
+        # second shows volumetric strain: path tables hold no pore pressure)
+        self._path_canvases = {
+            "axial": PathCanvas("Axial Stress vs Axial Strain", "Axial Strain", "Axial Stress", False, True, self._theme),
+            "volumetric": PathCanvas("Volumetric Strain vs Axial Strain", "Axial Strain", "Volumetric Strain", False, False, self._theme),
+            "deviatoric": PathCanvas("q vs Deviatoric Strain", "Deviatoric Strain", "q", False, True, self._theme),
+            "pq": PathCanvas("q vs p", "p", "q", True, True, self._theme),
+        }
+        path_page = QWidget()
+        path_grid = QGridLayout(path_page)
+        for index, canvas in enumerate(self._path_canvases.values()):
+            canvas.menu_handler = self._on_path_canvas_menu
+            canvas.set_display(self._scale(), self._stress_unit)
+            path_grid.addWidget(canvas, index // 2, index % 2)
+        self._graph_tabs = QTabWidget()
+        self._graph_tabs.addTab(plots, "Strength Graphs")
+        self._graph_tabs.addTab(path_page, "Stress Path Graphs")
+
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(scroll)
-        splitter.addWidget(plots)
+        splitter.addWidget(self._graph_tabs)
         splitter.setStretchFactor(1, 1)
         # the sidebar opens at its full width (no clipped buttons)
         splitter.setSizes([380, 770])
@@ -679,6 +699,21 @@ class MainWindow(QMainWindow):
                 if curve is None:
                     continue
                 label = f"{prefix}{path.name}"
+                # stress points (Mohr circle tops) on the tau-sigma plane
+                s_t = path.shear_path()
+                shear.append(
+                    {
+                        "x": s_t[0] / 1000.0,
+                        "y": s_t[1] / 1000.0,
+                        "color": path.color,
+                        "marker": ".",
+                        "linestyle": "-",
+                        "linewidth": 1.4,
+                        "markersize": 5.0,
+                        "legend": label,
+                        "export": (f"{label} s", f"{label} t"),
+                    }
+                )
                 principal.append(
                     {
                         "x": curve[0] / 1000.0,
@@ -694,6 +729,61 @@ class MainWindow(QMainWindow):
                 )
         self._principal.set_layers(principal)
         self._shear.set_layers(shear)
+        self._draw_path_graphs()
+
+    def _draw_path_graphs(self) -> None:
+        """The four Stress Path Graphs for the visible paths of visible materials."""
+
+        series = {key: [] for key in self._path_canvases}
+        multi = len(self._project.materials) > 1
+        for material in self._project.materials:
+            if not material.visible:
+                continue
+            for path in material.stress_paths:
+                inv = path.invariants() if path.visible else None
+                if inv is None:
+                    continue
+                label = f"{material.name}: {path.name}" if multi else path.name
+                kpa = 1000.0  # kPa -> internal MPa
+                series["axial"].append((label, inv.eps_a, inv.sigma_a / kpa, path.color))
+                series["volumetric"].append((label, inv.eps_a, inv.eps_v, path.color))
+                series["deviatoric"].append((label, inv.eps_q, inv.q / kpa, path.color))
+                series["pq"].append((label, inv.p / kpa, inv.q / kpa, path.color))
+        for key, canvas in self._path_canvases.items():
+            canvas.set_series(series[key])
+
+    def _on_path_canvas_menu(self, canvas, kind: str) -> None:
+        from PySide6.QtWidgets import QApplication, QFileDialog
+
+        from ..core import export as series_export
+
+        if kind == "copy":
+            QApplication.clipboard().setPixmap(canvas.grab())
+        elif kind == "save":
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Save graph as image", "", "PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)"
+            )
+            if path:
+                canvas.save_image(path)
+        elif kind == "export":
+            path, _ = QFileDialog.getSaveFileName(self, "Export graph to CSV", "", "CSV (*.csv)")
+            if not path:
+                return
+            if not path.endswith(".csv"):
+                path += ".csv"
+            self.export_path_graph(canvas, path)
+
+    def export_path_graph(self, canvas, path: str) -> None:
+        """CSV of a Stress Path Graph: two columns per path, stresses in the display unit."""
+
+        from ..core import export as series_export
+
+        x_name, y_name = canvas.axes.get_xlabel(), canvas.axes.get_ylabel()
+        kx = canvas.display_scale if canvas._stress_axes[0] else 1.0
+        ky = canvas.display_scale if canvas._stress_axes[1] else 1.0
+        columns = [(f"{label} {x_name}", f"{label} {y_name}", x * kx, y * ky) for label, x, y in canvas.series_data()]
+        if columns:
+            series_export.write_series_csv(path, columns, unit="")
 
     def _draw_other_materials(self) -> None:
         """The other visible materials, in their colors, on both plots."""
@@ -718,6 +808,8 @@ class MainWindow(QMainWindow):
         self._settings.setValue("theme", name)
         apply_theme(QApplication.instance(), name)
         for canvas in (self._principal, self._shear):
+            canvas.apply_theme(name)
+        for canvas in self._path_canvases.values():
             canvas.apply_theme(name)
         self._populate_tree()  # automatic-color swatches follow the theme
         self.refresh()
@@ -749,6 +841,8 @@ class MainWindow(QMainWindow):
         self._shear.set_axes_labels(f"normal stress ({u})", f"shear stress ({u})")
         for canvas in (self._principal, self._shear):
             canvas.set_display_scale(self._scale())
+        for canvas in getattr(self, "_path_canvases", {}).values():
+            canvas.set_display(self._scale(), u)
 
     def _set_stress_unit(self, unit: str) -> None:
         """Switch the display unit, rescaling widgets in place (spec 017).
@@ -1245,7 +1339,7 @@ class MainWindow(QMainWindow):
             return None
         if key in ("generalized_hoek_brown", "hoek_brown"):
             sigci_mpa, mb, s, a = self._hb_terms(key, params, sig3max)
-            # Hoek (2002) closed form over [0, sig3max], anchored on sigcm;
+            # Hoek (2002) closed form (eqs. 12-13) over sigt < sigma3 < sig3max;
             # only sigci and sig3max of inp are used by the formulation.
             inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=sig3max)
             mc = equivalent_mc(inp, mb, s, a)

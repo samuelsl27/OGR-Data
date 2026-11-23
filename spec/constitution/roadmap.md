@@ -5,8 +5,9 @@ ORMAS · los 10 criterios de RSData · pick dialogs Hoek/GSI · clasificador
 USCS · contrato de portapapeles · ajuste a datos de ensayo · proyectos
 e importación `.roc`. Después: 020 (línea de diseño), 008, 009, 017,
 016, 011 (proyectos multi-material, formato `.ogrdata` v2) y 012
-(estados de fallo y rutas de tensión; la pestaña Stress Path Graphs
-queda pendiente de fuente para εv/εq).
+(estados de fallo y rutas de tensión, con la pestaña Stress Path
+Graphs). Nueva **021** (estados y rutas fieles a RSData) pendiente de la
+verificación en la interfaz de RSData.
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad
