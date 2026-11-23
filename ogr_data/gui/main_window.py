@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import math
 
 import numpy as np
@@ -39,6 +40,7 @@ from PySide6.QtWidgets import (
 from ..core import application
 from ..core import criteria_envelopes as ce
 from ..core import project as projects
+from ..core import report
 from ..core import samplers
 from ..core import states as st
 from ..core import units
@@ -77,6 +79,10 @@ class MainWindow(QMainWindow):
         self._current = 0
         self._loading = True
         self._tree_updating = False
+        # spec 015: graph views added to the report (session only) and the
+        # section visibility chosen in the Report Generator
+        self.report_views = report.ReportViews()
+        self.report_visibility = report.default_visibility()
         from PySide6.QtWidgets import QApplication
 
         apply_theme(QApplication.instance(), self._theme)
@@ -297,6 +303,11 @@ class MainWindow(QMainWindow):
         analysis_menu.addAction(self._overlay_mogi_act)
         analysis_menu.addSeparator()
         analysis_menu.addAction("Material Database…", self._open_database)  # spec 010 (RSData: Open RocProp)
+        analysis_menu.addSeparator()
+        # spec 015 (RSData names)
+        analysis_menu.addAction("Report Generator…", self._open_report_generator)
+        analysis_menu.addAction("Add View To Report", self.add_view_to_report)
+        analysis_menu.addAction("Manage Report View…", self._manage_report_views)
         self._stress_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._mc_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._overlay_mc_act.toggled.connect(self.refresh)
@@ -1013,6 +1024,64 @@ class MainWindow(QMainWindow):
             return
         series_export.write_series_csv(path, columns, unit=self._stress_unit)
 
+    # ---------------------------------------------------------- spec 015: report
+
+    def report_project(self) -> projects.Project:
+        """The project as it stands, for the report."""
+
+        return self._project_for_save()
+
+    def _canvas_png(self, canvas) -> bytes:
+        """PNG of a canvas, drawn with the light theme (the report is for print)."""
+
+        buffer = io.BytesIO()
+        themed = self._theme != "light"
+        if themed:
+            canvas.apply_theme("light")
+        try:
+            canvas.figure.savefig(buffer, format="png", dpi=110, facecolor="white")
+        finally:
+            if themed:
+                canvas.apply_theme(self._theme)
+        return buffer.getvalue()
+
+    def add_view_to_report(self) -> report.ReportView:
+        """Add View To Report: the active graph tab of the selected material."""
+
+        self._store_current()
+        material = self._current_material()
+        if self._graph_tabs.currentIndex() == 0:
+            kind = "Strength Graphs"
+            canvases = [(c.axes.get_title(), c) for c in (self._principal, self._shear)]
+        else:
+            kind = "Stress Path Graphs"
+            canvases = [(c.title, c) for c in self._path_canvases.values()]
+        sample = self.statusBar().currentMessage() if self._sampler_mode else ""
+        view = report.ReportView(
+            title=f"{material.name} - {kind}",
+            material=material.name,
+            criterion=CRITERIA[material.criterion].label,
+            stress_unit=self._stress_unit,
+            parameters=report.parameter_rows(material, self._stress_unit),
+            results=report.computed_rows(material, self._stress_unit),
+            images=[(caption, self._canvas_png(canvas)) for caption, canvas in canvases],
+            sample=sample,
+        )
+        self.report_views.add(view)
+        n = len(self.report_views)
+        self.statusBar().showMessage(f"View added to the report ({n} view{'s' if n != 1 else ''})", 5000)
+        return view
+
+    def _manage_report_views(self) -> None:
+        from .report_dialog import ManageReportViewsDialog
+
+        ManageReportViewsDialog(self.report_views, self).exec()
+
+    def _open_report_generator(self) -> None:
+        from .report_dialog import ReportGeneratorDialog
+
+        ReportGeneratorDialog(self).exec()
+
     def _about(self) -> None:
         from .. import __version__
 
@@ -1194,6 +1263,7 @@ class MainWindow(QMainWindow):
 
         self._load_settings_into_window({"stress_unit": loaded.stress_unit})
         self._project = loaded
+        self.report_views.clear()  # views belong to the project they were taken from
         self._title_edit.setText(loaded.title)
         for name, canvas in (("principal", self._principal), ("shear", self._shear)):
             raw = loaded.graph_options.get(name)
