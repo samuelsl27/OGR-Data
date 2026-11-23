@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QListWidget,
     QListWidgetItem,
+    QPushButton,
     QVBoxLayout,
 )
 
@@ -118,6 +119,15 @@ class CalibrationDialog(QDialog):
         self.output.setWordWrap(True)
         self.output.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         layout.addWidget(self.output)
+        # spec 025a (B4): with nothing to calibrate against, say so and offer
+        # the way out instead of an error the user did not cause
+        self.wants_failure_states = False
+        self.define_states_button = QPushButton(tr("Define Failure States…"))
+        self.define_states_button.clicked.connect(self._ask_for_failure_states)
+        self.define_states_button.setVisible(
+            not any(cal.has_points(s) for m in project.materials for s in m.failure_states)
+        )
+        layout.addWidget(self.define_states_button, alignment=Qt.AlignmentFlag.AlignLeft)
         self._buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         self._buttons.accepted.connect(self.accept)
         self._buttons.rejected.connect(self.reject)
@@ -164,14 +174,34 @@ class CalibrationDialog(QDialog):
         self._states_form.setRowVisible(self.sigci, mass)
         self._states_form.setRowVisible(self.disturbance, mass)
         self._states_form.setRowVisible(self.phi_b, strength == "barton_bandis")
+        selected = self.selected_states()
+        if not any(cal.has_points(s) for s in selected):
+            # a hint, not an error: nothing has been tried yet
+            self.result = None
+            if self.define_states_button.isVisibleTo(self):
+                self.output.setText(tr(
+                    "There are no failure states with test points yet. Calibration fits a model to "
+                    "them: define them in Failure States > Define Failure States…"
+                ))
+            else:
+                self.output.setText(tr("Select at least one failure state with test points."))
+            self._buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            return
         try:
-            self.result = cal.calibrate(self.selected_states(), self.settings())
+            self.result = cal.calibrate(selected, self.settings())
         except ValueError as exc:
             self.result = None
             self.output.setText(f'<span style="color:#c0392b">{exc}</span>')  # i18n: ignore -- core message
         else:
             self.output.setText(localize(self._describe(self.result)))
         self._buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(self.result is not None)
+
+    def _ask_for_failure_states(self) -> None:
+        """Close and let the window open Define Failure States (spec 025a)."""
+
+        self.wants_failure_states = True
+        self.result = None
+        self.reject()
 
     def _describe(self, r: cal.CalibrationResult) -> str:
         scale = units.stress_factor(self._unit)  # MPa -> display

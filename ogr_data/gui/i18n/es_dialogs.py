@@ -95,6 +95,14 @@ ES: dict[str, str] = {
     "{0} direct shear points · residuals (sum of squares, vertical, {1}) = {2}": (
         "{0} puntos de corte directo · residuos (suma de cuadrados, vertical, {1}) = {2}"
     ),
+    "There are no failure states with test points yet. Calibration fits a model to "
+    "them: define them in Failure States > Define Failure States…": (
+        "Aún no hay estados de rotura con puntos de ensayo. La calibración ajusta un modelo "
+        "a ellos: defínalos en Estados de rotura > Definir estados de rotura…"
+    ),
+    "Select at least one failure state with test points.": (
+        "Seleccione al menos un estado de rotura con puntos de ensayo."
+    ),
     # ------------------------------------------------ fit lab data
     "Fit strength criterion to lab data": "Ajustar el criterio de rotura a datos de laboratorio",
     "Paste from clipboard": "Pegar del portapapeles",

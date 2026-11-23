@@ -78,17 +78,26 @@ class CalibrationResult:
 # ------------------------------------------------------------- data
 
 
+def _state_points(state: FailureState) -> tuple[str, np.ndarray, np.ndarray]:
+    """(data kind, x, y) in kPa of the non-excluded points of one state."""
+
+    if state.test_type == "direct_shear":
+        return (fitting.DIRECT, *state.shear_points())
+    return (fitting.TRIAXIAL, *state.principal_points())
+
+
+def has_points(state: FailureState) -> bool:
+    """True if the state has a non-excluded point to calibrate against."""
+
+    return len(_state_points(state)[1]) > 0
+
+
 def collect_points(states: Iterable[FailureState]) -> tuple[str, np.ndarray, np.ndarray]:
     """(data kind, x, y) in MPa from the non-excluded points of the states."""
 
     kinds, xs, ys = set(), [], []
     for state in states:
-        if state.test_type == "direct_shear":
-            x, y = state.shear_points()
-            kind = fitting.DIRECT
-        else:
-            x, y = state.principal_points()
-            kind = fitting.TRIAXIAL
+        kind, x, y = _state_points(state)
         if len(x):
             kinds.add(kind)
             xs.append(x / 1000.0)

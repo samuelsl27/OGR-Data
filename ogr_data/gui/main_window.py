@@ -832,6 +832,8 @@ class MainWindow(QMainWindow):
         dialog = CalibrationDialog(self, self._project, self._current, self._stress_unit)
         if dialog.exec() and dialog.result is not None:
             self.add_calibrated_material(dialog.name.text(), dialog.result)
+        elif dialog.wants_failure_states:  # spec 025a (B4)
+            self._define_failure_states()
 
     def add_calibrated_material(self, name: str, result) -> int:
         """New material from a calibration (the source material is not changed)."""

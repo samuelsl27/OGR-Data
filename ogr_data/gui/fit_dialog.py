@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
 
 from ..core import fitting
 from ..core.fitting import DIRECT, LEVENBERG_MARQUARDT, LINEAR, SIMPLEX, TRIAXIAL
+from ..core.models import CRITERIA
 from .i18n import localize, parse_number, tr
 
 
@@ -51,7 +52,8 @@ class FitDialog(QDialog):
 
         self._criterion = QComboBox()
         for key in fitting.COMPATIBILITY:
-            self._criterion.addItem(key, key)
+            # spec 025a (B1): the name, never the internal key (kept as data)
+            self._criterion.addItem(tr(CRITERIA[key].label), key)  # i18n: registry
         self._data_kind = QComboBox()
         self._method = QComboBox()
         self._fixed = QFormLayout()

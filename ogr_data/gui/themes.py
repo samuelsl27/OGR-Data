@@ -294,7 +294,63 @@ MPL_COLORS: dict[str, dict[str, str]] = {
 }
 
 
+#: The palette the application had before any theme (restored by "light").
+_ORIGINAL_PALETTE = None
+
+
+def _dark_palette():
+    """The dark theme's palette, from the colours its sheet already uses.
+
+    Adapted from OGR-Slip2D ``ogr_gui/themes`` (v0.1.316, D301): same author
+    and license.
+    """
+
+    from PySide6.QtGui import QColor, QPalette
+
+    palette = QPalette()
+    roles = {
+        QPalette.ColorRole.Window: "#2b2b2b",
+        QPalette.ColorRole.WindowText: "#e0e0e0",
+        QPalette.ColorRole.Base: "#353535",
+        QPalette.ColorRole.AlternateBase: "#3d3d3d",
+        QPalette.ColorRole.Text: "#e0e0e0",
+        QPalette.ColorRole.Button: "#3f3f3f",
+        QPalette.ColorRole.ButtonText: "#e0e0e0",
+        QPalette.ColorRole.BrightText: "#ffffff",
+        QPalette.ColorRole.Highlight: "#4a5a75",
+        QPalette.ColorRole.HighlightedText: "#ffffff",
+        QPalette.ColorRole.ToolTipBase: "#1e1e1e",
+        QPalette.ColorRole.ToolTipText: "#e0e0e0",
+        QPalette.ColorRole.PlaceholderText: "#8a8a8a",
+        QPalette.ColorRole.Link: "#8ab4f8",
+        QPalette.ColorRole.Light: "#505050",
+        QPalette.ColorRole.Midlight: "#454545",
+        QPalette.ColorRole.Mid: "#3a3a3a",
+        QPalette.ColorRole.Dark: "#202020",
+        QPalette.ColorRole.Shadow: "#101010",
+    }
+    for role, color in roles.items():
+        palette.setColor(role, QColor(color))
+    for role in (QPalette.ColorRole.WindowText, QPalette.ColorRole.Text, QPalette.ColorRole.ButtonText):
+        palette.setColor(QPalette.ColorGroup.Disabled, role, QColor("#7a7a7a"))
+    return palette
+
+
 def apply_theme(app: QApplication, name: str) -> None:
+    """Apply a named theme: the style sheet and, for dark, a dark palette.
+
+    The sheet colours only the widgets it names; a plain panel (the sidebar
+    inside its scroll area, spec 025a B2) keeps the palette's window colour,
+    which stayed light under the dark sheet. The light theme puts back the
+    palette the application had before any theme.
+    """
+
+    from PySide6.QtGui import QPalette
+
+    global _ORIGINAL_PALETTE
+    if _ORIGINAL_PALETTE is None:
+        _ORIGINAL_PALETTE = QPalette(app.palette())
+    app.setPalette(_dark_palette() if name == "dark" else QPalette(_ORIGINAL_PALETTE))
     app.setStyleSheet(THEMES[name])
 
 
