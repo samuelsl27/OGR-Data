@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
 from ..core import application
 from ..core import criteria_envelopes as ce
 from ..core import samplers
+from ..core import units
 from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
 from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas
@@ -46,6 +47,10 @@ class MainWindow(QMainWindow):
         self._theme = str(self._settings.value("theme", "light"))
         if self._theme not in THEMES:
             self._theme = "light"
+        # spec 017: display stress unit (registry and clipboard stay in kPa)
+        self._stress_unit = str(self._settings.value("stress_unit", units.DEFAULT_STRESS_UNIT))
+        if self._stress_unit not in units.STRESS_FACTORS:
+            self._stress_unit = units.DEFAULT_STRESS_UNIT
         # Spec 008: sampler / overlay state (created before the menus so the
         # toggled signals fired by setChecked find it in place).
         self._sampler_mode: str | None = None
@@ -66,11 +71,11 @@ class MainWindow(QMainWindow):
         self._criterion_combo.currentIndexChanged.connect(self.refresh)
 
         self._sig3max = QDoubleSpinBox()
-        self._sig3max.setRange(0.01, 1000000.0)
+        self._sig3max.setRange(0.00001, 1000000000.0)
         self._sig3max.setDecimals(4)
-        self._sig3max.setValue(7.5)
-        self._sig3max.setSingleStep(0.5)
-        self._sig3max.setSuffix(" MPa")
+        self._sig3max.setValue(7.5 * self._scale())
+        self._sig3max.setSingleStep(0.5 * self._scale())
+        self._sig3max.setSuffix(f" {self._stress_unit}")
         self._sig3max.valueChanged.connect(self.refresh)
 
         # spec 009: sigma3max by application (tunnel / slope)
@@ -119,6 +124,19 @@ class MainWindow(QMainWindow):
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText("Material name")
         sidebar.addWidget(self._name_edit)
+        # spec 017: display stress unit and project title
+        unit_row = QHBoxLayout()
+        unit_row.addWidget(QLabel("Stress unit"))
+        self._unit_combo = QComboBox()
+        for unit_name in units.STRESS_FACTORS:
+            self._unit_combo.addItem(unit_name)
+        self._unit_combo.setCurrentText(self._stress_unit)
+        unit_row.addWidget(self._unit_combo)
+        sidebar.addLayout(unit_row)
+        self._title_edit = QLineEdit()
+        self._title_edit.setPlaceholderText("Project title")
+        self._title_edit.textChanged.connect(self._update_window_title)
+        sidebar.addWidget(self._title_edit)
         copy_row = QHBoxLayout()
         copy_material = QPushButton("Copy material")
         copy_material.clicked.connect(self._copy_material)
@@ -159,8 +177,8 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setMaximumWidth(380)
 
-        self._principal = EnvelopeCanvas("Principal Stresses", "sigma3 (MPa)", "sigma1 (MPa)", self._theme, space="principal")
-        self._shear = EnvelopeCanvas("Shear - Normal Stresses", "normal stress (MPa)", "shear stress (MPa)", self._theme, space="shear")
+        self._principal = EnvelopeCanvas("Principal Stresses", f"sigma3 ({self._stress_unit})", f"sigma1 ({self._stress_unit})", self._theme, space="principal")
+        self._shear = EnvelopeCanvas("Shear - Normal Stresses", f"normal stress ({self._stress_unit})", f"shear stress ({self._stress_unit})", self._theme, space="shear")
         for canvas in (self._principal, self._shear):
             canvas.sampler_handler = self._on_plot_event
 
@@ -177,6 +195,7 @@ class MainWindow(QMainWindow):
 
         self._rebuild_form()
         self._overlay_mc_act.setChecked(True)
+        self._unit_combo.currentTextChanged.connect(self._set_stress_unit)
         self.refresh()
 
     # ----------------------------------------------------------------- menus
@@ -231,6 +250,59 @@ class MainWindow(QMainWindow):
         apply_theme(QApplication.instance(), name)
         for canvas in (self._principal, self._shear):
             canvas.apply_theme(name)
+
+    # ---------------------------------------------------------- spec 017: display units
+
+    def _scale(self) -> float:
+        """Display factor for MPa-internal values: display = MPa * scale."""
+
+        return units.stress_factor(self._stress_unit)
+
+    def _kpa_scale(self) -> float:
+        """Display factor for registry (kPa) values: display = kPa * scale."""
+
+        return units.stress_factor(self._stress_unit) / 1000.0
+
+    def _sig3max_mpa(self) -> float:
+        """Envelope range in internal MPa."""
+
+        return units.from_display(self._sig3max.value(), self._stress_unit)
+
+    def _update_window_title(self) -> None:
+        title = self._title_edit.text().strip()
+        self.setWindowTitle(f"OGR Data - {title}" if title else "OGR Data")
+
+    def _set_plot_labels(self) -> None:
+        u = self._stress_unit
+        self._principal.set_axes_labels(f"sigma3 ({u})", f"sigma1 ({u})")
+        self._shear.set_axes_labels(f"normal stress ({u})", f"shear stress ({u})")
+
+    def _set_stress_unit(self, unit: str) -> None:
+        """Switch the display unit, rescaling widgets in place (spec 017).
+
+        Internal values are untouched: the registry stays in kPa and
+        sigma3max in MPa; only the displayed numbers and labels change.
+        """
+
+        if unit == self._stress_unit or unit not in units.STRESS_FACTORS:
+            return
+        old_scale = self._scale()
+        self._stress_unit = unit
+        self._settings.setValue("stress_unit", unit)
+        ratio = self._scale() / old_scale
+        for field in self._criterion().fields:
+            widget = self._widgets.get(field.key)
+            if field.kind == "float" and field.unit == "kPa" and isinstance(widget, QDoubleSpinBox):
+                widget.blockSignals(True)
+                widget.setValue(widget.value() * ratio)
+                widget.setSuffix(f" {unit}")
+                widget.blockSignals(False)
+        self._sig3max.blockSignals(True)
+        self._sig3max.setValue(self._sig3max.value() * ratio)
+        self._sig3max.setSuffix(f" {unit}")
+        self._sig3max.blockSignals(False)
+        self._set_plot_labels()
+        self.refresh()
 
     def _about(self) -> None:
         from .. import __version__
@@ -313,7 +385,7 @@ class MainWindow(QMainWindow):
             gsi=float(params["gsi"]),
             mi=float(params["mi"]),
             disturbance=float(params["d"]),
-            sig3max=self._sig3max.value(),
+            sig3max=self._sig3max_mpa(),
         )
         result = compute(inp)
         return {
@@ -367,7 +439,7 @@ class MainWindow(QMainWindow):
         if not path.endswith(".ogrdata"):
             path += ".ogrdata"
         try:
-            project.save_project(path, self._material_name(), self._criterion_combo.currentData(), self._params(), self._sig3max.value())
+            project.save_project(path, self._material_name(), self._criterion_combo.currentData(), self._params(), self._sig3max_mpa(), stress_unit=self._stress_unit, title=self._title_edit.text())
         except ValueError as exc:
             QMessageBox.warning(self, "Save failed", str(exc))
 
@@ -384,8 +456,20 @@ class MainWindow(QMainWindow):
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, "Load failed", str(exc))
             return
+        self._load_settings_into_window(data)
         self._apply_project(data["criterion"], data["parameters"], data.get("sig3max_mpa"))
         self._name_edit.setText(data.get("name", ""))
+        self._title_edit.setText(data.get("title", ""))
+
+    def _load_settings_into_window(self, data: dict) -> None:
+        """Apply the display unit saved in the project (spec 017)."""
+
+        stress_unit = data.get("stress_unit", units.DEFAULT_STRESS_UNIT)
+        if stress_unit in units.STRESS_FACTORS:
+            self._unit_combo.blockSignals(True)
+            self._unit_combo.setCurrentText(stress_unit)
+            self._unit_combo.blockSignals(False)
+            self._set_stress_unit(stress_unit)
 
     def _import_roc(self) -> None:
         from PySide6.QtWidgets import QFileDialog, QMessageBox
@@ -408,11 +492,13 @@ class MainWindow(QMainWindow):
         if idx >= 0:
             self._criterion_combo.setCurrentIndex(idx)
         self._rebuild_form()
+        field_units = {f.key: f.unit for f in CRITERIA[criterion].fields}
         for key, value in parameters.items():
             if key in self._widgets and isinstance(self._widgets[key], QDoubleSpinBox):
-                self._widgets[key].setValue(float(value))
+                scale = self._kpa_scale() if field_units.get(key) == "kPa" else 1.0
+                self._widgets[key].setValue(float(value) * scale)
         if sig3max_mpa is not None:
-            self._sig3max.setValue(float(sig3max_mpa))
+            self._sig3max.setValue(float(sig3max_mpa) * self._scale())
 
     # ------------------------------------------------------------------ form
 
@@ -436,11 +522,14 @@ class MainWindow(QMainWindow):
                 widget = QDoubleSpinBox()
                 widget.setDecimals(6)
                 widget.setRange(-1e9, 1e12)
-                widget.setValue(float(field.default))
+                if field.unit == "kPa":
+                    widget.setValue(float(field.default) * self._kpa_scale())
+                else:
+                    widget.setValue(float(field.default))
                 if field.unit == "deg":
                     widget.setSuffix(" deg")
                 elif field.unit == "kPa":
-                    widget.setSuffix(" kPa")
+                    widget.setSuffix(f" {self._stress_unit}")
                 widget.valueChanged.connect(self.refresh)
             self._widgets[field.key] = widget
 
@@ -477,6 +566,9 @@ class MainWindow(QMainWindow):
                 params[field.key] = widget.isChecked()
             elif field.kind == "enum":
                 params[field.key] = widget.currentText()
+            elif field.unit == "kPa":
+                # spinbox shows the display unit; the registry stays in kPa
+                params[field.key] = widget.value() / self._kpa_scale()
             else:
                 params[field.key] = widget.value()
         return params
@@ -492,12 +584,12 @@ class MainWindow(QMainWindow):
                 gsi=float(params["gsi"]),
                 mi=float(params["mi"]),
                 disturbance=float(params["d"]),
-                sig3max=self._sig3max.value(),
+                sig3max=self._sig3max_mpa(),
             )
             return compute(inp).sigcm
         if key == "hoek_brown":
-            sigci_mpa, mb, s, a = self._hb_terms(key, params, self._sig3max.value())
-            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=self._sig3max.value())
+            sigci_mpa, mb, s, a = self._hb_terms(key, params, self._sig3max_mpa())
+            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=self._sig3max_mpa())
             return global_strength(inp, mb, s, a)
         return None
 
@@ -536,9 +628,9 @@ class MainWindow(QMainWindow):
         value = self._application_sig3max()
         if value is None:
             return
-        if abs(value - self._sig3max.value()) > 1e-12:
+        if abs(value - self._sig3max_mpa()) > 1e-12:
             self._sig3max.blockSignals(True)
-            self._sig3max.setValue(value)
+            self._sig3max.setValue(units.to_display(value, self._stress_unit))
             self._sig3max.blockSignals(False)
 
     # ---------------------------------------------------------- spec 008: overlays and samplers
@@ -607,7 +699,7 @@ class MainWindow(QMainWindow):
         return inst.cohesion_mpa + x * math.tan(math.radians(inst.friction_deg))
 
     def _sample_at(self, space: str, x: float) -> None:
-        sig3max = self._sig3max.value()
+        sig3max = self._sig3max_mpa()
         xr = np.linspace(0.0, sig3max, 2)
         if space == "principal":
             curve = self._curves["principal"]
@@ -616,9 +708,9 @@ class MainWindow(QMainWindow):
             sig3, sig1 = curve
             if self._sampler_mode == "stress":
                 s = samplers.sample(sig3, sig1, x)
-                text = f"sigma3 = {s.x:.4f} MPa   sigma1 = {s.y:.4f} MPa"
+                text = f"sigma3 = {units.stress_text(s.x, self._stress_unit)}   sigma1 = {units.stress_text(s.y, self._stress_unit)}"
                 if self._overlay_inst is not None:
-                    text += f"   [MC] sigma1 = {self._mc_line_value(self._overlay_inst, s.x):.4f} MPa"
+                    text += f"   [MC] sigma1 = {units.stress_text(self._mc_line_value(self._overlay_inst, s.x), self._stress_unit)}"
                 self._principal.show_sample(s.x)
                 self._shear.show_sample(s.x)
             else:
@@ -635,9 +727,9 @@ class MainWindow(QMainWindow):
                 self._principal.show_sample(inst.point_x, tangent=t_principal, marker=(inst.point_x, inst.point_y))
                 self._shear.show_sample(n_t, tangent=t_shear, marker=(n_t, t_t))
                 text = (
-                    f"c = {inst.cohesion_mpa:.4f} MPa   phi = {inst.friction_deg:.2f} deg   "
-                    f"sigma3 = {inst.point_x:.4f} MPa   sigma1 = {inst.point_y:.4f} MPa   "
-                    f"sigma_n = {n_t:.4f} MPa   tau = {t_t:.4f} MPa"
+                    f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
+                    f"sigma3 = {units.stress_text(inst.point_x, self._stress_unit)}   sigma1 = {units.stress_text(inst.point_y, self._stress_unit)}   "
+                    f"sigma_n = {units.stress_text(n_t, self._stress_unit)}   tau = {units.stress_text(t_t, self._stress_unit)}"
                 )
             self.statusBar().showMessage(text)
             return
@@ -649,9 +741,9 @@ class MainWindow(QMainWindow):
         normal, shear = curve
         if self._sampler_mode == "stress":
             s = samplers.sample(normal, shear, x)
-            text = f"sigma_n = {s.x:.4f} MPa   tau = {s.y:.4f} MPa"
+            text = f"sigma_n = {units.stress_text(s.x, self._stress_unit)}   tau = {units.stress_text(s.y, self._stress_unit)}"
             if self._overlay_inst is not None:
-                text += f"   [MC] tau = {self._mc_line_value(self._overlay_inst, s.x):.4f} MPa"
+                text += f"   [MC] tau = {units.stress_text(self._mc_line_value(self._overlay_inst, s.x), self._stress_unit)}"
             self._shear.show_sample(s.x)
             if self._curves["principal"] is not None:
                 self._principal.show_sample(s.x)
@@ -663,8 +755,8 @@ class MainWindow(QMainWindow):
             t_principal = samplers.mc_tangent_principal(inst, xr)
             self._principal.show_sample(None, tangent=t_principal)
             text = (
-                f"c = {inst.cohesion_mpa:.4f} MPa   phi = {inst.friction_deg:.2f} deg   "
-                f"sigma_n = {inst.point_x:.4f} MPa   tau = {inst.point_y:.4f} MPa"
+                f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
+                f"sigma_n = {units.stress_text(inst.point_x, self._stress_unit)}   tau = {units.stress_text(inst.point_y, self._stress_unit)}"
             )
         self.statusBar().showMessage(text)
 
@@ -676,7 +768,7 @@ class MainWindow(QMainWindow):
             return
         params = self._params()
         self._apply_application()
-        sig3max = self._sig3max.value()
+        sig3max = self._sig3max_mpa()
         crit = CRITERIA[key]
 
         self._clear_sampler_marks()
@@ -726,12 +818,12 @@ class MainWindow(QMainWindow):
                     f"mb   = {result.mb:.4f}\n"
                     f"s    = {result.s:.4f}\n"
                     f"a    = {result.a:.4f}\n"
-                    f"sigt = {result.sigt:.4f} MPa\n"
-                    f"sigc = {result.sigc:.4f} MPa\n"
-                    f"sigcm= {result.sigcm:.4f} MPa\n"
-                    f"c    = {result.mc.cohesion:.4f} MPa\n"
+                    f"sigt = {units.stress_text(result.sigt, self._stress_unit)}\n"
+                    f"sigc = {units.stress_text(result.sigc, self._stress_unit)}\n"
+                    f"sigcm= {units.stress_text(result.sigcm, self._stress_unit)}\n"
+                    f"c    = {units.stress_text(result.mc.cohesion, self._stress_unit)}\n"
                     f"phi  = {result.mc.friction_deg:.2f} deg\n"
-                    f"Erm  = {result.erm:.2f} MPa"
+                    f"Erm  = {units.stress_text(result.erm, self._stress_unit, decimals=2)}"
                 )
             else:
                 self._outputs.setText("")

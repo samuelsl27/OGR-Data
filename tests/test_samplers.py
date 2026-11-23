@@ -8,6 +8,7 @@ import numpy as np
 
 from ogr_data.core import criteria_envelopes as ce
 from ogr_data.core import samplers
+from ogr_data.core import units
 from ogr_data.core.hoek_brown import HbInput, hoek_brown_constants
 from ogr_data.core.models import defaults
 from ogr_data.gui.themes import mpl_colors
@@ -146,6 +147,7 @@ def test_sampler_window_offscreen() -> None:
 
     app = QApplication.instance() or QApplication([])
     w = MainWindow()
+    w._set_stress_unit("kPa")  # display unit; messages show kPa (spec 017)
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("generalized_hoek_brown"))
     app.processEvents()
 
@@ -159,7 +161,7 @@ def test_sampler_window_offscreen() -> None:
     w._on_plot_event("principal", "move", 4.0)
     w._on_plot_event("principal", "release", 4.0)
     msg = w.statusBar().currentMessage()
-    assert "sigma3 = 4.0000 MPa" in msg and "[MC]" in msg
+    assert "sigma3 = 4000.0000 kPa" in msg and "[MC]" in msg
     assert w._principal._vline.get_visible()
 
     # A move without pressing must not sample.
@@ -173,7 +175,7 @@ def test_sampler_window_offscreen() -> None:
     sig3, sig1 = w._curves["principal"]
     inst = samplers.instantaneous_mc(sig3, sig1, 2.0, slope=w._d1_func(2.0))
     msg = w.statusBar().currentMessage()
-    assert f"c = {inst.cohesion_mpa:.4f} MPa" in msg
+    assert f"c = {units.stress_text(inst.cohesion_mpa, 'kPa')}" in msg
     assert f"phi = {inst.friction_deg:.2f} deg" in msg
     assert len(w._shear._tangent_line.get_xdata()) == 2
     assert w._shear._marker.get_offsets().size > 0
@@ -188,7 +190,7 @@ def test_sampler_window_offscreen() -> None:
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("barton_bandis"))
     w._stress_sampler_act.setChecked(True)
     w._on_plot_event("shear", "press", 5.0)
-    assert "sigma_n = 5.0000 MPa" in w.statusBar().currentMessage()
+    assert "sigma_n = 5000.0000 kPa" in w.statusBar().currentMessage()
 
     # MC sampler on a shear-space envelope.
     w._mc_sampler_act.setChecked(True)

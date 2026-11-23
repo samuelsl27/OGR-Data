@@ -83,6 +83,13 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
 
     # ------------------------------------------------------------ overlays
 
+    def set_axes_labels(self, xlabel: str, ylabel: str) -> None:
+        """Relabel the axes (spec 017: display units)."""
+
+        self.axes.set_xlabel(xlabel)
+        self.axes.set_ylabel(ylabel)
+        self.apply_theme(self._theme)
+
     def redraw(self, x, y, x_mc=None, y_mc=None) -> None:
         self._line.set_data(x, y)
         self._mc_line.set_data(x_mc if x_mc is not None else [], y_mc if y_mc is not None else [])

@@ -110,8 +110,9 @@ def test_apply_project_and_roc_to_window_offscreen():
 
     app = QApplication.instance() or QApplication([])
     w = MainWindow()
+    w._set_stress_unit("kPa")  # display unit; widgets show kPa (spec 017)
     roc = roc_import.parse_roc(EXAMPLES / "Granite Triaxial Data.roc")
     w._apply_project(roc.criterion, roc.parameters, roc.sig3max_mpa)
     assert w._criterion_combo.currentData() == "generalized_hoek_brown"
     assert abs(w._widgets["sigci"].value() - 369270.0) < 1.0
-    assert w._sig3max.value() == 150.0
+    assert w._sig3max.value() == 150000.0  # 150 MPa in kPa

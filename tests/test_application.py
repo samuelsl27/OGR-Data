@@ -80,6 +80,7 @@ def test_application_window_offscreen() -> None:
 
     app = QApplication.instance() or QApplication([])
     w = MainWindow()
+    w._set_stress_unit("kPa")  # display unit; QSettings may persist a previous run
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("generalized_hoek_brown"))
     w._widgets["sigci"].setValue(30000.0)  # 30 MPa, the ORMAS case
     app.processEvents()
@@ -89,21 +90,23 @@ def test_application_window_offscreen() -> None:
     assert w._sig3max.isEnabled()
     assert w._app_fields.isHidden()
 
-    # tunnel: sigma3max estimated from sigcm (Hoek 2002 eq. 18)
+    # tunnel: sigma3max estimated from sigcm (Hoek 2002 eq. 18); the spin
+    # shows the display unit (kPa). Expected values from the core module
+    # (validated against ORMAS in the non-Qt tests above).
     w._application_combo.setCurrentIndex(w._application_combo.findData("tunnel"))
     assert not w._sig3max.isEnabled()
     assert not w._app_fields.isHidden()
-    assert abs(w._sig3max.value() - 0.6642) / 0.6642 < 0.005
+    assert abs(w._sig3max.value() - 1000.0 * _sig3max_tunnel_ormas()) < 0.01
     assert "sigma3max" not in w._sig3max_label.text() or w._sig3max_label.isHidden()
 
     # slope: eq. 19
     w._application_combo.setCurrentIndex(w._application_combo.findData("slope"))
-    assert abs(w._sig3max.value() - 1.0610) < 1e-3
+    assert abs(w._sig3max.value() - 1000.0 * _sig3max_slope_ormas()) < 0.01
     assert w._depth_label.text() == "Slope height"
 
     # changing the unit weight recomputes
     w._unit_weight.setValue(0.030)
-    assert abs(w._sig3max.value() - _slope_003()) < 1e-4  # spin has 4 decimals
+    assert abs(w._sig3max.value() - 1000.0 * _slope_003()) < 0.01  # spin has 4 decimals
 
     # non-HB criteria fall back to custom (no sigcm, as in ORMAS)
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("mohr_coulomb"))
@@ -118,6 +121,18 @@ def _tunnel_003() -> float:
     inp = HbInput(sigci=30.0, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=7.5)
     sigcm = compute(inp).sigcm
     return application.sig3max_tunnel(sigcm, 0.030, 50.0)
+
+
+def _sig3max_tunnel_ormas() -> float:
+    from ogr_data.core import application
+
+    return application.sig3max_tunnel(5.2300, 0.026, 50.0)
+
+
+def _sig3max_slope_ormas() -> float:
+    from ogr_data.core import application
+
+    return application.sig3max_slope(5.2300, 0.026, 50.0)
 
 
 def _slope_003() -> float:
