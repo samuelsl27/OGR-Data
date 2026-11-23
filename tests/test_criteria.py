@@ -118,7 +118,7 @@ def test_barton_bandis_formula():
     params["jrc"] = 10.0
     params["jcs"] = 100000.0  # kPa = 100 MPa
     normal, shear = ce.shear_curve("barton_bandis", params, 10.0)
-    expected = normal * np.tan(np.radians(30.0) + 10.0 * np.log10(100.0 / normal))
+    expected = normal * np.tan(np.radians(30.0 + 10.0 * np.log10(100.0 / normal)))
     assert np.allclose(shear, expected, rtol=1e-12)
 
 

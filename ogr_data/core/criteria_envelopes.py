@@ -110,13 +110,14 @@ def shear_curve(key: str, params: Params, sig3max_mpa: float, points: int = 200)
 
     if key == "barton_bandis":
         # tau = sigma_n tan(phi_r + JRC log10(JCS / sigma_n)), 0 < sigma_n <= JCS
-        phi_r = math.radians(_f(params, "phi_r"))
+        # (angles in degrees; Barton-Bandis 1982 as used by RocData)
+        phi_r = _f(params, "phi_r")
         jrc = _f(params, "jrc")
         jcs = _f(params, "jcs") * KPA_TO_MPA
         hi = min(sig3max_mpa, jcs)
         lo = max(hi * 1e-4, 1e-6)
         normal = np.geomspace(lo, hi, points)
-        angle = phi_r + jrc * np.log10(jcs / normal)
+        angle = np.radians(phi_r + jrc * np.log10(jcs / normal))
         return normal, normal * np.tan(angle)
 
     raise ValueError(f"no shear envelope implemented for {key!r}")

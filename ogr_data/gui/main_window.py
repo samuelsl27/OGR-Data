@@ -6,6 +6,7 @@ import math
 
 import numpy as np
 from PySide6.QtCore import QSettings, Qt
+from PySide6.QtGui import QAction, QActionGroup
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -27,7 +28,8 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import criteria_envelopes as ce
-from ..core.hoek_brown import HbInput, compute
+from ..core import samplers
+from ..core.hoek_brown import HbInput, compute, equivalent_mc, hoek_brown_constants
 from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas
 from .themes import THEMES, apply_theme
@@ -43,6 +45,13 @@ class MainWindow(QMainWindow):
         self._theme = str(self._settings.value("theme", "light"))
         if self._theme not in THEMES:
             self._theme = "light"
+        # Spec 008: sampler / overlay state (created before the menus so the
+        # toggled signals fired by setChecked find it in place).
+        self._sampler_mode: str | None = None
+        self._dragging = False
+        self._curves: dict[str, tuple | None] = {"principal": None, "shear": None}
+        self._d1_func = None
+        self._overlay_inst: samplers.InstantaneousMC | None = None
         from PySide6.QtWidgets import QApplication
 
         apply_theme(QApplication.instance(), self._theme)
@@ -118,8 +127,10 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setMaximumWidth(380)
 
-        self._principal = EnvelopeCanvas("Principal Stresses", "sigma3 (MPa)", "sigma1 (MPa)", self._theme)
-        self._shear = EnvelopeCanvas("Shear - Normal Stresses", "normal stress (MPa)", "shear stress (MPa)", self._theme)
+        self._principal = EnvelopeCanvas("Principal Stresses", "sigma3 (MPa)", "sigma1 (MPa)", self._theme, space="principal")
+        self._shear = EnvelopeCanvas("Shear - Normal Stresses", "normal stress (MPa)", "shear stress (MPa)", self._theme, space="shear")
+        for canvas in (self._principal, self._shear):
+            canvas.sampler_handler = self._on_plot_event
 
         plots = QSplitter(Qt.Orientation.Horizontal)
         plots.addWidget(self._principal)
@@ -130,8 +141,10 @@ class MainWindow(QMainWindow):
         splitter.addWidget(plots)
         splitter.setStretchFactor(1, 1)
         self.setCentralWidget(splitter)
+        self.statusBar()
 
         self._rebuild_form()
+        self._overlay_mc_act.setChecked(True)
         self.refresh()
 
     # ----------------------------------------------------------------- menus
@@ -150,6 +163,25 @@ class MainWindow(QMainWindow):
         edit_menu = bar.addMenu("Edit")
         edit_menu.addAction("Copy material", self._copy_material)
         edit_menu.addAction("Copy data", self._copy_data)
+
+        analysis_menu = bar.addMenu("Analysis")
+        self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
+        self._mc_sampler_act = QAction("Instantaneous MC Sampler", self, checkable=True)
+        sampler_group = QActionGroup(self)
+        sampler_group.setExclusive(True)
+        sampler_group.addAction(self._stress_sampler_act)
+        sampler_group.addAction(self._mc_sampler_act)
+        analysis_menu.addAction(self._stress_sampler_act)
+        analysis_menu.addAction(self._mc_sampler_act)
+        analysis_menu.addSeparator()
+        self._overlay_mc_act = QAction("Overlay MC Envelope", self, checkable=True)
+        self._overlay_mogi_act = QAction("Overlay Mogi Line", self, checkable=True)
+        analysis_menu.addAction(self._overlay_mc_act)
+        analysis_menu.addAction(self._overlay_mogi_act)
+        self._stress_sampler_act.toggled.connect(self._sampler_mode_changed)
+        self._mc_sampler_act.toggled.connect(self._sampler_mode_changed)
+        self._overlay_mc_act.toggled.connect(self.refresh)
+        self._overlay_mogi_act.toggled.connect(self.refresh)
 
         view_menu = bar.addMenu("View")
         theme_menu = view_menu.addMenu("Theme")
@@ -417,6 +449,133 @@ class MainWindow(QMainWindow):
                 params[field.key] = widget.value()
         return params
 
+    # ---------------------------------------------------------- spec 008: overlays and samplers
+
+    def _hb_terms(self, key: str, params: dict, sig3max: float) -> tuple[float, float, float, float]:
+        """(sigci_mpa, mb, s, a) of a Hoek-Brown criterion for the current inputs."""
+
+        if key == "generalized_hoek_brown":
+            inp = HbInput(
+                sigci=float(params["sigci"]) / 1000.0,
+                gsi=float(params["gsi"]),
+                mi=float(params["mi"]),
+                disturbance=float(params["d"]),
+                sig3max=sig3max,
+            )
+            mb, s, a = hoek_brown_constants(inp)
+            return inp.sigci, mb, s, a
+        # classic Hoek-Brown is the 2002 criterion with a = 0.5
+        return float(params["compressive_strength"]) / 1000.0, float(params["mb"]), float(params["s"]), 0.5
+
+    def _overlay_mc_params(self, key: str, params: dict, sig3max: float, normal, shear) -> samplers.InstantaneousMC | None:
+        """Equivalent / best-fit MC overlay for curved criteria (RocData 2004 p. 10)."""
+
+        if not self._overlay_mc_act.isChecked():
+            return None
+        if key in ("generalized_hoek_brown", "hoek_brown"):
+            sigci_mpa, mb, s, a = self._hb_terms(key, params, sig3max)
+            # Hoek (2002) closed form over [0, sig3max], anchored on sigcm;
+            # only sigci and sig3max of inp are used by the formulation.
+            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=sig3max)
+            mc = equivalent_mc(inp, mb, s, a)
+            return samplers.InstantaneousMC(mc.cohesion, mc.friction_deg, 0.0, 0.0, 0.0)
+        if key in ("power_curve", "barton_bandis") and normal is not None:
+            return samplers.best_fit_mc(normal, shear)
+        return None
+
+    def _sampler_mode_changed(self) -> None:
+        if self._stress_sampler_act.isChecked():
+            self._sampler_mode = "stress"
+        elif self._mc_sampler_act.isChecked():
+            self._sampler_mode = "mc"
+        else:
+            self._sampler_mode = None
+        if self._sampler_mode is None:
+            self._clear_sampler_marks()
+            self.statusBar().clearMessage()
+
+    def _clear_sampler_marks(self) -> None:
+        self._principal.clear_sample()
+        self._shear.clear_sample()
+
+    def _on_plot_event(self, space: str, kind: str, x: float) -> None:
+        if self._sampler_mode is None:
+            return
+        if kind == "press":
+            self._dragging = True
+        elif kind == "release":
+            self._dragging = False
+            return
+        elif kind == "move" and not self._dragging:
+            return
+        self._sample_at(space, x)
+
+    @staticmethod
+    def _mc_line_value(inst: samplers.InstantaneousMC, x: float) -> float:
+        return inst.cohesion_mpa + x * math.tan(math.radians(inst.friction_deg))
+
+    def _sample_at(self, space: str, x: float) -> None:
+        sig3max = self._sig3max.value()
+        xr = np.linspace(0.0, sig3max, 2)
+        if space == "principal":
+            curve = self._curves["principal"]
+            if curve is None:
+                return
+            sig3, sig1 = curve
+            if self._sampler_mode == "stress":
+                s = samplers.sample(sig3, sig1, x)
+                text = f"sigma3 = {s.x:.4f} MPa   sigma1 = {s.y:.4f} MPa"
+                if self._overlay_inst is not None:
+                    text += f"   [MC] sigma1 = {self._mc_line_value(self._overlay_inst, s.x):.4f} MPa"
+                self._principal.show_sample(s.x)
+                self._shear.show_sample(s.x)
+            else:
+                slope = self._d1_func(x) if self._d1_func is not None else None
+                inst = samplers.instantaneous_mc(sig3, sig1, x, slope=slope)
+                t_principal = samplers.mc_tangent_principal(inst, xr)
+                t_shear = samplers.mc_tangent_shear(inst, xr)
+                # tangency point of the tangent Mohr circle on the shear plot
+                sin_phi = math.sin(math.radians(inst.friction_deg))
+                centre = (inst.point_y + inst.point_x) / 2.0
+                radius = (inst.point_y - inst.point_x) / 2.0
+                n_t = centre - radius * sin_phi
+                t_t = radius * math.cos(math.radians(inst.friction_deg))
+                self._principal.show_sample(inst.point_x, tangent=t_principal, marker=(inst.point_x, inst.point_y))
+                self._shear.show_sample(n_t, tangent=t_shear, marker=(n_t, t_t))
+                text = (
+                    f"c = {inst.cohesion_mpa:.4f} MPa   phi = {inst.friction_deg:.2f} deg   "
+                    f"sigma3 = {inst.point_x:.4f} MPa   sigma1 = {inst.point_y:.4f} MPa   "
+                    f"sigma_n = {n_t:.4f} MPa   tau = {t_t:.4f} MPa"
+                )
+            self.statusBar().showMessage(text)
+            return
+
+        # shear-space click
+        curve = self._curves["shear"]
+        if curve is None:
+            return
+        normal, shear = curve
+        if self._sampler_mode == "stress":
+            s = samplers.sample(normal, shear, x)
+            text = f"sigma_n = {s.x:.4f} MPa   tau = {s.y:.4f} MPa"
+            if self._overlay_inst is not None:
+                text += f"   [MC] tau = {self._mc_line_value(self._overlay_inst, s.x):.4f} MPa"
+            self._shear.show_sample(s.x)
+            if self._curves["principal"] is not None:
+                self._principal.show_sample(s.x)
+        else:
+            inst = samplers.instantaneous_mc_shear(normal, shear, x)
+            t_shear = samplers.mc_tangent_shear(inst, xr)
+            self._shear.show_sample(inst.point_x, tangent=t_shear, marker=(inst.point_x, inst.point_y))
+            # converted MC line in principal space (also for shear-space criteria)
+            t_principal = samplers.mc_tangent_principal(inst, xr)
+            self._principal.show_sample(None, tangent=t_principal)
+            text = (
+                f"c = {inst.cohesion_mpa:.4f} MPa   phi = {inst.friction_deg:.2f} deg   "
+                f"sigma_n = {inst.point_x:.4f} MPa   tau = {inst.point_y:.4f} MPa"
+            )
+        self.statusBar().showMessage(text)
+
     # --------------------------------------------------------------- refresh
 
     def refresh(self) -> None:
@@ -426,6 +585,11 @@ class MainWindow(QMainWindow):
         params = self._params()
         sig3max = self._sig3max.value()
         crit = CRITERIA[key]
+
+        self._clear_sampler_marks()
+        self._curves = {"principal": None, "shear": None}
+        self._d1_func = None
+        self._overlay_inst = None
 
         if crit.envelope == "none":
             self._principal.redraw([], [])
@@ -439,10 +603,23 @@ class MainWindow(QMainWindow):
                 return
             sig3, sig1 = curve
             normal, shear = ce.tangent_shear(sig3, sig1)
-            self._principal.redraw(sig3, sig1)
-            self._shear.redraw(normal, shear)
+            self._curves["principal"] = (sig3, sig1)
+            self._curves["shear"] = (normal, shear)
+            if key in ("generalized_hoek_brown", "hoek_brown"):
+                sigci_mpa, mb, s, a = self._hb_terms(key, params, sig3max)
+                self._d1_func = lambda v, sc=sigci_mpa, m=mb, sv=s, av=a: samplers.hb_derivative(v, sc, m, sv, av)
 
-            # Overlay of the equivalent/best-fit MC line where defined.
+            self._overlay_inst = self._overlay_mc_params(key, params, sig3max, normal, shear)
+            if self._overlay_inst is not None:
+                (p3, p1), (n_mc, s_mc) = ce.mc_line(
+                    self._overlay_inst.cohesion_mpa, self._overlay_inst.friction_deg, sig3max
+                )
+                self._principal.redraw(sig3, sig1, p3, p1)
+                self._shear.redraw(normal, shear, n_mc, s_mc)
+            else:
+                self._principal.redraw(sig3, sig1)
+                self._shear.redraw(normal, shear)
+
             if key == "generalized_hoek_brown":
                 inp = HbInput(
                     sigci=float(params["sigci"]) / 1000.0,
@@ -452,9 +629,6 @@ class MainWindow(QMainWindow):
                     sig3max=sig3max,
                 )
                 result = compute(inp)
-                (p3, p1), (n_mc, s_mc) = ce.mc_line(result.mc.cohesion, result.mc.friction_deg, sig3max)
-                self._principal.redraw(sig3, sig1, p3, p1)
-                self._shear.redraw(normal, shear, n_mc, s_mc)
                 self._outputs.setText(
                     f"mb   = {result.mb:.4f}\n"
                     f"s    = {result.s:.4f}\n"
@@ -468,13 +642,27 @@ class MainWindow(QMainWindow):
                 )
             else:
                 self._outputs.setText("")
-            return
+        else:
+            # shear-space criteria
+            curve = ce.shear_curve(key, params, sig3max)
+            if curve is None:
+                return
+            normal, shear = curve
+            self._curves["shear"] = (normal, shear)
+            self._overlay_inst = self._overlay_mc_params(key, params, sig3max, normal, shear)
+            if self._overlay_inst is not None:
+                (p3, p1), (n_mc, s_mc) = ce.mc_line(
+                    self._overlay_inst.cohesion_mpa, self._overlay_inst.friction_deg, sig3max
+                )
+                # the equivalent MC line is shown in both spaces
+                self._principal.redraw([], [], p3, p1)
+                self._shear.redraw(normal, shear, n_mc, s_mc)
+            else:
+                self._principal.redraw([], [])
+                self._shear.redraw(normal, shear)
+            self._outputs.setText("")
 
-        # shear-space criteria
-        curve = ce.shear_curve(key, params, sig3max)
-        if curve is None:
-            return
-        normal, shear = curve
-        self._principal.redraw([], [])
-        self._shear.redraw(normal, shear)
-        self._outputs.setText("")
+        if self._overlay_mogi_act.isChecked() and self._curves["principal"] is not None:
+            self._principal.show_mogi(*samplers.mogi_line(sig3max))
+        else:
+            self._principal.clear_mogi()

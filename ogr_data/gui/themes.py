@@ -257,6 +257,7 @@ MPL_COLORS: dict[str, dict[str, str]] = {
         "envelope": "#4a90d9",
         "mc": "#40607a",
         "point": "#c0392b",
+        "mogi": "#1e8449",
     },
     "dark": {
         "figure": "#2b2b2b",
@@ -265,6 +266,7 @@ MPL_COLORS: dict[str, dict[str, str]] = {
         "envelope": "#6aa3d5",
         "mc": "#9ab6d6",
         "point": "#e67e22",
+        "mogi": "#2ecc71",
     },
 }
 
