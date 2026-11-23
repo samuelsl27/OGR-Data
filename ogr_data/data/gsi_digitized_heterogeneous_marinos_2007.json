@@ -1,0 +1,1287 @@
+{
+  "chart_id": "heterogeneous_marinos_2007",
+  "title": "GEOLOGICAL STRENGTH INDEX (GSI) FOR HETEROGENEOUS ROCK MASSES SUCH AS FLYSCH (V. Marinos, 2007)",
+  "citation": "Marinos, V. (2014). Tunnel behaviour and support associated with the weak rock masses of flysch. Journal of Rock Mechanics and Geotechnical Engineering, 6(3), 227-239. doi:10.1016/j.jrmge.2014.04.003 (Fig. 3). Carta original: Marinos, V. (2007), tesis doctoral, NTUA.",
+  "source_used": {
+    "file": "1-s2.0-S1674775514000390-gr3.jpg",
+    "page": null,
+    "method": "raster_691x922px_jpeg",
+    "notes": "JPEG en gris de la carpeta de trabajo, girado 90° en sentido horario -> fuentes/heterogeneous_gr3_rotada.png (922 x 691 px). Resolución efectiva de la rejilla: ~61 px por columna y ~84 px por fila: es la fuente más pobre de las tres; la versión 'high-res' de ScienceDirect no se pudo descargar (bloqueo de red y comprobación anti-bots)."
+  },
+  "frame": {
+    "u": "0 = left edge of VERY GOOD column, 1 = right edge of VERY POOR column",
+    "v": "0 = top of first structure row, 1 = bottom of last row"
+  },
+  "image_transform": {
+    "file": "fuentes/heterogeneous_gr3_rotada.png",
+    "rotation_deg": 90,
+    "rotation_note": "el JPEG original (691x922 px) se gira 90° en sentido horario; corners_px en la imagen girada",
+    "corners_px": {
+      "top_left": [612.8, 232.7],
+      "top_right": [919.9, 232.7],
+      "bottom_left": [612.8, 651.7],
+      "bottom_right": [919.9, 651.7]
+    }
+  },
+  "columns": [
+    {
+      "key": "very_good",
+      "label": "VERY GOOD",
+      "description": "Very rough, fresh unweathered surfaces",
+      "literal": "VERY GOOD\nVery rough, fresh unweathered surfaces",
+      "u0": -0.0,
+      "u1": 0.2012
+    },
+    {
+      "key": "good",
+      "label": "GOOD",
+      "description": "Rough, slightly weathered or oxylised surfaces",
+      "literal": "GOOD\nRough, slightly weathered or oxylised surfaces",
+      "u0": 0.2012,
+      "u1": 0.4061
+    },
+    {
+      "key": "fair",
+      "label": "FAIR",
+      "description": "Smooth, moderately weathered and altered surfaces",
+      "literal": "FAIR\nSmooth, moderately weathered and altered surfaces",
+      "u0": 0.4061,
+      "u1": 0.6057
+    },
+    {
+      "key": "poor",
+      "label": "POOR",
+      "description": "Very smooth, occasionally slickensided surfaces with compact coatings or fillings with angular fragments",
+      "literal": "POOR\nVery smooth, occasionally slickensided surfaces with compact coatings or fillings with angular fragments",
+      "u0": 0.6057,
+      "u1": 0.7971
+    },
+    {
+      "key": "very_poor",
+      "label": "VERY POOR",
+      "description": "Very smooth, slickensided or highly weathered surfaces with soft clay coating or fillings",
+      "literal": "VERY POOR\nVery smooth, slickensided or highly weathered surfaces with soft clay coating or fillings",
+      "u0": 0.7971,
+      "u1": 1.0
+    }
+  ],
+  "rows": [
+    {
+      "key": "row1",
+      "label": "I, II",
+      "description": "TYPE I. Undisturbed, with thick to medium thickness sandstone beds with sporadic thin films of siltstone. In shallow tunnels or slopes where confinement is poor the mode of the failure has a kinematic character controlled by the bedding planes and GSI is meanigless | TYPE II. Undisturbed massive siltstone (stratification planes are imperceptible) with sporadic thin interlayers of sandstones",
+      "types": [
+        "I",
+        "II"
+      ],
+      "v0": -0.0,
+      "v1": 0.2024
+    },
+    {
+      "key": "row2",
+      "label": "III, IV, V, VI",
+      "description": "TYPE III. Moderately disturbed sandstones with thin films of interlayers of siltstone | TYPE IV. Moderately disturbed rockmass with sandstone and siltstone similar amounts | TYPE V. Moderately disturbed siltstones with sandstone interlayers | TYPE VI. Moderately disturbed siltstones with sparse sandstone interlayers",
+      "types": [
+        "III",
+        "IV",
+        "V",
+        "VI"
+      ],
+      "v0": 0.2024,
+      "v1": 0.4,
+      "side_note": "WHEN THICKNESS OF SANDSTONE BEDS ~50cm",
+      "side_note_symbol": "upward_arrow"
+    },
+    {
+      "key": "row3",
+      "label": "VII, VIII",
+      "description": "TYPE VII. Strongly disturbed, folded rockmass that retains its structure, with sandstone and siltstone in similar extend | TYPE VIII. Strongly disturbed, folded rockmass, with siltstones and sandstone interlayers. The structure is retained and deformation - shearing is not strong",
+      "types": [
+        "VII",
+        "VIII"
+      ],
+      "v0": 0.4,
+      "v1": 0.5993
+    },
+    {
+      "key": "row4",
+      "label": "IX, X",
+      "description": "TYPE IX. Desintegrated rockmass that can be found in wide zones of faults or/and of high weathering. In this type mainly brittle material is present with some disturbed siltstones between rock pieces | TYPE X. Tectonically deformed intensively folded/ faulted siltstone or clay shale with broken and deformed sandstone layers forming an almost chaotic stucture",
+      "types": [
+        "IX",
+        "X"
+      ],
+      "v0": 0.5993,
+      "v1": 0.7998
+    },
+    {
+      "key": "row5",
+      "label": "XI",
+      "description": "TYPE XI. Tectonically strongly sheared siltstone or clayey shale forming a chaotic structure with pockets of clay. Thin layers of sandstone are transformed into small rock pieces. Ultimately the ground behavior is that of a soil",
+      "types": [
+        "XI"
+      ],
+      "v0": 0.7998,
+      "v1": 1.0
+    }
+  ],
+  "type_descriptions": {
+    "I": "Undisturbed, with thick to medium thickness sandstone beds with sporadic thin films of siltstone. In shallow tunnels or slopes where confinement is poor the mode of the failure has a kinematic character controlled by the bedding planes and GSI is meanigless",
+    "II": "Undisturbed massive siltstone (stratification planes are imperceptible) with sporadic thin interlayers of sandstones",
+    "III": "Moderately disturbed sandstones with thin films of interlayers of siltstone",
+    "IV": "Moderately disturbed rockmass with sandstone and siltstone similar amounts",
+    "V": "Moderately disturbed siltstones with sandstone interlayers",
+    "VI": "Moderately disturbed siltstones with sparse sandstone interlayers",
+    "VII": "Strongly disturbed, folded rockmass that retains its structure, with sandstone and siltstone in similar extend",
+    "VIII": "Strongly disturbed, folded rockmass, with siltstones and sandstone interlayers. The structure is retained and deformation - shearing is not strong",
+    "IX": "Desintegrated rockmass that can be found in wide zones of faults or/and of high weathering. In this type mainly brittle material is present with some disturbed siltstones between rock pieces",
+    "X": "Tectonically deformed intensively folded/ faulted siltstone or clay shale with broken and deformed sandstone layers forming an almost chaotic stucture",
+    "XI": "Tectonically strongly sheared siltstone or clayey shale forming a chaotic structure with pockets of clay. Thin layers of sandstone are transformed into small rock pieces. Ultimately the ground behavior is that of a soil"
+  },
+  "isolines": [
+    {
+      "gsi": 85,
+      "value_read_from_label": false,
+      "points": [
+        [0.0255, 0.0],
+        [0.0, 0.0187]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 6,
+        "rms_px": 0.53
+      }
+    },
+    {
+      "gsi": 80,
+      "value_read_from_label": true,
+      "points": [
+        [0.1344, 0.0],
+        [0.0, 0.1046]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 46,
+        "rms_px": 0.53
+      }
+    },
+    {
+      "gsi": 75,
+      "value_read_from_label": false,
+      "points": [
+        [0.2436, 0.0],
+        [0.0, 0.193]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 164,
+        "rms_px": 0.52
+      }
+    },
+    {
+      "gsi": 70,
+      "value_read_from_label": true,
+      "points": [
+        [0.3309, 0.0],
+        [0.0, 0.2773]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 229,
+        "rms_px": 0.59
+      }
+    },
+    {
+      "gsi": 65,
+      "value_read_from_label": false,
+      "points": [
+        [0.4275, 0.0],
+        [0.0, 0.3725]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 283,
+        "rms_px": 0.49
+      }
+    },
+    {
+      "gsi": 60,
+      "value_read_from_label": true,
+      "points": [
+        [0.511, 0.0],
+        [0.0, 0.4744]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 323,
+        "rms_px": 0.53
+      }
+    },
+    {
+      "gsi": 55,
+      "value_read_from_label": false,
+      "points": [
+        [0.6013, 0.0],
+        [0.0, 0.5835]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 366,
+        "rms_px": 0.55
+      }
+    },
+    {
+      "gsi": 50,
+      "value_read_from_label": true,
+      "points": [
+        [0.6924, 0.0],
+        [0.0, 0.7057]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 376,
+        "rms_px": 0.53
+      }
+    },
+    {
+      "gsi": 45,
+      "value_read_from_label": false,
+      "points": [
+        [0.7737, 0.0],
+        [0.0361, 0.7998]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 514,
+        "rms_px": 0.58
+      }
+    },
+    {
+      "gsi": 40,
+      "value_read_from_label": true,
+      "points": [
+        [0.8632, 0.0],
+        [0.1682, 0.7998]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 509,
+        "rms_px": 0.56
+      }
+    },
+    {
+      "gsi": 35,
+      "value_read_from_label": false,
+      "points": [
+        [0.9558, 0.0],
+        [0.3038, 0.7998]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 491,
+        "rms_px": 0.54
+      }
+    },
+    {
+      "gsi": 30,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.0682],
+        [0.4061, 0.8151]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 440,
+        "rms_px": 0.57
+      }
+    },
+    {
+      "gsi": 25,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.1715],
+        [0.4061, 0.9966]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 488,
+        "rms_px": 0.54
+      }
+    },
+    {
+      "gsi": 20,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.2978],
+        [0.5234, 1.0]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 461,
+        "rms_px": 0.54
+      }
+    },
+    {
+      "gsi": 15,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.4496],
+        [0.6582, 1.0]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 361,
+        "rms_px": 0.49
+      }
+    },
+    {
+      "gsi": 10,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.6266],
+        [0.7775, 1.0]
+      ],
+      "style": "black_inside_dashed_boundary_grey_outside",
+      "fit": {
+        "pixels": 262,
+        "rms_px": 0.58
+      }
+    },
+    {
+      "gsi": 5,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.8139],
+        [0.8968, 1.0]
+      ],
+      "style": "black",
+      "fit": {
+        "pixels": 141,
+        "rms_px": 0.55
+      }
+    }
+  ],
+  "regions": [
+    {
+      "label": "I-II",
+      "shading": "core",
+      "polygon": [
+        [0.1765, -0.0],
+        [0.5217, -0.0],
+        [0.5217, 0.2024],
+        [0.1765, 0.2024]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "I",
+        "II"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "I",
+      "shading": "core",
+      "polygon": [
+        [0.1765, -0.0],
+        [0.3515, -0.0],
+        [0.3515, 0.2024],
+        [0.1765, 0.2024]
+      ],
+      "label_at": [0.2644, 0.1033],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "II",
+      "shading": "core",
+      "polygon": [
+        [0.3515, -0.0],
+        [0.5217, -0.0],
+        [0.5217, 0.2024],
+        [0.3515, 0.2024]
+      ],
+      "label_at": [0.4386, 0.101],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "I-II",
+      "shading": "fringe",
+      "polygon": [
+        [0.1472, -0.0],
+        [0.5477, -0.0],
+        [0.5477, 0.2024],
+        [0.1472, 0.2024]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "I",
+        "II"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "I",
+      "shading": "fringe",
+      "polygon": [
+        [0.1472, -0.0],
+        [0.3515, -0.0],
+        [0.3515, 0.2024],
+        [0.1472, 0.2024]
+      ],
+      "label_at": [0.2644, 0.1033],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "II",
+      "shading": "fringe",
+      "polygon": [
+        [0.3515, -0.0],
+        [0.5477, -0.0],
+        [0.5477, 0.2024],
+        [0.3515, 0.2024]
+      ],
+      "label_at": [0.4386, 0.101],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "III-IV-V-VI",
+      "shading": "core",
+      "polygon": [
+        [0.2416, 0.2024],
+        [0.6584, 0.2024],
+        [0.6584, 0.4],
+        [0.2416, 0.4]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "III",
+        "IV",
+        "V",
+        "VI"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "III",
+      "shading": "core",
+      "polygon": [
+        [0.2416, 0.2024],
+        [0.3564, 0.2024],
+        [0.3564, 0.4],
+        [0.2416, 0.4]
+      ],
+      "label_at": [0.3002, 0.3026],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "IV",
+      "shading": "core",
+      "polygon": [
+        [0.3564, 0.2024],
+        [0.4595, 0.2024],
+        [0.4595, 0.4],
+        [0.3564, 0.4]
+      ],
+      "label_at": [0.4126, 0.3021],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "V",
+      "shading": "core",
+      "polygon": [
+        [0.4595, 0.2024],
+        [0.5531, 0.2024],
+        [0.5531, 0.4],
+        [0.4595, 0.4]
+      ],
+      "label_at": [0.5063, 0.3017],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VI",
+      "shading": "core",
+      "polygon": [
+        [0.5531, 0.2024],
+        [0.6584, 0.2024],
+        [0.6584, 0.4],
+        [0.5531, 0.4]
+      ],
+      "label_at": [0.5998, 0.3029],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "III-IV-V-VI",
+      "shading": "fringe",
+      "polygon": [
+        [0.2123, 0.2024],
+        [0.678, 0.2024],
+        [0.678, 0.4],
+        [0.2123, 0.4]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "III",
+        "IV",
+        "V",
+        "VI"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "III",
+      "shading": "fringe",
+      "polygon": [
+        [0.2123, 0.2024],
+        [0.3564, 0.2024],
+        [0.3564, 0.4],
+        [0.2123, 0.4]
+      ],
+      "label_at": [0.3002, 0.3026],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "IV",
+      "shading": "fringe",
+      "polygon": [
+        [0.3564, 0.2024],
+        [0.4595, 0.2024],
+        [0.4595, 0.4],
+        [0.3564, 0.4]
+      ],
+      "label_at": [0.4126, 0.3021],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "V",
+      "shading": "fringe",
+      "polygon": [
+        [0.4595, 0.2024],
+        [0.5531, 0.2024],
+        [0.5531, 0.4],
+        [0.4595, 0.4]
+      ],
+      "label_at": [0.5063, 0.3017],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VI",
+      "shading": "fringe",
+      "polygon": [
+        [0.5531, 0.2024],
+        [0.678, 0.2024],
+        [0.678, 0.4],
+        [0.5531, 0.4]
+      ],
+      "label_at": [0.5998, 0.3029],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VII-VIII",
+      "shading": "core",
+      "polygon": [
+        [0.4305, 0.4],
+        [0.8017, 0.4],
+        [0.8017, 0.5993],
+        [0.4305, 0.5993]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "VII",
+        "VIII"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VII",
+      "shading": "core",
+      "polygon": [
+        [0.4305, 0.4],
+        [0.6112, 0.4],
+        [0.6112, 0.5993],
+        [0.4305, 0.5993]
+      ],
+      "label_at": [0.5119, 0.5019],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VIII",
+      "shading": "core",
+      "polygon": [
+        [0.6112, 0.4],
+        [0.8017, 0.4],
+        [0.8017, 0.5993],
+        [0.6112, 0.5993]
+      ],
+      "label_at": [0.7105, 0.5019],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VII-VIII",
+      "shading": "fringe",
+      "polygon": [
+        [0.3979, 0.4],
+        [0.8277, 0.4],
+        [0.8277, 0.5993],
+        [0.3979, 0.5993]
+      ],
+      "label_at": null,
+      "combined": true,
+      "types": [
+        "VII",
+        "VIII"
+      ],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VII",
+      "shading": "fringe",
+      "polygon": [
+        [0.3979, 0.4],
+        [0.6112, 0.4],
+        [0.6112, 0.5993],
+        [0.3979, 0.5993]
+      ],
+      "label_at": [0.5119, 0.5019],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "VIII",
+      "shading": "fringe",
+      "polygon": [
+        [0.6112, 0.4],
+        [0.8277, 0.4],
+        [0.8277, 0.5993],
+        [0.6112, 0.5993]
+      ],
+      "label_at": [0.7105, 0.5019],
+      "split_inferred": true,
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "IX",
+      "shading": "core",
+      "polygon": [
+        [0.3719, 0.5993],
+        [0.5282, 0.5993],
+        [0.5282, 0.7998],
+        [0.3719, 0.7998]
+      ],
+      "label_at": [0.4565, 0.7048],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "X",
+      "shading": "core",
+      "polygon": [
+        [0.6519, 0.5993],
+        [0.8245, 0.5993],
+        [0.8245, 0.7998],
+        [0.6519, 0.7998]
+      ],
+      "label_at": [0.7447, 0.7048],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "IX",
+      "shading": "fringe",
+      "polygon": [
+        [0.3491, 0.5993],
+        [0.551, 0.5993],
+        [0.551, 0.7998],
+        [0.3491, 0.7998]
+      ],
+      "label_at": [0.4565, 0.7048],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "X",
+      "shading": "fringe",
+      "polygon": [
+        [0.6259, 0.5993],
+        [0.8473, 0.5993],
+        [0.8473, 0.7998],
+        [0.6259, 0.7998]
+      ],
+      "label_at": [0.7447, 0.7048],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "XI",
+      "shading": "core",
+      "polygon": [
+        [0.6812, 0.7998],
+        [0.8505, 0.7998],
+        [0.8505, 1.0],
+        [0.6812, 1.0]
+      ],
+      "label_at": [0.7659, 0.9076],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    },
+    {
+      "label": "XI",
+      "shading": "fringe",
+      "polygon": [
+        [0.6584, 0.7998],
+        [0.8701, 0.7998],
+        [0.8701, 1.0],
+        [0.6584, 1.0]
+      ],
+      "label_at": [0.7659, 0.9076],
+      "shading_definition": "core: oscurecimiento >= 50 % del máximo de la fila; fringe: >= 6 % (límite exterior visible del degradado, incluye el núcleo)"
+    }
+  ],
+  "not_applicable": [
+    {
+      "polygon": [
+        [0.6057, -0.0],
+        [0.7971, -0.0],
+        [0.7971, 0.2024],
+        [0.6057, 0.2024]
+      ],
+      "cell": {
+        "row": "row1",
+        "column": "poor"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": true
+    },
+    {
+      "polygon": [
+        [0.7971, -0.0],
+        [1.0, -0.0],
+        [1.0, 0.2024],
+        [0.7971, 0.2024]
+      ],
+      "cell": {
+        "row": "row1",
+        "column": "very_poor"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": true
+    },
+    {
+      "polygon": [
+        [0.7971, 0.2024],
+        [1.0, 0.2024],
+        [1.0, 0.4],
+        [0.7971, 0.4]
+      ],
+      "cell": {
+        "row": "row2",
+        "column": "very_poor"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": true
+    },
+    {
+      "polygon": [
+        [-0.0, 0.4],
+        [0.2012, 0.4],
+        [0.2012, 0.5993],
+        [-0.0, 0.5993]
+      ],
+      "cell": {
+        "row": "row3",
+        "column": "very_good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": true
+    },
+    {
+      "polygon": [
+        [-0.0, 0.5993],
+        [0.2012, 0.5993],
+        [0.2012, 0.7998],
+        [-0.0, 0.7998]
+      ],
+      "cell": {
+        "row": "row4",
+        "column": "very_good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": true
+    },
+    {
+      "polygon": [
+        [-0.0, 0.7998],
+        [0.2012, 0.7998],
+        [0.2012, 1.0],
+        [-0.0, 1.0]
+      ],
+      "cell": {
+        "row": "row5",
+        "column": "very_good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": false
+    },
+    {
+      "polygon": [
+        [0.2012, 0.7998],
+        [0.4061, 0.7998],
+        [0.4061, 1.0],
+        [0.2012, 1.0]
+      ],
+      "cell": {
+        "row": "row5",
+        "column": "good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A",
+      "contours_drawn_inside": false
+    }
+  ],
+  "dashed_boundary": [
+    [-0.0, -0.0],
+    [0.6057, -0.0],
+    [0.6057, 0.2024],
+    [0.7971, 0.2024],
+    [0.7971, 0.4],
+    [1.0, 0.4],
+    [1.0, 1.0],
+    [0.4061, 1.0],
+    [0.4061, 0.7998],
+    [0.2012, 0.7998],
+    [0.2012, 0.4],
+    [-0.0, 0.4]
+  ],
+  "dashed_boundary_note": "Polígono cerrado de la zona 'sombreada/posible'. Los lados que coinciden con el marco de la carta no van en discontinua; las partes realmente dibujadas en discontinua están en 'dashed_boundary_parts'. Trazado sobre las líneas de rejilla (diferencia < 1 px).",
+  "dashed_boundary_parts": [
+    [
+      [0.6057, -0.0],
+      [0.6057, 0.2024],
+      [0.7971, 0.2024],
+      [0.7971, 0.4],
+      [1.0, 0.4]
+    ],
+    [
+      [-0.0, 0.4],
+      [0.2012, 0.4],
+      [0.2012, 0.7998],
+      [0.4061, 0.7998],
+      [0.4061, 1.0]
+    ]
+  ],
+  "arrows": [
+    {
+      "from": "II",
+      "to": "V",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    },
+    {
+      "from": "II",
+      "to": "VI",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    },
+    {
+      "from": "IV",
+      "to": "VII",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology",
+      "note": "dudoso: la flecha nace en el borde izquierdo del dibujo del tipo IV (podría leerse como III)"
+    },
+    {
+      "from": "V",
+      "to": "VIII",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    },
+    {
+      "from": "VIII",
+      "to": "X",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    },
+    {
+      "from": "X",
+      "to": "XI",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    },
+    {
+      "from": "VI",
+      "to": "XI",
+      "meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    }
+  ],
+  "texts": {
+    "instructions": "Heterogeneous rockmasses are meant those with alternating layers of clearly different lithology types with significant differences in their strength properties. For flysch, a typical formation with heterogeneous rock masses, these alternations are consisting of sandstones and siltstones. Clay shales may be present. From a description of the lithology, structure and surface conditions of discontinuities (particularly of the bedding planes), choose a box in the chart. The selection of the structure should be based on the tectonic disturbance (undisturbed, slightly disturbed, strongly disturbed - folded, desintegrated, sheared), the proportion of slitstones against sandstones and the expressed or not stratification inside the siltstone layers. In the type IV and V when the thickness of sandstone beds exceed 50cm an increase of the GSI value by 5 is suggested. From type IV and the following types, the stratification planes are perceptible inside the siltstone mass. Locate the position in the box that corresponds to the conditions and estimate the average value GSI from the contours. The determination of the structure and the conditon of discontinuities may range between two adjacent fields. Note that the Hoek - Brown criterion does not apply to structurally controlled failures. Where unfavourably oriented continuous weak planar discontinuities are present, these will dominate the behaviour of the rock mass. The strength of some rock masses is reduced by the presence of groundwater and this can be allowed for by a slight shift to the right in the columns for fair, poor and very poor conditions. Water pressure does not change the value of GSI and it is dealt with by using effective stress analysis.",
+    "instructions_bold": "The selection of the structure should be based on the tectonic disturbance (undisturbed, slightly disturbed, strongly disturbed - folded, desintegrated, sheared), the proportion of slitstones against sandstones and the expressed or not stratification inside the siltstone layers. In the type IV and V when the thickness of sandstone beds exceed 50cm an increase of the GSI value by 5 is suggested. From type IV and the following types, the stratification planes are perceptible inside the siltstone mass.",
+    "transcription_note": "Erratas del original conservadas (slitstones, conditon, desintegrated, meanigless, stucture, oxylised, extend).",
+    "axis_labels": {
+      "columns_header": "SURFACE CONDITIONS OF DISCONTINUITIES (Predominantly bedding planes)",
+      "columns_arrow": "DECREASE OF THE QUALITY OF DISCONTINUITIES",
+      "rows_header": "STRUCTURE AND COMPOSITION"
+    },
+    "footnotes": [
+      "N/A Means geologically impossible combination. In the non - shadowed areas, such rockmasses are not impossible to find but it is very unusual",
+      "(flecha) Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+    ]
+  },
+  "quality": {
+    "control_points": [
+      {
+        "u": 0.1211,
+        "v": 0.0962,
+        "gsi_read_by_eye": 75,
+        "gsi_interpolated": 75.0,
+        "abs_error": 0.0,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.2188,
+        "v": 0.1845,
+        "gsi_read_by_eye": 65,
+        "gsi_interpolated": 64.8,
+        "abs_error": 0.2,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.2937,
+        "v": 0.3038,
+        "gsi_read_by_eye": 55,
+        "gsi_interpolated": 54.7,
+        "abs_error": 0.3,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.3849,
+        "v": 0.4255,
+        "gsi_read_by_eye": 45,
+        "gsi_interpolated": 44.8,
+        "abs_error": 0.2,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.6617,
+        "v": 0.3635,
+        "gsi_read_by_eye": 35,
+        "gsi_interpolated": 34.9,
+        "abs_error": 0.1,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.704,
+        "v": 0.5831,
+        "gsi_read_by_eye": 25,
+        "gsi_interpolated": 25.0,
+        "abs_error": 0.0,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.8505,
+        "v": 0.6928,
+        "gsi_read_by_eye": 15,
+        "gsi_interpolated": 14.9,
+        "abs_error": 0.1,
+        "kind": "píxel del trazo en la imagen",
+        "method": "interp"
+      },
+      {
+        "u": 0.06,
+        "v": 0.08,
+        "gsi_read_by_eye": 80,
+        "gsi_interpolated": 78.7,
+        "abs_error": 1.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.3,
+        "v": 0.1,
+        "gsi_read_by_eye": 66,
+        "gsi_interpolated": 65.6,
+        "abs_error": 0.4,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.45,
+        "v": 0.3,
+        "gsi_read_by_eye": 48,
+        "gsi_interpolated": 47.4,
+        "abs_error": 0.6,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.75,
+        "v": 0.4,
+        "gsi_read_by_eye": 30,
+        "gsi_interpolated": 29.3,
+        "abs_error": 0.7,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.25,
+        "v": 0.5,
+        "gsi_read_by_eye": 48,
+        "gsi_interpolated": 47.9,
+        "abs_error": 0.1,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.55,
+        "v": 0.5,
+        "gsi_read_by_eye": 35,
+        "gsi_interpolated": 34.9,
+        "abs_error": 0.1,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.9,
+        "v": 0.5,
+        "gsi_read_by_eye": 18,
+        "gsi_interpolated": 18.3,
+        "abs_error": 0.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.3,
+        "v": 0.7,
+        "gsi_read_by_eye": 38,
+        "gsi_interpolated": 38.3,
+        "abs_error": 0.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.7,
+        "v": 0.7,
+        "gsi_read_by_eye": 21.5,
+        "gsi_interpolated": 21.3,
+        "abs_error": 0.2,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.55,
+        "v": 0.9,
+        "gsi_read_by_eye": 22,
+        "gsi_interpolated": 21.8,
+        "abs_error": 0.2,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.9,
+        "v": 0.9,
+        "gsi_read_by_eye": 7.5,
+        "gsi_interpolated": 7.3,
+        "abs_error": 0.2,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      }
+    ],
+    "max_abs_error_gsi": 1.27,
+    "max_abs_error_gsi_eye_points": 1.3,
+    "max_abs_error_gsi_on_line_points": 0.3,
+    "interpolation_method": "Lineal entre las dos isolíneas que encierran el punto, ponderada por la distancia perpendicular a cada una; isolíneas prolongadas por semirrectas solo para el cálculo; fuera de la isolínea extrema, extrapolación con la separación local (límite 0-100); None dentro de N/A. Implementado en scripts/gsi_lib.py (Interpolator).",
+    "consistency": {
+      "inside_unit_square": true,
+      "crossings": [],
+      "monotonic": true,
+      "order_issues": []
+    },
+    "notes": "Fuente JPEG de baja resolución (~61 x 84 px por celda). Isolíneas rectas que cruzan toda la carta (negras dentro del borde discontinuo, grises fuera, también dentro de las celdas N/A de las filas 1-4; no hay isolíneas en las N/A de la fila XI). El rótulo '80' desviaba el ajuste de su línea y se ha excluido. Las líneas 85 (esquina) y 80 se apoyan en pocos píxeles (6 y ~46): la 85 es dudosa en posición y valor. Valores 75, 65, ..., 5 deducidos. El reparto I-II, III-VI y VII-VIII en tipos es inferido. La flecha IV->VII es dudosa (podría nacer de III)."
+  },
+  "i18n": {
+    "default": "en",
+    "languages": [
+      "en",
+      "es"
+    ],
+    "note": "'en' es el texto literal de la carta; 'es' es una traducción técnica (no oficial) hecha para OGR-Data. Mismas claves en ambos idiomas.",
+    "en": {
+      "title": "GEOLOGICAL STRENGTH INDEX (GSI) FOR HETEROGENEOUS ROCK MASSES SUCH AS FLYSCH (V. Marinos, 2007)",
+      "caption": "",
+      "columns": {
+        "very_good": {
+          "label": "VERY GOOD",
+          "description": "Very rough, fresh unweathered surfaces"
+        },
+        "good": {
+          "label": "GOOD",
+          "description": "Rough, slightly weathered or oxylised surfaces"
+        },
+        "fair": {
+          "label": "FAIR",
+          "description": "Smooth, moderately weathered and altered surfaces"
+        },
+        "poor": {
+          "label": "POOR",
+          "description": "Very smooth, occasionally slickensided surfaces with compact coatings or fillings with angular fragments"
+        },
+        "very_poor": {
+          "label": "VERY POOR",
+          "description": "Very smooth, slickensided or highly weathered surfaces with soft clay coating or fillings"
+        }
+      },
+      "rows": {
+        "row1": {
+          "label": "I, II",
+          "description": "TYPE I. Undisturbed, with thick to medium thickness sandstone beds with sporadic thin films of siltstone. In shallow tunnels or slopes where confinement is poor the mode of the failure has a kinematic character controlled by the bedding planes and GSI is meanigless | TYPE II. Undisturbed massive siltstone (stratification planes are imperceptible) with sporadic thin interlayers of sandstones"
+        },
+        "row2": {
+          "label": "III, IV, V, VI",
+          "description": "TYPE III. Moderately disturbed sandstones with thin films of interlayers of siltstone | TYPE IV. Moderately disturbed rockmass with sandstone and siltstone similar amounts | TYPE V. Moderately disturbed siltstones with sandstone interlayers | TYPE VI. Moderately disturbed siltstones with sparse sandstone interlayers"
+        },
+        "row3": {
+          "label": "VII, VIII",
+          "description": "TYPE VII. Strongly disturbed, folded rockmass that retains its structure, with sandstone and siltstone in similar extend | TYPE VIII. Strongly disturbed, folded rockmass, with siltstones and sandstone interlayers. The structure is retained and deformation - shearing is not strong"
+        },
+        "row4": {
+          "label": "IX, X",
+          "description": "TYPE IX. Desintegrated rockmass that can be found in wide zones of faults or/and of high weathering. In this type mainly brittle material is present with some disturbed siltstones between rock pieces | TYPE X. Tectonically deformed intensively folded/ faulted siltstone or clay shale with broken and deformed sandstone layers forming an almost chaotic stucture"
+        },
+        "row5": {
+          "label": "XI",
+          "description": "TYPE XI. Tectonically strongly sheared siltstone or clayey shale forming a chaotic structure with pockets of clay. Thin layers of sandstone are transformed into small rock pieces. Ultimately the ground behavior is that of a soil"
+        }
+      },
+      "type_descriptions": {
+        "I": "Undisturbed, with thick to medium thickness sandstone beds with sporadic thin films of siltstone. In shallow tunnels or slopes where confinement is poor the mode of the failure has a kinematic character controlled by the bedding planes and GSI is meanigless",
+        "II": "Undisturbed massive siltstone (stratification planes are imperceptible) with sporadic thin interlayers of sandstones",
+        "III": "Moderately disturbed sandstones with thin films of interlayers of siltstone",
+        "IV": "Moderately disturbed rockmass with sandstone and siltstone similar amounts",
+        "V": "Moderately disturbed siltstones with sandstone interlayers",
+        "VI": "Moderately disturbed siltstones with sparse sandstone interlayers",
+        "VII": "Strongly disturbed, folded rockmass that retains its structure, with sandstone and siltstone in similar extend",
+        "VIII": "Strongly disturbed, folded rockmass, with siltstones and sandstone interlayers. The structure is retained and deformation - shearing is not strong",
+        "IX": "Desintegrated rockmass that can be found in wide zones of faults or/and of high weathering. In this type mainly brittle material is present with some disturbed siltstones between rock pieces",
+        "X": "Tectonically deformed intensively folded/ faulted siltstone or clay shale with broken and deformed sandstone layers forming an almost chaotic stucture",
+        "XI": "Tectonically strongly sheared siltstone or clayey shale forming a chaotic structure with pockets of clay. Thin layers of sandstone are transformed into small rock pieces. Ultimately the ground behavior is that of a soil"
+      },
+      "texts": {
+        "instructions": "Heterogeneous rockmasses are meant those with alternating layers of clearly different lithology types with significant differences in their strength properties. For flysch, a typical formation with heterogeneous rock masses, these alternations are consisting of sandstones and siltstones. Clay shales may be present. From a description of the lithology, structure and surface conditions of discontinuities (particularly of the bedding planes), choose a box in the chart. The selection of the structure should be based on the tectonic disturbance (undisturbed, slightly disturbed, strongly disturbed - folded, desintegrated, sheared), the proportion of slitstones against sandstones and the expressed or not stratification inside the siltstone layers. In the type IV and V when the thickness of sandstone beds exceed 50cm an increase of the GSI value by 5 is suggested. From type IV and the following types, the stratification planes are perceptible inside the siltstone mass. Locate the position in the box that corresponds to the conditions and estimate the average value GSI from the contours. The determination of the structure and the conditon of discontinuities may range between two adjacent fields. Note that the Hoek - Brown criterion does not apply to structurally controlled failures. Where unfavourably oriented continuous weak planar discontinuities are present, these will dominate the behaviour of the rock mass. The strength of some rock masses is reduced by the presence of groundwater and this can be allowed for by a slight shift to the right in the columns for fair, poor and very poor conditions. Water pressure does not change the value of GSI and it is dealt with by using effective stress analysis.",
+        "emphasis": "The selection of the structure should be based on the tectonic disturbance (undisturbed, slightly disturbed, strongly disturbed - folded, desintegrated, sheared), the proportion of slitstones against sandstones and the expressed or not stratification inside the siltstone layers. In the type IV and V when the thickness of sandstone beds exceed 50cm an increase of the GSI value by 5 is suggested. From type IV and the following types, the stratification planes are perceptible inside the siltstone mass.",
+        "emphasis_style": "bold",
+        "axis_labels": {
+          "columns_header": "SURFACE CONDITIONS OF DISCONTINUITIES (Predominantly bedding planes)",
+          "columns_arrow": "DECREASE OF THE QUALITY OF DISCONTINUITIES",
+          "rows_header": "STRUCTURE AND COMPOSITION"
+        },
+        "box_note": "",
+        "side_note": "WHEN THICKNESS OF SANDSTONE BEDS ~50cm",
+        "footnotes": [
+          "N/A Means geologically impossible combination. In the non - shadowed areas, such rockmasses are not impossible to find but it is very unusual",
+          "(flecha) Direction of tectonic disturbance and deformation of equivalent rockmass lithology"
+        ]
+      },
+      "arrow_meaning": "Direction of tectonic disturbance and deformation of equivalent rockmass lithology",
+      "na_label": "N/A",
+      "na_meaning": "Means geologically impossible combination"
+    },
+    "es": {
+      "title": "ÍNDICE DE RESISTENCIA GEOLÓGICA (GSI) PARA MACIZOS ROCOSOS HETEROGÉNEOS COMO EL FLYSCH (V. Marinos, 2007)",
+      "caption": "",
+      "columns": {
+        "very_good": {
+          "label": "MUY BUENA",
+          "description": "Superficies muy rugosas, sanas, sin meteorizar"
+        },
+        "good": {
+          "label": "BUENA",
+          "description": "Superficies rugosas, ligeramente meteorizadas u oxidadas"
+        },
+        "fair": {
+          "label": "MEDIA",
+          "description": "Superficies lisas, moderadamente meteorizadas y alteradas"
+        },
+        "poor": {
+          "label": "MALA",
+          "description": "Superficies muy lisas, ocasionalmente con espejos de falla, con recubrimientos o rellenos compactos con fragmentos angulosos"
+        },
+        "very_poor": {
+          "label": "MUY MALA",
+          "description": "Superficies muy lisas con espejos de falla o muy meteorizadas, con recubrimientos o rellenos de arcilla blanda"
+        }
+      },
+      "type_descriptions": {
+        "I": "No perturbado, con bancos de arenisca de espesor grueso a medio y finas películas esporádicas de limolita. En túneles someros o taludes con poco confinamiento, el mecanismo de rotura es cinemático, controlado por los planos de estratificación, y el GSI carece de sentido",
+        "II": "Limolita masiva no perturbada (planos de estratificación imperceptibles) con finas intercalaciones esporádicas de arenisca",
+        "III": "Areniscas moderadamente perturbadas con finas intercalaciones de limolita en forma de película",
+        "IV": "Macizo moderadamente perturbado con arenisca y limolita en proporciones similares",
+        "V": "Limolitas moderadamente perturbadas con intercalaciones de arenisca",
+        "VI": "Limolitas moderadamente perturbadas con escasas intercalaciones de arenisca",
+        "VII": "Macizo intensamente perturbado y plegado que conserva su estructura, con arenisca y limolita en proporciones similares",
+        "VIII": "Macizo intensamente perturbado y plegado, con limolitas e intercalaciones de arenisca. La estructura se conserva y la deformación por cizalla no es intensa",
+        "IX": "Macizo desintegrado, propio de zonas amplias de falla o de meteorización intensa. Predomina el material frágil, con algunas limolitas perturbadas entre los fragmentos de roca",
+        "X": "Limolita o lutita arcillosa tectónicamente deformada, intensamente plegada y fallada, con capas de arenisca rotas y deformadas que forman una estructura casi caótica",
+        "XI": "Limolita o lutita arcillosa tectónicamente muy cizallada que forma una estructura caótica con bolsadas de arcilla. Las capas delgadas de arenisca se han transformado en pequeños fragmentos de roca. En último término, el terreno se comporta como un suelo"
+      },
+      "texts": {
+        "instructions": "Se entiende por macizos rocosos heterogéneos los formados por alternancias de capas de litologías claramente distintas, con diferencias significativas en sus propiedades resistentes. En el flysch, formación típica de macizos heterogéneos, estas alternancias son de areniscas y limolitas, y pueden aparecer lutitas arcillosas. A partir de la descripción de la litología, la estructura y la condición de las superficies de las discontinuidades (en particular, de los planos de estratificación), elegir una casilla de la tabla. La elección de la estructura debe basarse en el grado de perturbación tectónica (no perturbado, ligeramente perturbado, intensamente perturbado-plegado, desintegrado, cizallado), en la proporción de limolitas frente a areniscas y en si la estratificación se manifiesta o no dentro de las capas de limolita. En los tipos IV y V, cuando el espesor de los bancos de arenisca supera 50 cm, se recomienda aumentar en 5 el valor del GSI. A partir del tipo IV, los planos de estratificación son perceptibles dentro de la masa de limolita. Situar en la casilla la posición que corresponda a las condiciones y estimar el valor medio del GSI a partir de las isolíneas. La estructura y la condición de las discontinuidades pueden quedar entre dos casillas contiguas. El criterio de Hoek-Brown no es aplicable a roturas controladas por la estructura. Cuando existan discontinuidades planas débiles, continuas y orientadas desfavorablemente, estas dominarán el comportamiento del macizo rocoso. La resistencia de algunos macizos rocosos disminuye en presencia de agua subterránea, lo que puede tenerse en cuenta con un ligero desplazamiento hacia la derecha en las columnas de condición media, mala y muy mala. La presión de agua no modifica el valor del GSI y se tiene en cuenta mediante un análisis en tensiones efectivas.",
+        "emphasis": "La elección de la estructura debe basarse en el grado de perturbación tectónica (no perturbado, ligeramente perturbado, intensamente perturbado-plegado, desintegrado, cizallado), en la proporción de limolitas frente a areniscas y en si la estratificación se manifiesta o no dentro de las capas de limolita. En los tipos IV y V, cuando el espesor de los bancos de arenisca supera 50 cm, se recomienda aumentar en 5 el valor del GSI. A partir del tipo IV, los planos de estratificación son perceptibles dentro de la masa de limolita.",
+        "emphasis_style": "bold",
+        "axis_labels": {
+          "columns_header": "CONDICIÓN DE LAS SUPERFICIES DE LAS DISCONTINUIDADES (principalmente planos de estratificación)",
+          "columns_arrow": "DISMINUCIÓN DE LA CALIDAD DE LAS DISCONTINUIDADES",
+          "rows_header": "ESTRUCTURA Y COMPOSICIÓN"
+        },
+        "box_note": "",
+        "side_note": "CUANDO EL ESPESOR DE LOS BANCOS DE ARENISCA ES ~50 cm",
+        "footnotes": [
+          "N/A: combinación geológicamente imposible. En las zonas no sombreadas estos macizos rocosos no son imposibles, pero sí muy poco frecuentes",
+          "(flecha): dirección de la perturbación tectónica y de la deformación de macizos rocosos de litología equivalente"
+        ]
+      },
+      "arrow_meaning": "Dirección de la perturbación tectónica y de la deformación de macizos rocosos de litología equivalente",
+      "na_label": "N/A",
+      "na_meaning": "Combinación geológicamente imposible",
+      "rows": {
+        "row1": {
+          "label": "I, II",
+          "description": "TIPO I. No perturbado, con bancos de arenisca de espesor grueso a medio y finas películas esporádicas de limolita. En túneles someros o taludes con poco confinamiento, el mecanismo de rotura es cinemático, controlado por los planos de estratificación, y el GSI carece de sentido | TIPO II. Limolita masiva no perturbada (planos de estratificación imperceptibles) con finas intercalaciones esporádicas de arenisca"
+        },
+        "row2": {
+          "label": "III, IV, V, VI",
+          "description": "TIPO III. Areniscas moderadamente perturbadas con finas intercalaciones de limolita en forma de película | TIPO IV. Macizo moderadamente perturbado con arenisca y limolita en proporciones similares | TIPO V. Limolitas moderadamente perturbadas con intercalaciones de arenisca | TIPO VI. Limolitas moderadamente perturbadas con escasas intercalaciones de arenisca"
+        },
+        "row3": {
+          "label": "VII, VIII",
+          "description": "TIPO VII. Macizo intensamente perturbado y plegado que conserva su estructura, con arenisca y limolita en proporciones similares | TIPO VIII. Macizo intensamente perturbado y plegado, con limolitas e intercalaciones de arenisca. La estructura se conserva y la deformación por cizalla no es intensa"
+        },
+        "row4": {
+          "label": "IX, X",
+          "description": "TIPO IX. Macizo desintegrado, propio de zonas amplias de falla o de meteorización intensa. Predomina el material frágil, con algunas limolitas perturbadas entre los fragmentos de roca | TIPO X. Limolita o lutita arcillosa tectónicamente deformada, intensamente plegada y fallada, con capas de arenisca rotas y deformadas que forman una estructura casi caótica"
+        },
+        "row5": {
+          "label": "XI",
+          "description": "TIPO XI. Limolita o lutita arcillosa tectónicamente muy cizallada que forma una estructura caótica con bolsadas de arcilla. Las capas delgadas de arenisca se han transformado en pequeños fragmentos de roca. En último término, el terreno se comporta como un suelo"
+        }
+      }
+    }
+  }
+}

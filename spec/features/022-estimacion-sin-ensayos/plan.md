@@ -47,6 +47,12 @@
 
 ## Pendiente (no implementado, con motivo)
 
+- **Hecho (23-11-2026)**: las tres cartas (general 2000, flysch 2000 y
+  heterogénea de V. Marinos 2007, publicada en Marinos 2014) se han
+  digitalizado desde la fuente (error máx. 1,3 GSI en los puntos de
+  control) y se integran con clic en `core/gsi_charts.py` y
+  `gui/gsi_chart_view.py`, con textos en inglés y español. Lo que sigue
+  es la nota original.
 - **Carta de flysch 2000 (Marinos & Hoek) y Heterogeneous 2013**: no son
   lineales; harían falta isolíneas digitalizadas. ORMAS tiene las suyas
   en su código, pero son su trabajo (no se copian); digitalizarlas desde

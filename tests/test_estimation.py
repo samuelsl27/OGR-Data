@@ -94,11 +94,11 @@ def test_gsi_dialog_modes() -> None:
     app = _app()
     dlg = GsiDialog(None)
     try:
-        dlg._tabs.setCurrentIndex(1)
+        dlg._tabs.setCurrentWidget(dlg._chart_page)
         assert dlg.value is None  # nothing clicked yet
         assert dlg._chart.set_point(30.0, 20.0) == 50.0
         assert dlg.value == 50.0 and "VERY BLOCKY" in dlg._chart_label.text()
-        dlg._tabs.setCurrentIndex(2)
+        dlg._tabs.setCurrentIndex(dlg._tabs.count() - 1)  # calculator
         dlg._rqd.setValue(30.0)
         dlg._j89.setValue(10.0)
         assert dlg.value == 30.0

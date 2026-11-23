@@ -3,8 +3,10 @@
 One-click selectors next to the GHB fields, as ORMAS (and the old RocData)
 offer them; RSData hides them behind double-click buttons.
 
-- GsiDialog: three tabs — the Hoek & Marinos (2000) chart selector of
-  spec 003; the quantified chart of Hoek, Carter & Diederichs (2013,
+- GsiDialog: the Hoek & Marinos (2000) chart selector of spec 003; the
+  digitized charts, redrawn and clickable (general 2000, flysch 2000 and
+  heterogeneous V. Marinos 2007; texts in English or Spanish, see
+  gsi_chart_view); the quantified chart of Hoek, Carter & Diederichs (2013,
   Fig. 5) redrawn from its equation GSI = 1.5 JCond89 + RQD/2 (click on it
   to read GSI); and the 2013 calculator (RQD direct / from lambda / from
   Jv; joint condition as JCond89, its Table 1 ratings, JCond76 or Jr/Ja).
@@ -16,7 +18,7 @@ from __future__ import annotations
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -37,6 +39,7 @@ from PySide6.QtWidgets import (
 
 from ..core import gsi as qgsi
 from ..core import tables
+from .gsi_chart_view import DigitizedGsiPage
 from .pickers import GsiPickerDialog
 from .themes import mpl_colors
 
@@ -116,14 +119,21 @@ class QuantifiedGsiChart(FigureCanvasQTAgg):
         return value
 
 
-class GsiDialog(QDialog):
-    """GSI: 2000 chart selector, quantified chart (2013) and calculator (2013)."""
+CHART_LANGUAGES = (("en", "English (original)"), ("es", "Español"))
 
-    def __init__(self, parent=None, theme: str = "light") -> None:
+
+class GsiDialog(QDialog):
+    """GSI: 2000 selector, digitized charts (2000 / flysch / heterogeneous), quantified chart and calculator (2013)."""
+
+    def __init__(self, parent=None, theme: str = "light", lang: str | None = None) -> None:
         super().__init__(parent)
         self.setWindowTitle("Pick GSI")
-        self.resize(820, 640)
+        self.resize(1000, 860)
         self.value: float | None = None
+        self._settings = QSettings("OpenGeoRock", "OGR-Data")
+        if lang is None:
+            lang = str(self._settings.value("gsi_chart_language", "en"))
+        self._lang = lang if lang in {code for code, _ in CHART_LANGUAGES} else "en"
         self._tabs = QTabWidget()
 
         # 1. Hoek & Marinos (2000) selector (spec 003)
@@ -136,9 +146,20 @@ class GsiDialog(QDialog):
         for combo in (self._chart2000._structure, self._chart2000._surface):
             combo.currentIndexChanged.connect(self._update_result)
         self._chart2000._value.valueChanged.connect(self._update_result)
-        self._tabs.addTab(self._chart2000, "Chart 2000 (Hoek && Marinos)")
+        self._tabs.addTab(self._chart2000, "Chart 2000 (selector)")
 
-        # 2. quantified chart (2013)
+        # 2. digitized charts: click -> GSI (general 2000, flysch 2000, heterogeneous 2007)
+        self._digitized: dict[str, DigitizedGsiPage] = {}
+        for chart_id, title in (
+            ("general_2000", "Chart 2000 (click)"),
+            ("flysch_2000", "Flysch 2000 (Marinos && Hoek)"),
+            ("heterogeneous_marinos_2007", "Heterogeneous (V. Marinos 2007)"),
+        ):
+            page = DigitizedGsiPage(chart_id, theme, self._lang, on_change=self._update_result)
+            self._digitized[chart_id] = page
+            self._tabs.addTab(page, title)
+
+        # 3. quantified chart (2013)
         chart_page = QWidget()
         chart_layout = QVBoxLayout(chart_page)
         self._chart = QuantifiedGsiChart(theme, on_pick=self._chart_picked)
@@ -147,20 +168,35 @@ class GsiDialog(QDialog):
         chart_layout.addWidget(self._chart, stretch=1)
         chart_layout.addWidget(self._chart_label)
         self._tabs.addTab(chart_page, "Quantified chart 2013")
+        self._chart_page = chart_page
 
-        # 3. calculator (2013)
+        # 4. calculator (2013)
         self._tabs.addTab(self._build_calculator(), "Calculator 2013")
         self._tabs.currentChanged.connect(self._update_result)
 
         self._result = QLabel()
         source = tables.gsi_quantified()["source"]
-        note = QLabel(f"Sources: Hoek & Marinos (2000); {source}")
+        note = QLabel(
+            f"Sources: Hoek & Marinos (2000); Marinos & Hoek (2001), flysch; V. Marinos (2007), in Marinos (2014), "
+            f"JRMGE 6(3), Fig. 3; {source} Digitized charts: redrawn from isolines digitized from the sources "
+            "(max. error 1.3 GSI at the control points)."
+        )
         note.setWordWrap(True)
         note.setStyleSheet("font-size: 8pt;")
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
+        self._language = QComboBox()
+        for code, name in CHART_LANGUAGES:
+            self._language.addItem(name, code)
+        self._language.setCurrentIndex(self._language.findData(self._lang))
+        self._language.activated.connect(self._language_chosen)
+        top = QHBoxLayout()
+        top.addStretch(1)
+        top.addWidget(QLabel("Chart text / Texto de las cartas:"))
+        top.addWidget(self._language)
         layout = QVBoxLayout(self)
+        layout.addLayout(top)
         layout.addWidget(self._tabs, stretch=1)
         layout.addWidget(self._result)
         layout.addWidget(note)
@@ -303,16 +339,40 @@ class GsiDialog(QDialog):
                 self._rqd_form.setRowVisible(widget, shown)
             self._rqd_value.setText(f"{self.rqd():.2f} %")
         text = ""
-        if tab == 0:
+        page = self._tabs.widget(tab)
+        if page is self._chart2000:
             self.value = self._chart2000.gsi()
             text = "" if self.value is None else f"GSI = {self.value:.1f} (chart 2000)"
-        elif tab == 1:
+        elif isinstance(page, DigitizedGsiPage):
+            self.value = page.value
+            if page.result is None:
+                text = "Click on the chart."
+            elif self.value is None:
+                text = "Not applicable here (N/A): pick another cell."
+            else:
+                text = f"GSI = {self.value:.1f} — {page.result.summary(self._lang)}"
+        elif page is self._chart_page:
             self.value = None if self._chart.point is None else sum(self._chart.point)
             text = "Click on the chart." if self.value is None else f"GSI = {self.value:.1f}"
         else:
             self.value, formula = self.calculator_gsi()
             text = f"{formula} = {self.value:.2f}"
         self._result.setText(f"<b>{text}</b>")
+
+    def set_language(self, lang: str) -> None:
+        """Language of the digitized charts' texts: 'en' (literal) or 'es'."""
+
+        self._lang = lang
+        if self._language.currentData() != lang:
+            self._language.setCurrentIndex(self._language.findData(lang))
+        for page in self._digitized.values():
+            page.set_language(lang)
+        self._update_result()
+
+    def _language_chosen(self) -> None:
+        lang = self._language.currentData()
+        self._settings.setValue("gsi_chart_language", lang)  # remembered for the next dialog
+        self.set_language(lang)
 
     def accept(self) -> None:
         self._update_result()

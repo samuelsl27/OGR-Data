@@ -8,4 +8,8 @@
 - [x] mi con filtros; D por aplicación; Ei = MR·σci
 - [x] Picks de un clic y en la unidad de visualización (fallo de σci en MPa)
 - [x] tests/test_estimation.py; suite en verde; commit y push
-- [ ] Cartas de flysch 2000 y heterogénea 2013 (digitalizar isolíneas desde la fuente)
+- [x] Cartas digitalizadas con clic (general 2000, flysch 2000 y heterogénea
+      V. Marinos 2007/2014): datos en `data/gsi_digitized_*.json` (desde
+      `Bibliografia/Rocas/flysch 2000 y heterogénea 2013`), `core/gsi_charts.py`
+      (interpolador, N/A, tipos), `gui/gsi_chart_view.py` (redibujo, selector de
+      tipo, notas) y textos EN/ES conmutables; `tests/test_gsi_charts.py`

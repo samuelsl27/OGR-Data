@@ -1,0 +1,706 @@
+{
+  "chart_id": "general_2000",
+  "title": "GEOLOGICAL STRENGTH INDEX FOR JOINTED ROCKS (Hoek and Marinos, 2000)",
+  "citation": "Marinos, P. & Hoek, E. (2000). GSI: a geologically friendly tool for rock mass strength estimation. Proc. GeoEng2000 International Conference on Geotechnical and Geological Engineering, Melbourne. Technomic Publishing Co., Lancaster, PA, pp. 1422-1440. Carta: 'Geological Strength Index for jointed rocks (Hoek and Marinos, 2000)', Table 3.",
+  "source_used": {
+    "file": "../Marinos_Hoek_2000_GSI_Geologically-Friendly-Tool.pdf",
+    "page": 4,
+    "method": "pdf_vector",
+    "notes": "Trazos vectoriales extraídos con PyMuPDF page.get_drawings(). El texto de la carta está convertido a contornos (no hay capa de texto): las transcripciones se han hecho leyendo la página renderizada a 170 ppp. Coordenadas de image_transform en puntos PDF (1/72 pulgada) de la página 4 sin rotación; a 300 ppp multiplicar por 300/72."
+  },
+  "frame": {
+    "u": "0 = left edge of VERY GOOD column, 1 = right edge of VERY POOR column",
+    "v": "0 = top of first structure row, 1 = bottom of last row"
+  },
+  "image_transform": {
+    "file": "../Marinos_Hoek_2000_GSI_Geologically-Friendly-Tool.pdf#page=4",
+    "units": "pdf_points",
+    "rotation_deg": 0,
+    "corners_px": {
+      "top_left": [298.6, 328.92],
+      "top_right": [500.56, 328.92],
+      "bottom_left": [298.6, 659.76],
+      "bottom_right": [500.56, 659.76]
+    }
+  },
+  "columns": [
+    {
+      "key": "very_good",
+      "label": "VERY GOOD",
+      "description": "Very rough, fresh unweathered surfaces",
+      "literal": "VERY GOOD\nVery rough, fresh unweathered surfaces",
+      "u0": 0.0,
+      "u1": 0.2008
+    },
+    {
+      "key": "good",
+      "label": "GOOD",
+      "description": "Rough, slightly weathered, iron stained surfaces",
+      "literal": "GOOD\nRough, slightly weathered, iron stained surfaces",
+      "u0": 0.2008,
+      "u1": 0.4052
+    },
+    {
+      "key": "fair",
+      "label": "FAIR",
+      "description": "Smooth, moderately weathered and altered surfaces",
+      "literal": "FAIR\nSmooth, moderately weathered and altered surfaces",
+      "u0": 0.4052,
+      "u1": 0.6055
+    },
+    {
+      "key": "poor",
+      "label": "POOR",
+      "description": "Slickensided, highly weathered surfaces with compact coatings or fillings or angular fragments",
+      "literal": "POOR\nSlickensided, highly weathered surfaces with compact coatings or fillings or angular fragments",
+      "u0": 0.6055,
+      "u1": 0.8033
+    },
+    {
+      "key": "very_poor",
+      "label": "VERY POOR",
+      "description": "Slickensided, highly weathered surfaces with soft clay coatings or fillings",
+      "literal": "VERY POOR\nSlickensided, highly weathered surfaces with soft clay coatings or fillings",
+      "u0": 0.8033,
+      "u1": 1.0
+    }
+  ],
+  "rows": [
+    {
+      "key": "intact_massive",
+      "label": "INTACT OR MASSIVE",
+      "description": "intact rock specimens or massive in situ rock with few widely spaced discontinuities",
+      "literal": "INTACT OR MASSIVE - intact rock specimens or massive in situ rock with few widely spaced discontinuities",
+      "types": [],
+      "v0": 0.0,
+      "v1": 0.1661
+    },
+    {
+      "key": "blocky",
+      "label": "BLOCKY",
+      "description": "well interlocked undisturbed rock mass consisting of cubical blocks formed by three intersecting discontinuity sets",
+      "literal": "BLOCKY - well interlocked undisturbed rock mass consisting of cubical blocks formed by three intersecting discontinuity sets",
+      "types": [],
+      "v0": 0.1661,
+      "v1": 0.3344
+    },
+    {
+      "key": "very_blocky",
+      "label": "VERY BLOCKY",
+      "description": "interlocked, partially disturbed mass with multi-faceted angular blocks formed by 4 or more joint sets",
+      "literal": "VERY BLOCKY- interlocked, partially disturbed mass with multi-faceted angular blocks formed by 4 or more joint sets",
+      "types": [],
+      "v0": 0.3344,
+      "v1": 0.4996
+    },
+    {
+      "key": "blocky_disturbed_seamy",
+      "label": "BLOCKY/DISTURBED/SEAMY",
+      "description": "folded with angular blocks formed by many intersecting discontinuity sets. Persistence of bedding planes or schistosity",
+      "literal": "BLOCKY/DISTURBED/SEAMY - folded with angular blocks formed by many intersecting discontinuity sets. Persistence of bedding planes or schistosity",
+      "types": [],
+      "v0": 0.4996,
+      "v1": 0.6678
+    },
+    {
+      "key": "disintegrated",
+      "label": "DISINTEGRATED",
+      "description": "poorly interlocked, heavily broken rock mass with mixture of angular and rounded rock pieces",
+      "literal": "DISINTEGRATED - poorly interlocked, heavily broken rock mass with mixture of angular and rounded rock pieces",
+      "types": [],
+      "v0": 0.6678,
+      "v1": 0.8339
+    },
+    {
+      "key": "laminated_sheared",
+      "label": "LAMINATED/SHEARED",
+      "description": "Lack of blockiness due to close spacing of weak schistosity or shear planes",
+      "literal": "LAMINATED/SHEARED - Lack of blockiness due to close spacing of weak schistosity or shear planes",
+      "types": [],
+      "v0": 0.8339,
+      "v1": 1.0
+    }
+  ],
+  "isolines": [
+    {
+      "gsi": 95,
+      "value_read_from_label": false,
+      "points": [
+        [0.0939, 0.0],
+        [0.0, 0.0493]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 90,
+      "value_read_from_label": true,
+      "points": [
+        [0.202, 0.0],
+        [0.0963, 0.0566],
+        [0.0404, 0.0871],
+        [0.0, 0.1074]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 85,
+      "value_read_from_label": false,
+      "points": [
+        [0.3018, 0.0],
+        [0.0, 0.1785]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 80,
+      "value_read_from_label": true,
+      "points": [
+        [0.4017, 0.0],
+        [0.1783, 0.1393],
+        [0.1224, 0.1748],
+        [0.0, 0.2503]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 75,
+      "value_read_from_label": false,
+      "points": [
+        [0.4884, 0.0],
+        [0.0, 0.3272]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 70,
+      "value_read_from_label": true,
+      "points": [
+        [0.5722, 0.0],
+        [0.2555, 0.2184],
+        [0.2056, 0.2561],
+        [0.0, 0.3975]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 65,
+      "value_read_from_label": false,
+      "points": [
+        [0.6043, 0.0413],
+        [0.0, 0.4759]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 60,
+      "value_read_from_label": true,
+      "points": [
+        [0.6043, 0.0965],
+        [0.3375, 0.3003],
+        [0.2876, 0.338],
+        [0.0, 0.5593]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 55,
+      "value_read_from_label": false,
+      "points": [
+        [0.6043, 0.1661],
+        [0.0, 0.6503]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 50,
+      "value_read_from_label": true,
+      "points": [
+        [0.6946, 0.1661],
+        [0.429, 0.3917],
+        [0.3791, 0.4302],
+        [0.0, 0.7541]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 45,
+      "value_read_from_label": false,
+      "points": [
+        [0.773, 0.1661],
+        [0.0321, 0.8339]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 40,
+      "value_read_from_label": true,
+      "points": [
+        [0.8633, 0.1661],
+        [0.5282, 0.4889],
+        [0.4813, 0.531],
+        [0.1699, 0.8339]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 35,
+      "value_read_from_label": false,
+      "points": [
+        [0.9572, 0.1661],
+        [0.3054, 0.8339]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 30,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.2242],
+        [0.6399, 0.6003],
+        [0.5948, 0.6489],
+        [0.404, 0.8506]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 25,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.3127],
+        [0.404, 1.0]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 20,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.4164],
+        [0.7552, 0.7156],
+        [0.7148, 0.7642],
+        [0.527, 1.0]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 15,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.5462],
+        [0.6613, 1.0]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    },
+    {
+      "gsi": 10,
+      "value_read_from_label": true,
+      "points": [
+        [1.0, 0.6931],
+        [0.8883, 0.8484],
+        [0.8515, 0.8963],
+        [0.7825, 1.0]
+      ],
+      "n_vector_segments": 2,
+      "note": "hueco del rótulo salvado uniendo los dos tramos colineales"
+    },
+    {
+      "gsi": 5,
+      "value_read_from_label": false,
+      "points": [
+        [1.0, 0.8527],
+        [0.9002, 1.0]
+      ],
+      "n_vector_segments": 1,
+      "note": ""
+    }
+  ],
+  "regions": [],
+  "not_applicable": [
+    {
+      "polygon": [
+        [0.6055, 0.0],
+        [0.8033, 0.0],
+        [0.8033, 0.1661],
+        [0.6055, 0.1661]
+      ],
+      "cell": {
+        "row": "intact_massive",
+        "column": "poor"
+      },
+      "kind": "N/A",
+      "label_text": "N/A"
+    },
+    {
+      "polygon": [
+        [0.8033, 0.0],
+        [1.0, 0.0],
+        [1.0, 0.1661],
+        [0.8033, 0.1661]
+      ],
+      "cell": {
+        "row": "intact_massive",
+        "column": "very_poor"
+      },
+      "kind": "N/A",
+      "label_text": "N/A"
+    },
+    {
+      "polygon": [
+        [0.0, 0.8339],
+        [0.2008, 0.8339],
+        [0.2008, 1.0],
+        [0.0, 1.0]
+      ],
+      "cell": {
+        "row": "laminated_sheared",
+        "column": "very_good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A"
+    },
+    {
+      "polygon": [
+        [0.2008, 0.8339],
+        [0.4052, 0.8339],
+        [0.4052, 1.0],
+        [0.2008, 1.0]
+      ],
+      "cell": {
+        "row": "laminated_sheared",
+        "column": "good"
+      },
+      "kind": "N/A",
+      "label_text": "N/A"
+    }
+  ],
+  "dashed_boundary": [],
+  "arrows": [],
+  "texts": {
+    "title": "GEOLOGICAL STRENGTH INDEX FOR JOINTED ROCKS (Hoek and Marinos, 2000)",
+    "caption_in_source": "Table 3: Geological strength index for jointed rock masses.",
+    "instructions": "From the lithology, structure and surface conditions of the discontinuities, estimate the average value of GSI. Do not try to be too precise. Quoting a range from 33 to 37 is more realistic than stating that GSI = 35. Note that the table does not apply to structurally controlled failures. Where weak planar structural planes are present in an unfavourable orientation with respect to the excavation face, these will dominate the rock mass behaviour. The shear strength of surfaces in rocks that are prone to deterioration as a result of changes in moisture content will be reduced if water is present. When working with rocks in the fair to very poor categories, a shift to the right may be made for wet conditions. Water pressure is dealt with by effective stress analysis.",
+    "instructions_underlined": "Note that the table does not apply to structurally controlled failures.",
+    "axis_labels": {
+      "columns_header": "SURFACE CONDITIONS",
+      "columns_arrow": "DECREASING SURFACE QUALITY",
+      "rows_header": "STRUCTURE",
+      "rows_arrow": "DECREASING INTERLOCKING OF ROCK PIECES"
+    },
+    "footnotes": []
+  },
+  "quality": {
+    "control_points": [
+      {
+        "u": 0.101,
+        "v": 0.0537,
+        "gsi_read_by_eye": 90,
+        "gsi_interpolated": 90.0,
+        "abs_error": 0.0,
+        "kind": "punto medio del trazo vectorial",
+        "method": "interp"
+      },
+      {
+        "u": 0.2861,
+        "v": 0.1988,
+        "gsi_read_by_eye": 70,
+        "gsi_interpolated": 69.9,
+        "abs_error": 0.1,
+        "kind": "punto medio del trazo vectorial",
+        "method": "interp"
+      },
+      {
+        "u": 0.3473,
+        "v": 0.4601,
+        "gsi_read_by_eye": 50,
+        "gsi_interpolated": 49.8,
+        "abs_error": 0.2,
+        "kind": "punto medio del trazo vectorial",
+        "method": "interp"
+      },
+      {
+        "u": 0.702,
+        "v": 0.5374,
+        "gsi_read_by_eye": 30,
+        "gsi_interpolated": 29.9,
+        "abs_error": 0.1,
+        "kind": "punto medio del trazo vectorial",
+        "method": "interp"
+      },
+      {
+        "u": 0.8912,
+        "v": 0.8466,
+        "gsi_read_by_eye": 10,
+        "gsi_interpolated": 9.9,
+        "abs_error": 0.1,
+        "kind": "punto medio del trazo vectorial",
+        "method": "interp"
+      },
+      {
+        "u": 0.1,
+        "v": 0.08,
+        "gsi_read_by_eye": 88,
+        "gsi_interpolated": 88.0,
+        "abs_error": 0.0,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.3,
+        "v": 0.25,
+        "gsi_read_by_eye": 66,
+        "gsi_interpolated": 65.7,
+        "abs_error": 0.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.5,
+        "v": 0.4,
+        "gsi_read_by_eye": 47,
+        "gsi_interpolated": 45.7,
+        "abs_error": 1.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.7,
+        "v": 0.55,
+        "gsi_read_by_eye": 30,
+        "gsi_interpolated": 29.5,
+        "abs_error": 0.5,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.9,
+        "v": 0.75,
+        "gsi_read_by_eye": 13,
+        "gsi_interpolated": 12.7,
+        "abs_error": 0.3,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.15,
+        "v": 0.6,
+        "gsi_read_by_eye": 52,
+        "gsi_interpolated": 51.3,
+        "abs_error": 0.7,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.5,
+        "v": 0.9,
+        "gsi_read_by_eye": 25,
+        "gsi_interpolated": 24.6,
+        "abs_error": 0.4,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.85,
+        "v": 0.3,
+        "gsi_read_by_eye": 34,
+        "gsi_interpolated": 33.8,
+        "abs_error": 0.2,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.35,
+        "v": 0.7,
+        "gsi_read_by_eye": 38,
+        "gsi_interpolated": 38.4,
+        "abs_error": 0.4,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      },
+      {
+        "u": 0.65,
+        "v": 0.95,
+        "gsi_read_by_eye": 18,
+        "gsi_interpolated": 16.9,
+        "abs_error": 1.1,
+        "kind": "lectura a ojo",
+        "method": "interp"
+      }
+    ],
+    "max_abs_error_gsi": 1.26,
+    "max_abs_error_gsi_eye_points": 1.3,
+    "max_abs_error_gsi_on_line_points": 0.2,
+    "interpolation_method": "Lineal entre las dos isolíneas que encierran el punto, ponderada por la distancia perpendicular a cada una; isolíneas prolongadas por semirrectas solo para el cálculo; fuera de la isolínea extrema, extrapolación con la separación local (límite 0-100); None dentro de N/A. Implementado en scripts/gsi_lib.py (Interpolator).",
+    "consistency": {
+      "inside_unit_square": true,
+      "crossings": [],
+      "monotonic": true,
+      "order_issues": []
+    },
+    "notes": "Isolíneas rectas tomadas directamente de los trazos vectoriales del PDF (sin error de digitalización apreciable, < 0.05 pt). Valores 90..10 leídos de los rótulos; 95, 85, ..., 5 deducidos (líneas sin rótulo a medio camino). La línea 95 (esquina superior izquierda) y la 5 (esquina inferior derecha) no llevan rótulo: dudosas en valor, aunque coherentes con la secuencia. Los huecos de los rótulos se han salvado uniendo los dos tramos colineales."
+  },
+  "i18n": {
+    "default": "en",
+    "languages": [
+      "en",
+      "es"
+    ],
+    "note": "'en' es el texto literal de la carta; 'es' es una traducción técnica (no oficial) hecha para OGR-Data. Mismas claves en ambos idiomas.",
+    "en": {
+      "title": "GEOLOGICAL STRENGTH INDEX FOR JOINTED ROCKS (Hoek and Marinos, 2000)",
+      "caption": "Table 3: Geological strength index for jointed rock masses.",
+      "columns": {
+        "very_good": {
+          "label": "VERY GOOD",
+          "description": "Very rough, fresh unweathered surfaces"
+        },
+        "good": {
+          "label": "GOOD",
+          "description": "Rough, slightly weathered, iron stained surfaces"
+        },
+        "fair": {
+          "label": "FAIR",
+          "description": "Smooth, moderately weathered and altered surfaces"
+        },
+        "poor": {
+          "label": "POOR",
+          "description": "Slickensided, highly weathered surfaces with compact coatings or fillings or angular fragments"
+        },
+        "very_poor": {
+          "label": "VERY POOR",
+          "description": "Slickensided, highly weathered surfaces with soft clay coatings or fillings"
+        }
+      },
+      "rows": {
+        "intact_massive": {
+          "label": "INTACT OR MASSIVE",
+          "description": "intact rock specimens or massive in situ rock with few widely spaced discontinuities"
+        },
+        "blocky": {
+          "label": "BLOCKY",
+          "description": "well interlocked undisturbed rock mass consisting of cubical blocks formed by three intersecting discontinuity sets"
+        },
+        "very_blocky": {
+          "label": "VERY BLOCKY",
+          "description": "interlocked, partially disturbed mass with multi-faceted angular blocks formed by 4 or more joint sets"
+        },
+        "blocky_disturbed_seamy": {
+          "label": "BLOCKY/DISTURBED/SEAMY",
+          "description": "folded with angular blocks formed by many intersecting discontinuity sets. Persistence of bedding planes or schistosity"
+        },
+        "disintegrated": {
+          "label": "DISINTEGRATED",
+          "description": "poorly interlocked, heavily broken rock mass with mixture of angular and rounded rock pieces"
+        },
+        "laminated_sheared": {
+          "label": "LAMINATED/SHEARED",
+          "description": "Lack of blockiness due to close spacing of weak schistosity or shear planes"
+        }
+      },
+      "type_descriptions": {},
+      "texts": {
+        "instructions": "From the lithology, structure and surface conditions of the discontinuities, estimate the average value of GSI. Do not try to be too precise. Quoting a range from 33 to 37 is more realistic than stating that GSI = 35. Note that the table does not apply to structurally controlled failures. Where weak planar structural planes are present in an unfavourable orientation with respect to the excavation face, these will dominate the rock mass behaviour. The shear strength of surfaces in rocks that are prone to deterioration as a result of changes in moisture content will be reduced if water is present. When working with rocks in the fair to very poor categories, a shift to the right may be made for wet conditions. Water pressure is dealt with by effective stress analysis.",
+        "emphasis": "Note that the table does not apply to structurally controlled failures.",
+        "emphasis_style": "underline",
+        "axis_labels": {
+          "columns_header": "SURFACE CONDITIONS",
+          "columns_arrow": "DECREASING SURFACE QUALITY",
+          "rows_header": "STRUCTURE",
+          "rows_arrow": "DECREASING INTERLOCKING OF ROCK PIECES"
+        },
+        "box_note": "",
+        "side_note": "",
+        "footnotes": []
+      },
+      "arrow_meaning": "",
+      "na_label": "N/A",
+      "na_meaning": "Not applicable"
+    },
+    "es": {
+      "title": "ÍNDICE DE RESISTENCIA GEOLÓGICA PARA ROCAS DIACLASADAS (Hoek y Marinos, 2000)",
+      "caption": "Tabla 3: Índice de resistencia geológica para macizos rocosos diaclasados.",
+      "columns": {
+        "very_good": {
+          "label": "MUY BUENA",
+          "description": "Superficies muy rugosas, sanas, sin meteorizar"
+        },
+        "good": {
+          "label": "BUENA",
+          "description": "Superficies rugosas, ligeramente meteorizadas, con pátinas de óxido de hierro"
+        },
+        "fair": {
+          "label": "MEDIA",
+          "description": "Superficies lisas, moderadamente meteorizadas y alteradas"
+        },
+        "poor": {
+          "label": "MALA",
+          "description": "Superficies con espejos de falla, muy meteorizadas, con recubrimientos o rellenos compactos o con fragmentos angulosos"
+        },
+        "very_poor": {
+          "label": "MUY MALA",
+          "description": "Superficies con espejos de falla, muy meteorizadas, con recubrimientos o rellenos de arcilla blanda"
+        }
+      },
+      "type_descriptions": {},
+      "texts": {
+        "instructions": "A partir de la litología, la estructura y la condición de las superficies de las discontinuidades, estimar el valor medio del GSI. No conviene intentar una precisión excesiva: indicar un intervalo de 33 a 37 es más realista que afirmar que GSI = 35. La tabla no es aplicable a roturas controladas por la estructura. Cuando existan planos estructurales débiles con una orientación desfavorable respecto al frente de excavación, estos dominarán el comportamiento del macizo rocoso. La resistencia al corte de las superficies de rocas propensas a deteriorarse por cambios de humedad se reduce en presencia de agua. En rocas de las categorías media a muy mala puede desplazarse la estimación hacia la derecha en condiciones húmedas. La presión de agua se tiene en cuenta mediante un análisis en tensiones efectivas.",
+        "emphasis": "La tabla no es aplicable a roturas controladas por la estructura.",
+        "emphasis_style": "underline",
+        "axis_labels": {
+          "columns_header": "CONDICIÓN DE LAS SUPERFICIES",
+          "columns_arrow": "DISMINUCIÓN DE LA CALIDAD DE LAS SUPERFICIES",
+          "rows_header": "ESTRUCTURA",
+          "rows_arrow": "DISMINUCIÓN DE LA TRABAZÓN ENTRE LOS FRAGMENTOS DE ROCA"
+        },
+        "box_note": "",
+        "side_note": "",
+        "footnotes": []
+      },
+      "arrow_meaning": "",
+      "na_label": "N/A",
+      "na_meaning": "No aplicable",
+      "rows": {
+        "intact_massive": {
+          "label": "INTACTA O MASIVA",
+          "description": "Probetas de roca intacta o roca masiva in situ con pocas discontinuidades, muy espaciadas"
+        },
+        "blocky": {
+          "label": "EN BLOQUES",
+          "description": "Macizo rocoso no perturbado y bien trabado, formado por bloques cúbicos delimitados por tres familias de discontinuidades que se cortan"
+        },
+        "very_blocky": {
+          "label": "MUY FRACTURADA EN BLOQUES",
+          "description": "Macizo trabado, parcialmente perturbado, con bloques angulosos de múltiples caras formados por cuatro o más familias de diaclasas"
+        },
+        "blocky_disturbed_seamy": {
+          "label": "EN BLOQUES / PERTURBADA / CON NIVELES DÉBILES",
+          "description": "Plegada, con bloques angulosos formados por numerosas familias de discontinuidades que se cortan. Persistencia de los planos de estratificación o de esquistosidad"
+        },
+        "disintegrated": {
+          "label": "DESINTEGRADA",
+          "description": "Macizo rocoso con escasa trabazón, muy fragmentado, con mezcla de fragmentos de roca angulosos y redondeados"
+        },
+        "laminated_sheared": {
+          "label": "LAMINADA / CIZALLADA",
+          "description": "Sin estructura de bloques, debido al pequeño espaciado de la esquistosidad débil o de los planos de cizalla"
+        }
+      }
+    }
+  }
+}
