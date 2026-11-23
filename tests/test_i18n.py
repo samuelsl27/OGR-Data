@@ -327,7 +327,6 @@ def test_spanish_window_and_dialogs_show_no_english_text() -> None:
 
 
 def test_language_switch_keeps_the_project_and_history() -> None:
-    from PySide6.QtCore import QSettings
     from PySide6.QtWidgets import QApplication
 
     from ogr_data.core import history as hist
@@ -335,7 +334,9 @@ def test_language_switch_keeps_the_project_and_history() -> None:
     from ogr_data.gui.main_window import MainWindow
 
     app = QApplication.instance() or QApplication([])
-    settings = QSettings("OpenGeoRock", "OGR-Data")
+    from ogr_data.gui.settings import app_settings
+
+    settings = app_settings()
     saved = settings.value("language", None)
     w = MainWindow()
     try:

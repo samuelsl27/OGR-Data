@@ -1,7 +1,8 @@
 # Spec 025b — Ventana principal: resultados a la vista
 
-> Estado: **borrador** (2026-11-24). Opciones exploradas; la propietaria
-> se inclina por el panel a la derecha (opción B). Pendiente de aprobar.
+> Estado: **aprobada** (2026-11-24): opción B, lecturas del muestreador
+> en el panel y en la barra de estado, título en *Project Settings*.
+> RF-9 añadido después de aprobar (ver «Cambios tras la aprobación»).
 
 ## Contexto y objetivo
 
@@ -62,19 +63,24 @@ Geotécnico que ajusta parámetros y copia el material a Slip2D/FEM2D.
 - **RF-7**: EL SISTEMA tendrá una barra de herramientas con Nuevo, Abrir,
   Guardar, Deshacer, Rehacer, Copiar material, Copiar datos, Copiar
   gráfica, Calcular y el selector de unidad de tensión.
-- **RF-8**: MIENTRAS el muestreador de tensiones esté activo, EL SISTEMA
-  mostrará sus lecturas en el panel de resultados además de en la barra
-  de estado. [NECESITA ACLARACIÓN: ¿o solo en el panel?]
+- **RF-8**: MIENTRAS un muestreador (de tensiones o MC instantáneo) esté
+  activo, EL SISTEMA mostrará sus lecturas en el panel de resultados
+  además de en la barra de estado.
+- **RF-9**: SI el criterio del material no es Hoek-Brown generalizado,
+  ENTONCES EL SISTEMA mostrará en el panel la cohesión y el ángulo de
+  rozamiento Mohr-Coulomb equivalentes en el rango de σ3 cuando el núcleo
+  los calcule para ese criterio, y si no, una frase que diga que ese
+  criterio no tiene parámetros derivados.
 
 ## Requisitos no funcionales
 
 - Redibujar tras editar sigue por debajo de 400 ms.
 - Textos nuevos con `tr()` y español; cambio de idioma (spec 024)
   conserva la posición del panel.
-- El título del proyecto se edita en un diálogo de propiedades del
-  proyecto (File > Project Properties…), como en RSData *Project
-  Settings*. [NECESITA ACLARACIÓN: ¿diálogo, o campo en la barra de
-  herramientas?]
+- El título del proyecto y la unidad de tensión se editan en
+  File > Project Settings…, como en RSData *Project Settings*; la unidad
+  también en la barra de herramientas. El título sigue deshaciéndose
+  (spec 023).
 
 ## UX
 
@@ -100,6 +106,13 @@ U1, U2, U10, U12, U16, U17. Lista de comprobación de la guía al validar.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: confirmar la opción B]
-- [NECESITA ACLARACIÓN: RF-8, lecturas del muestreador]
-- [NECESITA ACLARACIÓN: dónde se edita el título del proyecto]
+Ninguna: resueltas por la propietaria el 2026-11-24 («sí a todo»).
+
+## Cambios tras la aprobación
+
+- **RF-9** (2026-11-24, aprobado por la propietaria el mismo día): al preparar el plan se vio que
+  hoy el bloque *Computed* solo tiene contenido con Hoek-Brown
+  generalizado; con los otros nueve criterios queda vacío. Un panel vacío
+  incumple U6. El núcleo ya calcula el MC equivalente
+  (`material_results.overlay_mc`) para la familia Hoek-Brown, Power Curve
+  y Barton-Bandis.

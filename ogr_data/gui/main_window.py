@@ -7,7 +7,7 @@ import io
 import math
 
 import numpy as np
-from PySide6.QtCore import QSettings, Qt
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -54,6 +54,7 @@ from ..core.models import CRITERIA, Criterion, defaults
 from . import i18n
 from .i18n import tr
 from .plots import EnvelopeCanvas, PathCanvas
+from .settings import app_settings
 from .themes import THEMES, apply_theme
 
 
@@ -74,7 +75,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("OGR Data")
         self.resize(1150, 640)
 
-        self._settings = QSettings("OpenGeoRock", "OGR-Data")
+        self._settings = app_settings()  # spec 025b: never built by hand
         self._theme = str(self._settings.value("theme", "light"))
         if self._theme not in THEMES:
             self._theme = "light"

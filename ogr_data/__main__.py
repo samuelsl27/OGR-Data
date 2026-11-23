@@ -4,15 +4,15 @@ import sys
 
 
 def main() -> int:
-    from PySide6.QtCore import QSettings
     from PySide6.QtWidgets import QApplication
 
     from .gui import i18n
     from .gui.main_window import MainWindow
+    from .gui.settings import app_settings
 
     app = QApplication(sys.argv)
     # spec 024: interface language (saved choice; first start follows the system)
-    language = i18n.saved_language(QSettings("OpenGeoRock", "OGR-Data"))
+    language = i18n.saved_language(app_settings())
     i18n.set_language(language)
     i18n.install_qt_translator(app, language)
     window = MainWindow()

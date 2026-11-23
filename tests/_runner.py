@@ -7,7 +7,9 @@ standalone and keeps the same spirit).
 from __future__ import annotations
 
 import importlib.util
+import shutil
 import sys
+import tempfile
 import traceback
 from pathlib import Path
 
@@ -22,6 +24,19 @@ def _load_module(path: Path):
 def main() -> int:
     root = Path(__file__).parent
     sys.path.insert(0, str(root.parent))
+    # spec 025b: the program's settings go to a throwaway INI file, never to
+    # the user's (the registry on Windows)
+    from ogr_data.gui.settings import isolate_for_tests
+
+    settings_dir = tempfile.mkdtemp(prefix="ogr-data-settings-")
+    isolate_for_tests(settings_dir)
+    try:
+        return _run(root)
+    finally:
+        shutil.rmtree(settings_dir, ignore_errors=True)
+
+
+def _run(root: Path) -> int:
     passed = failed = 0
     failures: list[str] = []
     for file in sorted(root.glob("test_*.py")):

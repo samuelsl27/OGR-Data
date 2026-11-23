@@ -159,6 +159,12 @@ Idioma, tema, unidades, `QSettings`, cachés de módulo: lo que un test
 cambia, lo restaura. Un idioma olvidado en español rompe tests ajenos solo
 en la suite completa.
 
+Los ajustes del programa salen siempre de `gui.settings.app_settings()`
+(nunca `QSettings(...)` a mano; un test lo impide). Con `tests/_runner.py`
+van a un INI en una carpeta temporal y no tocan los del usuario; un script
+que cargue tests por su cuenta debe llamar antes a
+`gui.settings.isolate_for_tests(carpeta)`.
+
 ### 6. Las anomalías se reportan ANTES de corregirlas
 
 Si algo parece incorrecto, dilo con la evidencia antes de cambiarlo. Un
