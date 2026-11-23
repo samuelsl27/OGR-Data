@@ -42,8 +42,8 @@ from ..core import samplers
 from ..core import states as st
 from ..core import units
 from ..core.graph_options import PlotOptions
-from ..core.hoek_brown import HbInput, compute, equivalent_mc, global_strength, hoek_brown_constants
-from ..core.models import CRITERIA, Criterion, defaults
+from ..core.hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength, hoek_brown_constants
+from ..core.models import CRITERIA, MODULUS_METHODS, Criterion, defaults
 from .plots import EnvelopeCanvas, PathCanvas
 from .themes import THEMES, apply_theme
 
@@ -993,14 +993,8 @@ class MainWindow(QMainWindow):
         if key != "generalized_hoek_brown":
             return {}
         params = self._params()
-        inp = HbInput(
-            sigci=float(params["sigci"]) / 1000.0,
-            gsi=float(params["gsi"]),
-            mi=float(params["mi"]),
-            disturbance=float(params["d"]),
-            sig3max=self._sig3max_mpa(),
-        )
-        result = compute(inp)
+        inp = self._ghb_input(params, self._sig3max_mpa())
+        result = compute(inp, self._modulus_method(params))
         return {
             "mb": result.mb,
             "s": result.s,
@@ -1204,18 +1198,32 @@ class MainWindow(QMainWindow):
                 row.addWidget(pick_button)
             self._form_layout.addRow(field.label, editor)
 
-    def _pick(self, field, widget: QDoubleSpinBox) -> None:
-        from . import pickers
+    def pick_value(self, key: str) -> float | None:
+        """Open the selector of a pick key; the value in registry units (kPa for stresses)."""
 
-        picker = {
-            "sigci_grades": pickers.sigci_picker,
-            "mi_values": pickers.mi_picker,
-            "gsi_chart": pickers.gsi_picker,
-        }.get(field.pick)
-        if picker is None:
-            return
-        value = picker(self)
+        from . import estimation, pickers
+
+        if key == "sigci_grades":
+            return pickers.sigci_picker(self)
+        if key == "mi_values":
+            return estimation.mi_picker(self)
+        if key == "gsi_chart":
+            return estimation.gsi_dialog(self, self._theme)
+        if key == "disturbance":
+            return estimation.disturbance_picker(self)
+        if key == "modulus_ratio":
+            params = self._params()
+            sigci = params.get("sigci", params.get("compressive_strength", 0.0))
+            return estimation.modulus_ratio_picker(float(sigci), self._stress_unit, self)
+        return None
+
+    def _pick(self, field, widget: QDoubleSpinBox) -> None:
+        """One-click selectors (spec 022); stresses come in kPa, shown in the display unit."""
+
+        value = self.pick_value(field.pick)
         if value is not None:
+            if field.unit == "kPa":
+                value *= self._kpa_scale()
             widget.setValue(value)
 
     def _params(self) -> dict:
@@ -1233,20 +1241,35 @@ class MainWindow(QMainWindow):
                 params[field.key] = widget.value()
         return params
 
+    # ---------------------------------------------------------- spec 022: Ei and Erm method
+
+    @staticmethod
+    def _ghb_input(params: dict, sig3max_mpa: float) -> HbInput:
+        """Generalized Hoek-Brown input (MPa) from the registry parameters (kPa)."""
+
+        return HbInput(
+            sigci=float(params["sigci"]) / 1000.0,
+            gsi=float(params["gsi"]),
+            mi=float(params["mi"]),
+            disturbance=float(params["d"]),
+            ei=float(params.get("ei", 12000000.0)) / 1000.0,
+            sig3max=sig3max_mpa,
+        )
+
+    @staticmethod
+    def _modulus_method(params: dict) -> ModulusMethod:
+        label = params.get("modulus_method", MODULUS_METHODS[0])
+        index = MODULUS_METHODS.index(label) if label in MODULUS_METHODS else 0
+        return list(ModulusMethod)[index]
+
     # ---------------------------------------------------------- spec 009: sig3max by application
 
     def _rock_mass_strength_mpa(self, key: str, params: dict) -> float | None:
         """Global rock mass strength sigcm (MPa), for HB-family criteria only."""
 
         if key == "generalized_hoek_brown":
-            inp = HbInput(
-                sigci=float(params["sigci"]) / 1000.0,
-                gsi=float(params["gsi"]),
-                mi=float(params["mi"]),
-                disturbance=float(params["d"]),
-                sig3max=self._sig3max_mpa(),
-            )
-            return compute(inp).sigcm
+            inp = self._ghb_input(params, self._sig3max_mpa())
+            return compute(inp, self._modulus_method(params)).sigcm
         if key == "hoek_brown":
             sigci_mpa, mb, s, a = self._hb_terms(key, params, self._sig3max_mpa())
             inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=self._sig3max_mpa())
@@ -1299,13 +1322,7 @@ class MainWindow(QMainWindow):
         """(sigci_mpa, mb, s, a) of a Hoek-Brown criterion for the current inputs."""
 
         if key == "generalized_hoek_brown":
-            inp = HbInput(
-                sigci=float(params["sigci"]) / 1000.0,
-                gsi=float(params["gsi"]),
-                mi=float(params["mi"]),
-                disturbance=float(params["d"]),
-                sig3max=sig3max,
-            )
+            inp = self._ghb_input(params, sig3max)
             mb, s, a = hoek_brown_constants(inp)
             return inp.sigci, mb, s, a
         # classic Hoek-Brown is the 2002 criterion with a = 0.5
@@ -1473,14 +1490,8 @@ class MainWindow(QMainWindow):
                 self._shear.redraw(normal, shear)
 
             if key == "generalized_hoek_brown":
-                inp = HbInput(
-                    sigci=float(params["sigci"]) / 1000.0,
-                    gsi=float(params["gsi"]),
-                    mi=float(params["mi"]),
-                    disturbance=float(params["d"]),
-                    sig3max=sig3max,
-                )
-                result = compute(inp)
+                inp = self._ghb_input(params, sig3max)
+                result = compute(inp, self._modulus_method(params))
                 self._outputs.setText(
                     f"mb   = {result.mb:.4f}\n"
                     f"s    = {result.s:.4f}\n"

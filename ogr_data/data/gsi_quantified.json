@@ -1,0 +1,298 @@
+{
+  "source": "Hoek, E., Carter, T.G. & Diederichs, M.S. (2013). Quantification of the Geological Strength Index chart. 47th US Rock Mechanics / Geomechanics Symposium, ARMA 13-672. Eqs. 1-6, Figure 5 and Tables 1-3 (Appendix 1). PDF: Referencias/Bibliografia/General/2013-Quantification-of-the-GSI-Chart.pdf (rocscience.com).",
+  "equations": {
+    "jcond89": "GSI = 1.5 JCond89 + RQD/2 (eq. 1)",
+    "jcond76": "JCond89 = 1.3 JCond76; GSI = 2 JCond76 + RQD/2 (eq. 2, as published)",
+    "jr_ja": "JCond89 = 35 (Jr/Ja)/(1 + Jr/Ja); GSI = 52 (Jr/Ja)/(1 + Jr/Ja) + RQD/2 (eq. 3, as published)",
+    "rqd_lambda": "RQD = 100 e^(-0.1 lambda) (0.1 lambda + 1), lambda = discontinuities per metre (eq. 4, Priest & Hudson 1976; the minus sign is lost in the PDF rendering)",
+    "rqd_jv": "RQD = 115 - 3.3 Jv (eq. 5, Palmstrom 1982) or RQD = 110 - 2.5 Jv (eq. 6, Palmstrom 2005)"
+  },
+  "rsdata_note": "RSData 1.009 GSI Calculator differs on the alternatives: JCond76 via 1.5 x 1.3 = 1.95 (not the published 2) and Jr/Ja via GSI = 5.5 ln(Jr/Ja) + 21 + RQD/2, a form not in this paper (Referencias/Ejemplos/RSData_analisis/08_estimacion_sin_ensayos.md). OGR follows the paper.",
+  "chart": {
+    "x": "1.5 JCond89, from 45 (left) to 0 (right)",
+    "y": "RQD/2, from 0 to 40 (upper and lower rows of the 2000 chart removed, items 3-4 of the paper)",
+    "rows_note": "Structure bands read from Figure 5 (approximate positions on the RQD/2 axis).",
+    "rows": [
+      {
+        "label": "BLOCKY",
+        "description": "Well interlocked undisturbed rock mass made up of cubical blocks formed by three sets of intersecting joints",
+        "y_lo": 30.0,
+        "y_hi": 40.0
+      },
+      {
+        "label": "VERY BLOCKY",
+        "description": "Interlocked, partially disturbed rock mass, multi-faceted angular blocks formed by 4 or more joint sets",
+        "y_lo": 20.0,
+        "y_hi": 30.0
+      },
+      {
+        "label": "BLOCKY/DISTURBED/SEAMY",
+        "description": "Folded with angular blocks formed by many intersecting joint sets. Persistence of bedding planes or schistosity",
+        "y_lo": 10.0,
+        "y_hi": 20.0
+      },
+      {
+        "label": "DISINTEGRATED",
+        "description": "Poorly interlocked, heavily broken rock mass with mixture of angular and rounded rock pieces",
+        "y_lo": 0.0,
+        "y_hi": 10.0
+      }
+    ],
+    "columns_note": "Surface condition headings of Figure 5, placed at the 1.5 JCond89 value of the matching condition rating of Table 1 (30, 25, 20, 10, 0).",
+    "columns": [
+      {
+        "label": "VERY GOOD",
+        "description": "Very rough, fresh unweathered surfaces",
+        "x": 45.0
+      },
+      {
+        "label": "GOOD",
+        "description": "Rough, slightly weathered, iron-stained surfaces",
+        "x": 37.5
+      },
+      {
+        "label": "FAIR",
+        "description": "Smooth, moderately weathered and altered surfaces",
+        "x": 30.0
+      },
+      {
+        "label": "POOR",
+        "description": "Slickensided, highly weathered surfaces with compact coatings or fillings of angular fragments",
+        "x": 15.0
+      },
+      {
+        "label": "VERY POOR",
+        "description": "Slickensided, highly weathered surfaces with soft clay coatings or infillings",
+        "x": 0.0
+      }
+    ]
+  },
+  "jcond89_conditions": [
+    {
+      "rating": 30,
+      "description": "Very rough surfaces, not continuous, no separation, unweathered wall rock"
+    },
+    {
+      "rating": 25,
+      "description": "Slightly rough surfaces, separation < 1 mm, slightly weathered walls"
+    },
+    {
+      "rating": 20,
+      "description": "Slightly rough surfaces, separation < 1 mm, highly weathered walls"
+    },
+    {
+      "rating": 10,
+      "description": "Slickensided surfaces or gouge < 5 mm thick or separation 1-5 mm, continuous"
+    },
+    {
+      "rating": 0,
+      "description": "Soft gouge > 5 mm thick or separation > 5 mm, continuous"
+    }
+  ],
+  "jcond89_parameters": [
+    {
+      "key": "persistence",
+      "label": "Discontinuity length (persistence)",
+      "options": [
+        [
+          "< 1 m",
+          6
+        ],
+        [
+          "1 to 3 m",
+          4
+        ],
+        [
+          "3 to 10 m",
+          2
+        ],
+        [
+          "10 to 20 m",
+          1
+        ],
+        [
+          "More than 20 m",
+          0
+        ]
+      ]
+    },
+    {
+      "key": "aperture",
+      "label": "Separation (aperture)",
+      "options": [
+        [
+          "None",
+          6
+        ],
+        [
+          "< 0.1 mm",
+          5
+        ],
+        [
+          "0.1 - 1.0 mm",
+          4
+        ],
+        [
+          "1 - 5 mm",
+          1
+        ],
+        [
+          "More than 5 mm",
+          0
+        ]
+      ]
+    },
+    {
+      "key": "roughness",
+      "label": "Roughness",
+      "options": [
+        [
+          "Very rough",
+          6
+        ],
+        [
+          "Rough",
+          5
+        ],
+        [
+          "Slightly rough",
+          3
+        ],
+        [
+          "Smooth",
+          1
+        ],
+        [
+          "Slickensided",
+          0
+        ]
+      ]
+    },
+    {
+      "key": "infilling",
+      "label": "Infilling (gouge)",
+      "options": [
+        [
+          "None",
+          6
+        ],
+        [
+          "Hard infilling < 5 mm",
+          4
+        ],
+        [
+          "Hard filling > 5 mm",
+          2
+        ],
+        [
+          "Soft infilling < 5 mm",
+          2
+        ],
+        [
+          "Soft infilling > 5 mm",
+          0
+        ]
+      ]
+    },
+    {
+      "key": "weathering",
+      "label": "Weathering",
+      "options": [
+        [
+          "Unweathered",
+          6
+        ],
+        [
+          "Slightly weathered",
+          5
+        ],
+        [
+          "Moderate weathering",
+          3
+        ],
+        [
+          "Highly weathered",
+          1
+        ],
+        [
+          "Decomposed",
+          0
+        ]
+      ]
+    }
+  ],
+  "jcond76_conditions": [
+    {
+      "rating": 25,
+      "description": "Very rough surfaces, not continuous, no separation, hard joint wall rock"
+    },
+    {
+      "rating": 20,
+      "description": "Slightly rough surfaces, separation < 1 mm, hard joint wall rock"
+    },
+    {
+      "rating": 12,
+      "description": "Slightly rough surfaces, separation < 1 mm, soft joint wall rock"
+    },
+    {
+      "rating": 6,
+      "description": "Slickensided surfaces or gouge < 5 mm thick or joints open 1-5 mm, continuous joints"
+    },
+    {
+      "rating": 0,
+      "description": "Soft gouge > 5 mm thick or joints open > 5 mm, continuous joints"
+    }
+  ],
+  "jr": [
+    [
+      "Discontinuous joints",
+      4.0
+    ],
+    [
+      "Rough and irregular, undulating",
+      3.0
+    ],
+    [
+      "Smooth, undulating",
+      2.0
+    ],
+    [
+      "Slickensided, undulating",
+      1.5
+    ],
+    [
+      "Rough or irregular planar",
+      1.5
+    ],
+    [
+      "Smooth, planar",
+      1.0
+    ],
+    [
+      "Slickensided, planar",
+      0.5
+    ]
+  ],
+  "ja": [
+    [
+      "Tightly healed, hard, non-softening, impermeable filling",
+      0.75
+    ],
+    [
+      "Unaltered joint walls, surface staining only",
+      1.0
+    ],
+    [
+      "Slightly altered joint walls, non-softening mineral coatings, sandy particles, clay-free disintegrated rock, etc",
+      2.0
+    ],
+    [
+      "Silty-, or sandy-clay coatings, small clay fraction (non-softening)",
+      3.0
+    ],
+    [
+      "Softening or low friction clay, mineral coatings, i.e. kaolinite, mica. Also chlorite, talc, gypsum and graphite etc., and small quantities of swelling clays (discontinuous coatings, 1 - 2 mm or less in thickness)",
+      4.0
+    ]
+  ]
+}

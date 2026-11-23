@@ -36,6 +36,15 @@ class Criterion:
     fields: tuple[Field, ...]
 
 
+# Rock mass modulus methods (labels as in ORMAS; spec 022), same order as
+# core.hoek_brown.ModulusMethod.
+MODULUS_METHODS = (
+    "Generalized Hoek & Diederichs (2006)",
+    "Simplified Hoek & Diederichs (2006)",
+    "Hoek, Carranza-Torres & Corkum (2002)",
+)
+
+
 def _peak_residual_tensile() -> tuple[Field, ...]:
     return (
         Field("peak_tensile", "Peak Tensile Strength", 0.0, "kPa"),
@@ -100,7 +109,11 @@ CRITERIA: dict[str, Criterion] = {
             Field("sigci", "UCS of intact rock", 100000.0, "kPa", pick="sigci_grades"),
             Field("gsi", "GSI", 50.0, pick="gsi_chart"),
             Field("mi", "mi", 10.0, pick="mi_values"),
-            Field("d", "D", 0.0),
+            Field("d", "D", 0.0, pick="disturbance"),
+            # spec 022: intact modulus and rock mass modulus method (ORMAS-like;
+            # RSData uses a hidden fixed Ei). Default Ei = ORMAS default.
+            Field("ei", "Intact modulus Ei", 12000000.0, "kPa", pick="modulus_ratio"),
+            Field("modulus_method", "Erm method", MODULUS_METHODS[0], kind="enum", options=MODULUS_METHODS),
             Field("set_residual_to_peak", "Set Residual to Peak", True, kind="bool"),
             Field("gsi_residual", "GSI Residual", 50.0),
             Field("mi_residual", "mi Residual", 10.0),

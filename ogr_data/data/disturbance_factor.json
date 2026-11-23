@@ -1,0 +1,53 @@
+{
+  "source": "Hoek, E. (2023), Practical Rock Engineering, Rock mass properties, Figure 9: Guidelines for estimating the disturbance factor D (same content as Table 1 of Hoek, Carranza-Torres & Corkum 2002). PDF: Referencias/Bibliografia/Rocas/Hoek_Practical-Rock-Engineering_2023_completo.pdf.",
+  "values": [
+    {
+      "application": "Tunnel",
+      "case": "",
+      "d": 0.0,
+      "description": "Excellent quality-controlled blasting or excavation by Tunnel Boring Machine results in minimal disturbance to the confined rock mass surrounding a tunnel."
+    },
+    {
+      "application": "Tunnel",
+      "case": "Mechanical excavation",
+      "d": 0.0,
+      "description": "Mechanical or hand excavation in poor quality rock masses (no blasting) results in minimal disturbance to the surrounding rock mass."
+    },
+    {
+      "application": "Tunnel",
+      "case": "No invert",
+      "d": 0.5,
+      "description": "Where squeezing problems result in significant floor heave, disturbance can be severe unless a temporary invert is placed."
+    },
+    {
+      "application": "Tunnel",
+      "case": "",
+      "d": 0.8,
+      "description": "Very poor-quality blasting in a hard rock tunnel results in severe local damage, extending 2 or 3 m, in the surrounding rock mass."
+    },
+    {
+      "application": "Slope",
+      "case": "Good blasting",
+      "d": 0.7,
+      "description": "Small scale blasting in civil engineering slopes results in modest rock mass damage, particularly if controlled blasting is used. However, stress relief results in some disturbance."
+    },
+    {
+      "application": "Slope",
+      "case": "Poor blasting",
+      "d": 1.0,
+      "description": "Small scale blasting in civil engineering slopes (as above), poor blasting."
+    },
+    {
+      "application": "Slope",
+      "case": "Production blasting",
+      "d": 1.0,
+      "description": "Very large open pit mine slopes suffer significant disturbance due to heavy production blasting and also due to stress relief from overburden removal."
+    },
+    {
+      "application": "Slope",
+      "case": "Mechanical excavation",
+      "d": 0.7,
+      "description": "In some softer rocks excavation can be carried out by ripping and dozing and the degree of damage to the slopes is less."
+    }
+  ]
+}

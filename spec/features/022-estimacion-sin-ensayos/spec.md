@@ -44,11 +44,10 @@ RSData_analisis/08_estimacion_sin_ensayos.md` y `ORMAS_analisis/`.
 - En Bibliografia: Hoek PRE cap. 11 (Tablas 2 y 3), PRE 2023 (figs. 9 y
   13, ecs. 20-22), Hoek 2002 (Tabla 1), Marinos & Hoek 2000 (carta GSI
   y flysch).
-- **Pendiente de descargar**: Hoek, Carter & Diederichs (2013),
-  *Quantification of the Geological Strength Index chart* (ARMA 13-672)
-  para la carta cuantitativa y la calculadora; carta heterogénea 2013
-  (Marinos & Hoek / Hoek et al.). Sin fuente, esas dos cartas y la
-  calculadora no se implementan.
+- Hoek, Carter & Diederichs (2013), *Quantification of the Geological
+  Strength Index chart* (ARMA 13-672): en `Bibliografia/General/`
+  (carta cuantitativa y calculadora; ver plan). Carta heterogénea 2013:
+  pendiente (ver plan).
 - Derechos: las cartas GSI y las fotos de D son material con derechos
   (Hoek, Marinos, Rocscience): **redibujarlas** (vectorial, con las
   isolíneas digitalizadas) o pedir permiso; no copiar imágenes.
