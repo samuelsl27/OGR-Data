@@ -25,7 +25,15 @@ Material ORMAS por defecto: sigci=30 MPa, GSI=50, mi=10, D=0 → σcm=5,2300 MPa
   **φ=46,50°**, exactamente el valor anotado de ORMAS ✓ (γH=1,3 es el
   único que reproduce el φ anotado con el material por defecto).
 
-**Pendiente (no inventar):** los valores de cohesión anotados para
+**RESUELTO (2026-11-23):** el código de ORMAS (guardado y analizado en
+`Referencias/Ejemplos/ORMAS_analisis/codigo/`) calcula c con la **eq. 13
+de Hoek 2002** (σ3n = σ3max/σci) y reproduce exactamente c = 0,3669 /
+0,4608. El error era de OGR-Data: `equivalent_mc` usaba c = σcm(1−sinφ)/
+(2cosφ), que solo coincide con la eq. 13 para σ3max = σci/4 (el caso
+Custom por defecto validado en la 001). Corregido; los tests de túnel y
+talud comprueban ahora c y φ. Texto original de la discrepancia:
+
+~~Pendiente (no inventar):~~ los valores de cohesión anotados para
 túnel/talud (c=0,3669 / 0,4608) NO son reproducibles: la forma cerrada
 (validada en spec 001 contra el caso Custom de ORMAS) daría c≈0,95 / 1,04,
 y un ajuste numérico por mínimos cuadrados tampoco los reproduce. El φ sí

@@ -36,6 +36,8 @@ def test_slope_reproduces_ormas_fit_phi() -> None:
     mb, s, a = hoek_brown_constants(inp)
     mc = equivalent_mc(inp, mb, s, a)
     assert abs(mc.friction_deg - 46.50) < 0.05
+    # and the ORMAS slope cohesion c = 0.4608 MPa (Hoek 2002 eq. 13)
+    assert abs(mc.cohesion - 0.4608) < 1e-3
 
 
 def test_tunnel_reproduces_ormas_fit_phi() -> None:
@@ -47,8 +49,9 @@ def test_tunnel_reproduces_ormas_fit_phi() -> None:
     inp = HbInput(sigci=30.0, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=sig3max)
     mb, s, a = hoek_brown_constants(inp)
     mc = equivalent_mc(inp, mb, s, a)
-    # ORMAS annotated tunnel fit: phi = 49.98 deg
+    # ORMAS annotated tunnel fit: phi = 49.98 deg, c = 0.3669 MPa
     assert abs(mc.friction_deg - 49.98) < 0.05
+    assert abs(mc.cohesion - 0.3669) < 1e-3
 
 
 def test_sig3max_scales_with_depth() -> None:

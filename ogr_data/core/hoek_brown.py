@@ -113,37 +113,56 @@ def global_strength(inp: HbInput, mb: float, s: float, a: float) -> float:
 
 
 def equivalent_mc(inp: HbInput, mb: float, s: float, a: float, points: int = 200) -> McEquivalent:
-    """Best-fit Mohr-Coulomb parameters over [0, sig3max].
+    """Equivalent Mohr-Coulomb parameters over sigt < sigma3 < sig3max.
 
-    Rocscience formulation (Hoek 2002 closed form evaluated at
-    sigma3n = sig3max / sigci, anchored on the global strength sigcm):
+    Hoek, Carranza-Torres & Corkum (2002), eqs. 12 and 13, with
+    sigma3n = sig3max / sigci:
 
         X = 6 a mb (s + mb sigma3n)^(a-1)
-        sin(phi') = X / (2(1+a)(2+a) + X)
-        c' = sigcm (1 - sin(phi')) / (2 cos(phi'))
+        sin(phi') = X / (2(1+a)(2+a) + X)                                (12)
+        c' = sigci [(1+2a) s + (1-a) mb sigma3n] (s + mb sigma3n)^(a-1)
+             / ((1+a)(2+a) sqrt(1 + X / ((1+a)(2+a))))                  (13)
 
-    Validated against ORMAS V2.0 (spec 001).
+    Validated against ORMAS V2.0 for the Custom (sig3max = 7.5 MPa),
+    Tunnel and Slope cases (specs 001 and 009). The earlier form
+    c' = sigcm (1 - sin phi') / (2 cos phi') is only valid for
+    sig3max = sigci/4, the range of eq. 17 that defines sigcm.
     """
 
     sig3n = inp.sig3max / inp.sigci
-    x_term = 6.0 * a * mb * (s + mb * sig3n) ** (a - 1.0)
-    sin_phi = x_term / (2.0 * (1.0 + a) * (2.0 + a) + x_term)
+    k = (1.0 + a) * (2.0 + a)
+    base = (s + mb * sig3n) ** (a - 1.0)
+    x_term = 6.0 * a * mb * base
+    sin_phi = x_term / (2.0 * k + x_term)
     friction = math.degrees(math.asin(sin_phi))
-    sigcm = global_strength(inp, mb, s, a)
-    cohesion = sigcm * (1.0 - sin_phi) / (2.0 * math.cos(math.radians(friction)))
+    cohesion = (
+        inp.sigci * ((1.0 + 2.0 * a) * s + (1.0 - a) * mb * sig3n) * base
+        / (k * math.sqrt(1.0 + x_term / k))
+    )
     return McEquivalent(cohesion=cohesion, friction_deg=friction)
 
 
 def rock_mass_modulus(inp: HbInput, method: ModulusMethod = ModulusMethod.HOEK_DIEDERICHS_2006) -> float:
-    """Rock mass deformation modulus Erm (MPa)."""
+    """Rock mass deformation modulus Erm (MPa).
+
+    - Generalized Hoek & Diederichs (2006): Ei (0.02 + (1-D/2) /
+      (1 + e^((60+15D-GSI)/11)))  (Practical Rock Engineering 2023, eq. 22)
+    - Simplified Hoek & Diederichs (2006): 100000 (1-D/2) /
+      (1 + e^((75+25D-GSI)/11))  (idem, eq. 20; no 0.02 term)
+    - Hoek, Carranza-Torres & Corkum (2002), eq. 11: Em (GPa) = (1-D/2)
+      sqrt(sigci/100) 10^((GSI-10)/40); for sigci > 100 MPa the square root
+      term is 1 (Practical Rock Engineering 2023, rock mass spreadsheet:
+      IF(sigci>100, 1000*10^((GSI-10)/40), ...)). Returned in MPa.
+    All three agree with ORMAS V2.0 (its code, saved in ORMAS_analisis).
+    """
 
     d = inp.disturbance
     if method is ModulusMethod.HOEK_DIEDERICHS_2006:
         return inp.ei * (0.02 + (1.0 - d / 2.0) / (1.0 + math.exp((60.0 + 15.0 * d - inp.gsi) / 11.0)))
     if method is ModulusMethod.HOEK_DIEDERICHS_2006_SIMPLIFIED:
-        return 100000.0 * (0.02 + (1.0 - d / 2.0) / (1.0 + math.exp((60.0 + 15.0 * d - inp.gsi) / 11.0)))
-    # Hoek, Carranza-Torres & Corkum (2002), sigci in MPa
-    return (1.0 - d / 2.0) * math.sqrt(inp.sigci / 100.0) * 10.0 ** ((inp.gsi - 10.0) / 40.0)
+        return 100000.0 * (1.0 - d / 2.0) / (1.0 + math.exp((75.0 + 25.0 * d - inp.gsi) / 11.0))
+    strength_term = math.sqrt(min(inp.sigci, 100.0) / 100.0)
+    return 1000.0 * (1.0 - d / 2.0) * strength_term * 10.0 ** ((inp.gsi - 10.0) / 40.0)
 
 
 def compute(inp: HbInput, method: ModulusMethod = ModulusMethod.HOEK_DIEDERICHS_2006) -> HbResult:
