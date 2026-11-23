@@ -11,7 +11,8 @@ Graphs) y **021** (estados y rutas verificados en la interfaz de RSData
 
 **022 — Estimación sin ensayos** hecha (selectores de un clic: σci, GSI
 con carta cuantificada 2013 y calculadora, mi con filtros, D, Ei/MR y
-método de Erm; pendientes las cartas de flysch/heterogénea).
+método de Erm; y las cartas digitalizadas con clic: general 2000,
+flysch 2000 y heterogénea de V. Marinos 2007, con textos EN/ES).
 **014 — Calibración** hecha (varios estados, MC/GHB/Power Curve/
 Barton-Bandis, lab o macizo, LR/LM/Simplex, error absoluto/relativo;
 contrastada con RSData) y **010 — Base de datos de materiales** (estilo
@@ -32,7 +33,11 @@ contrastados con los manuales de RS2/RSData; NorSand y General Test
 sin fuente), completada después con NorSand (FLAC3D + Nova, contrastado
 con el tutorial de RSData), General Test, casquetes y tablas de
 Softening-Hardening, los campos reales del diálogo (σ'h0, K0) y **013c**
-(animación). Siguiente: **019** (API y MCP).
+(animación). **019 — API y MCP** hecha (`ogr_data.api`, 36
+operaciones sin Qt con las mismas funciones de núcleo que la ventana, y
+`ogr-data-mcp` por stdio, extra `[mcp]`). Con ella se cierra el backlog
+de specs; quedan pendientes menores dentro de 010, 012/021, 013, 014,
+015 y 018 (ver sus tasks).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

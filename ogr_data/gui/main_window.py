@@ -37,7 +37,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ..core import application
+from ..core import material_factory as factory
+from ..core import material_results as mr
 from ..core import criteria_envelopes as ce
 from ..core import project as projects
 from ..core import report
@@ -46,8 +47,8 @@ from ..core import simulation as sm
 from ..core import states as st
 from ..core import units
 from ..core.graph_options import PlotOptions
-from ..core.hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength, hoek_brown_constants
-from ..core.models import CRITERIA, MODULUS_METHODS, Criterion, defaults
+from ..core.hoek_brown import HbInput, ModulusMethod, compute
+from ..core.models import CRITERIA, Criterion, defaults
 from .plots import EnvelopeCanvas, PathCanvas
 from .themes import THEMES, apply_theme
 
@@ -729,34 +730,15 @@ class MainWindow(QMainWindow):
     def use_database_specimens(self, record: dict) -> None:
         """Failure state of the selected material from the record's specimens (sigma3, sigma1)."""
 
-        from ..core import database as mdb
-
-        points = mdb.specimen_points(record)
-        if not points:
-            raise ValueError("the record has no specimens with sigma3 and sigma1")
         material = self._current_material()
-        name = st.unique_name(mdb.title(record) or "Database", (s.name for s in material.failure_states))
-        state = st.FailureState(
-            name=name,
-            color=st.next_color(s.color for s in material.failure_states),
-            points=[st.TestPoint(s3, s1, exclude) for s3, s1, exclude in points],
-        )
+        state = factory.state_from_record(record, material.failure_states)
         self.set_failure_states(material.failure_states + [state])
-        self.statusBar().showMessage(f"Failure state '{name}' added to {material.name} ({len(points)} points from record {record.get('record_id')}).")
+        self.statusBar().showMessage(f"Failure state '{state.name}' added to {material.name} ({len(state.points)} points from record {record.get('record_id')}).")
 
     def use_database_record(self, record: dict) -> int:
         """New Generalized Hoek-Brown material from a database record (sigci, mi)."""
 
-        from ..core import database as mdb
-
-        params = defaults("generalized_hoek_brown")
-        params.update(mdb.to_material_parameters(record))
-        material = projects.Material(
-            name=mdb.title(record) or "Material",
-            criterion="generalized_hoek_brown",
-            parameters=params,
-            sig3max_mpa=self._current_material().sig3max_mpa,
-        )
+        material = factory.from_record(record, self._current_material().sig3max_mpa)
         self._store_current()
         index = self._project.append(material)
         self._load_material(index)
@@ -779,12 +761,7 @@ class MainWindow(QMainWindow):
     def add_calibrated_material(self, name: str, result) -> int:
         """New material from a calibration (the source material is not changed)."""
 
-        material = projects.Material(
-            name=name.strip() or "Calibrated Material",
-            criterion=result.criterion,
-            parameters=dict(result.parameters),
-            sig3max_mpa=self._current_material().sig3max_mpa,
-        )
+        material = factory.from_calibration(name, result, self._current_material().sig3max_mpa)
         self._store_current()
         index = self._project.append(material)
         self._load_material(index)
@@ -1268,16 +1245,7 @@ class MainWindow(QMainWindow):
     def add_soil_material(self, symbol: str, parameters: dict) -> int:
         """New Mohr-Coulomb material from a USCS group (spec 018, UFC 3-220-01N)."""
 
-        params = defaults("mohr_coulomb")
-        params.update(parameters)
-        params["residual_cohesion"] = params["peak_cohesion"]
-        params["residual_friction"] = params["peak_friction"]
-        material = projects.Material(
-            name=f"{symbol} (typical compacted, UFC 3-220-01N)",
-            criterion="mohr_coulomb",
-            parameters=params,
-            sig3max_mpa=self._current_material().sig3max_mpa,
-        )
+        material = factory.from_uscs(symbol, parameters, self._current_material().sig3max_mpa)
         self._store_current()
         index = self._project.append(material)
         self._load_material(index)
@@ -1290,47 +1258,22 @@ class MainWindow(QMainWindow):
         FitDialog(self).exec()
 
     def apply_fit_parameters(self, result) -> None:
-        """Fill the parameter form from a FitResult (spec 006)."""
+        """Fill the parameter form from a FitResult (spec 006).
 
-        from ..core.fitting import DIRECT, TRIAXIAL
+        The mapping is core.material_results.fit_to_parameters (shared with
+        the API); values are registry kPa/deg, shown in the display unit.
+        """
 
-        mapping: dict[str, tuple[str, dict[str, float]]] = {
-            # criterion to select -> {fit parameter: form field}
-            "mohr_coulomb": (
-                "mohr_coulomb",
-                {"cohesion_mpa": ("peak_cohesion", 1000.0), "friction_deg": ("peak_friction", 1.0)},
-            ),
-            "hoek_brown": (
-                "hoek_brown",
-                {"sigci_mpa": ("compressive_strength", 1000.0), "mi": ("mb", 1.0)},
-            ),
-            "generalized_hoek_brown": (
-                "hoek_brown",
-                {"mb": ("mb", 1.0), "s": ("s", 1.0)},
-            ),
-            "barton_bandis": (
-                "barton_bandis",
-                {"jrc": ("jrc", 1.0), "jcs_mpa": ("jcs", 1000.0)},
-            ),
-            "power_curve": (
-                "power_curve",
-                {"a": ("a", 1.0), "b": ("b", 1.0), "d_mpa": ("d", 1000.0)},
-            ),
-        }
-        target, fields = mapping[result.criterion]
+        target, values = mr.fit_to_parameters(result)
         idx = self._criterion_combo.findData(target)
         if idx >= 0:
             self._criterion_combo.setCurrentIndex(idx)
         self._rebuild_form()
-        for fit_key, (field_key, scale) in fields.items():
-            if fit_key in result.parameters and field_key in self._widgets:
-                self._widgets[field_key].setValue(result.parameters[fit_key] * scale)
-        if target == "hoek_brown" and result.criterion == "hoek_brown":
-            if "s" in self._widgets:
-                self._widgets["s"].setValue(1.0)
-        if target == "barton_bandis" and "phi_r" in self._widgets and result.fixed:
-            if "phi_b_deg" in result.fixed:
-                self._widgets["phi_r"].setValue(result.fixed["phi_b_deg"])
+        field_units = {f.key: f.unit for f in CRITERIA[target].fields}
+        for key, value in values.items():
+            if key in self._widgets:
+                scale = self._kpa_scale() if field_units.get(key) == "kPa" else 1.0
+                self._widgets[key].setValue(value * scale)
 
     # ------------------------------------------------------------- clipboard
 
@@ -1339,23 +1282,7 @@ class MainWindow(QMainWindow):
         return name or self._criterion().label
 
     def _ghb_computed(self) -> dict[str, float]:
-        key = self._criterion_combo.currentData()
-        if key != "generalized_hoek_brown":
-            return {}
-        params = self._params()
-        inp = self._ghb_input(params, self._sig3max_mpa())
-        result = compute(inp, self._modulus_method(params))
-        return {
-            "mb": result.mb,
-            "s": result.s,
-            "a": result.a,
-            "sigt_mpa": result.sigt,
-            "sigc_mpa": result.sigc,
-            "sigcm_mpa": result.sigcm,
-            "c_mpa": result.mc.cohesion,
-            "phi_deg": result.mc.friction_deg,
-            "erm_mpa": result.erm,
-        }
+        return mr.ghb_computed(self._criterion_combo.currentData(), self._params(), self._sig3max_mpa())
 
     def _copy_material(self) -> None:
         from PySide6.QtWidgets import QApplication
@@ -1638,48 +1565,26 @@ class MainWindow(QMainWindow):
     def _ghb_input(params: dict, sig3max_mpa: float) -> HbInput:
         """Generalized Hoek-Brown input (MPa) from the registry parameters (kPa)."""
 
-        return HbInput(
-            sigci=float(params["sigci"]) / 1000.0,
-            gsi=float(params["gsi"]),
-            mi=float(params["mi"]),
-            disturbance=float(params["d"]),
-            ei=float(params.get("ei", 12000000.0)) / 1000.0,
-            sig3max=sig3max_mpa,
-        )
+        return mr.ghb_input(params, sig3max_mpa)
 
     @staticmethod
     def _modulus_method(params: dict) -> ModulusMethod:
-        label = params.get("modulus_method", MODULUS_METHODS[0])
-        index = MODULUS_METHODS.index(label) if label in MODULUS_METHODS else 0
-        return list(ModulusMethod)[index]
+        return mr.modulus_method(params)
 
     # ---------------------------------------------------------- spec 009: sig3max by application
 
     def _rock_mass_strength_mpa(self, key: str, params: dict) -> float | None:
         """Global rock mass strength sigcm (MPa), for HB-family criteria only."""
 
-        if key == "generalized_hoek_brown":
-            inp = self._ghb_input(params, self._sig3max_mpa())
-            return compute(inp, self._modulus_method(params)).sigcm
-        if key == "hoek_brown":
-            sigci_mpa, mb, s, a = self._hb_terms(key, params, self._sig3max_mpa())
-            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=self._sig3max_mpa())
-            return global_strength(inp, mb, s, a)
-        return None
+        return mr.rock_mass_strength_mpa(key, params, self._sig3max_mpa())
 
     def _application_sig3max(self) -> float | None:
         """sigma3max from the application mode, or None for manual (custom)."""
 
-        mode = self._application_combo.currentData()
-        if mode == "custom":
-            return None
-        key = self._criterion_combo.currentData()
-        sigcm = self._rock_mass_strength_mpa(key, self._params())
-        if sigcm is None or sigcm <= 0.0:
-            return None
-        if mode == "tunnel":
-            return application.sig3max_tunnel(sigcm, self._unit_weight.value(), self._app_depth.value())
-        return application.sig3max_slope(sigcm, self._unit_weight.value(), self._app_depth.value())
+        return mr.application_sig3max(
+            self._criterion_combo.currentData(), self._params(), self._application_combo.currentData(),
+            self._unit_weight.value(), self._app_depth.value(), self._sig3max_mpa(),
+        )
 
     def _update_application(self) -> None:
         key = self._criterion_combo.currentData()
@@ -1712,27 +1617,17 @@ class MainWindow(QMainWindow):
     def _hb_terms(self, key: str, params: dict, sig3max: float) -> tuple[float, float, float, float]:
         """(sigci_mpa, mb, s, a) of a Hoek-Brown criterion for the current inputs."""
 
-        if key == "generalized_hoek_brown":
-            inp = self._ghb_input(params, sig3max)
-            mb, s, a = hoek_brown_constants(inp)
-            return inp.sigci, mb, s, a
-        # classic Hoek-Brown is the 2002 criterion with a = 0.5
-        return float(params["compressive_strength"]) / 1000.0, float(params["mb"]), float(params["s"]), 0.5
+        return mr.hb_terms(key, params, sig3max)
 
     def _overlay_mc_params(self, key: str, params: dict, sig3max: float, normal, shear) -> samplers.InstantaneousMC | None:
         """Equivalent / best-fit MC overlay for curved criteria (RocData 2004 p. 10)."""
 
         if not self._overlay_mc_act.isChecked():
             return None
-        if key in ("generalized_hoek_brown", "hoek_brown"):
-            sigci_mpa, mb, s, a = self._hb_terms(key, params, sig3max)
-            # Hoek (2002) closed form (eqs. 12-13) over sigt < sigma3 < sig3max;
-            # only sigci and sig3max of inp are used by the formulation.
-            inp = HbInput(sigci=sigci_mpa, gsi=50.0, mi=10.0, disturbance=0.0, sig3max=sig3max)
-            mc = equivalent_mc(inp, mb, s, a)
-            return samplers.InstantaneousMC(mc.cohesion, mc.friction_deg, 0.0, 0.0, 0.0)
+        if key in mr.HB_FAMILY:
+            return mr.overlay_mc(key, params, sig3max)
         if key in ("power_curve", "barton_bandis") and normal is not None:
-            return samplers.best_fit_mc(normal, shear)
+            return mr.overlay_mc(key, params, sig3max, (normal, shear))
         return None
 
     def _sampler_mode_changed(self) -> None:

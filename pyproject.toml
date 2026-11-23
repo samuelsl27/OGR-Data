@@ -16,8 +16,13 @@ dependencies = [
     "scipy>=1.11",
 ]
 
+[project.optional-dependencies]
+# spec 019: the MCP server for AI agents (MIT SDK, as OGR-Slip2D).
+mcp = ["mcp>=2.1,<3"]
+
 [project.scripts]
 ogr-data = "ogr_data.__main__:main"
+ogr-data-mcp = "ogr_data.mcp_server.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["ogr_data*"]

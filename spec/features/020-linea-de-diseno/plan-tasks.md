@@ -14,7 +14,10 @@
 # Tasks 020
 
 - [x] Spec y plan
-- [ ] themes.py (QSS + mpl colors)
-- [ ] Menú, QSettings, conmutación en caliente
-- [ ] Canvas reactivos al tema
-- [ ] Tests; commit y push
+- [x] themes.py (QSS + mpl colors)
+- [x] Menú, QSettings, conmutación en caliente
+- [x] Canvas reactivos al tema
+- [x] Tests; commit y push
+
+Hecho en el commit 6356463 («Feature 020: OGR-Slip2D design language»);
+casillas marcadas el 23-11-2026 al revisar el estado de las specs.

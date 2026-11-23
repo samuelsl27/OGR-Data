@@ -26,11 +26,12 @@ from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
 from . import criteria_envelopes as ce
+from . import material_results
 from . import samplers
 from . import simulation as sm
 from . import units
 from .hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength
-from .models import CRITERIA, MODULUS_METHODS
+from .models import CRITERIA
 from .project import SYMBOLS, Material, Project
 from .states import FAILURE_TEST_TYPES, PATH_TEST_TYPES, FailureState, StressPath
 
@@ -216,9 +217,7 @@ def range_rows(material: Material, unit: str) -> Rows:
 
 
 def _modulus_method(params: Mapping) -> ModulusMethod:
-    label = params.get("modulus_method", MODULUS_METHODS[0])
-    index = MODULUS_METHODS.index(label) if label in MODULUS_METHODS else 0
-    return list(ModulusMethod)[index]
+    return material_results.modulus_method(params)
 
 
 def computed_rows(material: Material, unit: str) -> Rows:

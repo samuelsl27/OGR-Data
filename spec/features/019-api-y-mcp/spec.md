@@ -19,19 +19,37 @@ agentes.
 
 ## Alcance v1
 
-- `ogr_data.api`: operaciones puros-python sobre un objeto proyecto en
-  memoria (sin ventana): `material_define/material_list/material_compute/
-  classify_uscs/fit/copy_material/save/load`.
-- `ogr-mcp`: servidor stdio con el SDK `mcp` (extra `[mcp]`), sin
-  `--attach` (no hay ventana viva que adjuntar en v1; opera sobre
-  proyectos de archivo).
-- Tests del servidor con el cliente de pruebas del SDK (como Slip2D).
+Revisado al desarrollarla (23-11-2026): el alcance original es anterior a
+las specs 012–022 y se amplía a lo que el programa hace hoy.
+
+- `ogr_data.api`: operaciones puro-python sobre proyectos en memoria (sin
+  ventana), con handles `project_id`, validación con sugerencias y
+  errores con código (patrón de `ogr_api` de Slip2D). Grupos: proyecto
+  (`.ogrdata`), materiales (definir, calcular, copiar/pegar con el
+  contrato de portapapeles, importar `.roc`), datos (estados de fallo,
+  rutas de tensión, ajuste a datos, calibración), simulación de ensayos,
+  estimación sin ensayos (GSI cuantificado y por carta digitalizada,
+  tablas, USCS, Barton), base de datos de materiales, salidas (PNG de la
+  envolvente e informe HTML).
+- Unidades de la API, de entrada y salida: kPa, kN/m3, m, grados.
+- `ogr-data-mcp` (no `ogr-mcp`, para no chocar con el de Slip2D):
+  servidor stdio con el SDK `mcp` (extra `[mcp]`), una herramienta por
+  operación más `server_info`, y la guía como recurso
+  `ogr-data://guide`. Sin `--attach` (no hay ventana viva que adjuntar).
+- Lógica que vivía en la ventana (σ3max por aplicación, valores
+  calculados del portapapeles, MC equivalente, aplicar un ajuste,
+  materiales creados desde USCS / base de datos / calibración) pasa al
+  núcleo (`core/material_results.py`, `core/material_factory.py`) para
+  que ventana y API usen las mismas funciones.
+- Tests del servidor con el cliente en memoria del SDK (como Slip2D).
 
 ## Criterios de aceptación
 
 - Las mismas operaciones, llamadas desde tests, producen los mismos
   resultados que la UI (mismas funciones de núcleo, sin duplicar lógica).
 - El servidor arranca y responde `server_info` con la ventana cerrada.
+- El caso ORMAS (GHB por defecto) da por la API y por el protocolo MCP
+  los mismos c, φ, Erm y σ3max de túnel/talud que la ventana.
 
 ## Fuera de alcance
 
