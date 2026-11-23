@@ -12,7 +12,10 @@ Graphs) y **021** (estados y rutas verificados en la interfaz de RSData
 **022 — Estimación sin ensayos** hecha (selectores de un clic: σci, GSI
 con carta cuantificada 2013 y calculadora, mi con filtros, D, Ei/MR y
 método de Erm; pendientes las cartas de flysch/heterogénea).
-**Siguiente: 014 (calibración, opciones ya verificadas en RSData).**
+**014 — Calibración** hecha (varios estados, MC/GHB/Power Curve/
+Barton-Bandis, lab o macizo, LR/LM/Simplex, error absoluto/relativo;
+contrastada con RSData). Siguiente del orden propuesto: **010** (base de
+datos de materiales).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

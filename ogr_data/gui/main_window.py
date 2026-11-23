@@ -276,6 +276,9 @@ class MainWindow(QMainWindow):
         states_menu.addAction("Define Failure States…", lambda: self._define_failure_states())
         paths_menu = bar.addMenu("Stress Paths")
         paths_menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
+        # spec 014
+        calibrate_menu = bar.addMenu("Calibrate")
+        calibrate_menu.addAction("Calibrate…", self._open_calibration)
 
         analysis_menu = bar.addMenu("Analysis")
         self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
@@ -636,6 +639,31 @@ class MainWindow(QMainWindow):
         self._current_material().stress_paths = list(stress_paths)
         self._populate_tree()
         self.refresh()
+
+    # ------------------------------------------------- spec 014: calibration
+
+    def _open_calibration(self) -> None:
+        from .calibration_dialog import CalibrationDialog
+
+        self._store_current()
+        dialog = CalibrationDialog(self, self._project, self._current, self._stress_unit)
+        if dialog.exec() and dialog.result is not None:
+            self.add_calibrated_material(dialog.name.text(), dialog.result)
+
+    def add_calibrated_material(self, name: str, result) -> int:
+        """New material from a calibration (the source material is not changed)."""
+
+        material = projects.Material(
+            name=name.strip() or "Calibrated Material",
+            criterion=result.criterion,
+            parameters=dict(result.parameters),
+            sig3max_mpa=self._current_material().sig3max_mpa,
+        )
+        self._store_current()
+        index = self._project.append(material)
+        self._load_material(index)
+        self._populate_tree()
+        return index
 
     def _draw_test_data(self) -> None:
         """Failure-state points, Mohr circles and stress paths of visible materials.

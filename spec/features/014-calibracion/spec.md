@@ -47,6 +47,10 @@ global. Es la evolución natural: se apoya en el núcleo de ajuste.
 - Con Algorithm = Linear Regression y Error = None el modelo salió igual
   al de partida (no verificado si es que no ajusta): aclarar en el plan.
 
+## Estado (2026-11-23)
+
+Desarrollada: ver plan.md (contraste numérico con RSData y decisiones).
+
 ## Pendiente (fase de plan)
 
 Definición del error global con varios estados (suma de SSR por estado,
