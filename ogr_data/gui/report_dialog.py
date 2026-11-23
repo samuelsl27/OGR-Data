@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import report
-from .i18n import current_language, tr, translator
+from .i18n import current_language, decimal_point, tr, translator
 
 
 class ManageReportViewsDialog(QDialog):
@@ -180,6 +180,7 @@ class ReportGeneratorDialog(QDialog):
             self.title.text(),
             translate=translator(),
             lang=current_language(),
+            decimal=decimal_point(),
         )
 
     def generate(self, path: str | Path, open_browser: bool = False) -> Path:

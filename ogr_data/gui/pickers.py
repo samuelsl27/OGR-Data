@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import tables
-from .i18n import tr
+from .i18n import localize, tr
 
 
 class TablePickerDialog(QDialog):
@@ -44,7 +44,7 @@ class TablePickerDialog(QDialog):
         self._table.doubleClicked.connect(self.accept)
         for i, r in enumerate(rows):
             for j in range(1, len(columns)):
-                self._table.setItem(i, j - 1, QTableWidgetItem(r[j]))
+                self._table.setItem(i, j - 1, QTableWidgetItem(localize(str(r[j]))))
         self._table.resizeColumnsToContents()
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)

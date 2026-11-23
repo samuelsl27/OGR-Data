@@ -27,7 +27,7 @@ from ..core import calibration as cal
 from ..core import fitting
 from ..core import units
 from ..core.models import CRITERIA
-from .i18n import tr
+from .i18n import localize, tr
 
 
 class CalibrationDialog(QDialog):
@@ -170,7 +170,7 @@ class CalibrationDialog(QDialog):
             self.result = None
             self.output.setText(f'<span style="color:#c0392b">{exc}</span>')  # i18n: ignore -- core message
         else:
-            self.output.setText(self._describe(self.result))
+            self.output.setText(localize(self._describe(self.result)))
         self._buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(self.result is not None)
 
     def _describe(self, r: cal.CalibrationResult) -> str:

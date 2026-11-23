@@ -42,7 +42,7 @@ from PySide6.QtWidgets import (
 from ..core import states as st
 from ..core import units
 from ..core.project import SYMBOLS
-from .i18n import tr
+from .i18n import localize, tr
 
 
 def _header_text(name: str) -> str:
@@ -144,7 +144,7 @@ class PointTable(QWidget):
             self.table.insertRow(r)
         for c in range(self._numeric):
             value = float(row[c]) * self._scales[c]
-            self.table.setItem(r, c, QTableWidgetItem(f"{value:.10g}"))
+            self.table.setItem(r, c, QTableWidgetItem(localize(f"{value:.10g}")))
         if self._flag:
             item = QTableWidgetItem()
             item.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)

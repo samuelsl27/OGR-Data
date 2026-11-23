@@ -26,6 +26,7 @@ from __future__ import annotations
 import base64
 import html
 import math
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -674,15 +675,26 @@ def build_html(
     generated: datetime | None = None,
     translate: Translate | None = None,
     lang: str = "en",
+    decimal: str = ".",
 ) -> str:
     """Self-contained HTML report of a project and its graph views.
 
     ``translate`` gives each English text of the document in the report's
-    language (identity by default); ``lang`` is the ``<html lang>``.
+    language (identity by default); ``lang`` is the ``<html lang>``;
+    ``decimal`` the decimal separator of the numbers in its tables ("," in
+    Spanish).
     """
 
     title = (title if title is not None else project.title).strip() or _t("Untitled Project", translate)
-    return _Builder(project, list(views), visibility or {}, title, generated or datetime.now(), translate, lang).build()
+    document = _Builder(project, list(views), visibility or {}, title, generated or datetime.now(), translate, lang).build()
+    if decimal != ".":
+        document = _TABLE_CELL.sub(lambda m: m.group(1) + _DECIMAL_DOT.sub(decimal, m.group(2)) + m.group(3), document)
+    return document
+
+
+# a decimal point between two digits, inside a table cell (not in the CSS, images or prose)
+_TABLE_CELL = re.compile(r"(<td>)(.*?)(</td>)", re.S)
+_DECIMAL_DOT = re.compile(r"(?<=\d)\.(?=\d)")
 
 
 def included_sections(

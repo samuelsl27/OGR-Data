@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core.graph_options import LINE_STYLES, SERIES_KEYS, PlotOptions, SeriesStyle
-from .i18n import tr
+from .i18n import parse_number, tr
 from .themes import mpl_colors
 
 
@@ -244,8 +244,8 @@ class GraphEditorDialog(QDialog):
         if self._default_range.isChecked():
             return None
         try:
-            lo = float(self._range_edits[f"{axis}_lo"].text())
-            hi = float(self._range_edits[f"{axis}_hi"].text())
+            lo = parse_number(self._range_edits[f"{axis}_lo"].text())
+            hi = parse_number(self._range_edits[f"{axis}_hi"].text())
         except ValueError:
             return None
         k = getattr(self._canvas(), "display_scale", 1.0)

@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import database as mdb
-from .i18n import tr
+from .i18n import localize, tr
 
 
 def _help() -> str:
@@ -387,7 +387,7 @@ class DatabaseDialog(QDialog):
             header = "".join(f"<th>{e(k)}</th>" for k in keys)
             body = "".join("<tr>" + "".join(f"<td>{e(str(sp.get(k, '')))}</td>" for k in keys) + "</tr>" for sp in specimens)
             parts.append(f"<h4>{tr('Specimens ({0})').format(len(specimens))}</h4><table border='1' cellspacing='0' cellpadding='2'><tr>{header}</tr>{body}</table>")
-        self.html = "".join(parts)
+        self.html = localize("".join(parts))
         self.view.setHtml(self.html)
 
     def _select(self, record_id: int) -> None:

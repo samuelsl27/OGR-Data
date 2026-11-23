@@ -14,9 +14,13 @@ its English label.
 from __future__ import annotations
 
 import importlib
+import re
 from typing import Callable
 
 LANGUAGES: dict[str, str] = {"en": "English", "es": "Español"}
+#: Decimal separator of each language (what the user reads and types).
+DECIMAL_POINT: dict[str, str] = {"en": ".", "es": ","}
+_DECIMAL_DOT = re.compile(r"(?<=\d)\.(?=\d)")
 ZONES = ("main", "dialogs", "estimation", "registry", "report", "history")
 
 _LANG = "en"
@@ -50,6 +54,38 @@ def set_language(code: str) -> None:
     if code == "es":
         spanish()
     _LANG = code
+    _apply_locale(code)
+
+
+def _apply_locale(code: str) -> None:
+    """Qt's default locale follows the language: spin boxes show and accept its
+    decimal separator ("," in Spanish, "." in English), whatever Windows says."""
+
+    from PySide6.QtCore import QLocale
+
+    locale = QLocale(QLocale.Language.Spanish, QLocale.Country.Spain) if code == "es" else         QLocale(QLocale.Language.English, QLocale.Country.UnitedStates)
+    locale.setNumberOptions(QLocale.NumberOption.OmitGroupSeparator)
+    QLocale.setDefault(locale)
+
+
+def decimal_point() -> str:
+    return DECIMAL_POINT[_LANG]
+
+
+def localize(text: str) -> str:
+    """A text with numbers written for reading: the decimal point of the language.
+
+    For results and readings shown on screen (not files, clipboard or CSV,
+    which keep the point). Only a point between two digits changes.
+    """
+
+    return _DECIMAL_DOT.sub(",", text) if _LANG == "es" else text
+
+
+def parse_number(text: str) -> float:
+    """A number typed by the user, with "," or "." as decimal separator."""
+
+    return float(str(text).strip().replace(",", "."))
 
 
 def current_language() -> str:
@@ -101,3 +137,6 @@ def install_qt_translator(app, code: str) -> None:
     if translator_.load(f"qtbase_{code}", QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)):
         app.installTranslator(translator_)
         _QT_TRANSLATOR = translator_
+
+
+_apply_locale(_LANG)  # English numbers until a language is chosen

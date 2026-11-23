@@ -364,3 +364,40 @@ def test_language_switch_keeps_the_project_and_history() -> None:
             settings.remove("language")
         else:
             settings.setValue("language", saved)
+
+
+def test_decimal_separator_follows_the_language() -> None:
+    """Spec 024: "," in Spanish and "." in English, whatever the Windows locale."""
+
+    from PySide6.QtCore import QLocale
+    from PySide6.QtWidgets import QApplication, QDoubleSpinBox
+
+    from ogr_data.gui import i18n
+
+    app = QApplication.instance() or QApplication([])
+    try:
+        i18n.set_language("es")
+        assert i18n.decimal_point() == "," and QLocale().decimalPoint() == ","
+        assert i18n.localize("c = 1.4941 MPa, phi 30.52 deg (eq. 7, 2026)") == "c = 1,4941 MPa, phi 30,52 deg (eq. 7, 2026)"
+        assert i18n.parse_number(" 1,5 ") == 1.5 and i18n.parse_number("2.25") == 2.25
+        spin = QDoubleSpinBox()
+        spin.setDecimals(2)
+        spin.setValue(7.5)
+        assert spin.text() == "7,50"
+        from ogr_data.gui.estimation import GsiDialog
+
+        dlg = GsiDialog(None, lang="es")
+        dlg._tabs.setCurrentIndex(dlg._tabs.count() - 1)  # calculator
+        dlg._rqd.setValue(30.0)
+        dlg._j89.setValue(10.0)
+        assert "30,00" in dlg._result.text() and dlg.value == 30.0
+        dlg.deleteLater()
+        i18n.set_language("en")
+        assert QLocale().decimalPoint() == "." and i18n.localize("1.5") == "1.5"
+        spin2 = QDoubleSpinBox()
+        spin2.setDecimals(2)
+        spin2.setValue(7.5)
+        assert spin2.text() == "7.50"
+        app.processEvents()
+    finally:
+        i18n.set_language("en")

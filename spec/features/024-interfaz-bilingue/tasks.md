@@ -11,3 +11,5 @@
 - [x] View > Language: la ventana se reabre en el idioma conservando proyecto, selección, historial y vistas
 - [x] Tests: `test_i18n.py` (estático, diccionario, ventana y diálogos en español, cambio de idioma) e informe en español
 - [x] Commit y push
+- [x] Separador decimal según el idioma (QLocale por idioma, `localize`/`parse_number`, gráficas, resultados, tablas, informe)
+- [x] Commit y push del separador

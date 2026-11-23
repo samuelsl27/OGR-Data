@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (
 
 from ..core import fitting
 from ..core.fitting import DIRECT, LEVENBERG_MARQUARDT, LINEAR, SIMPLEX, TRIAXIAL
-from .i18n import tr
+from .i18n import localize, parse_number, tr
 
 
 def _data_labels() -> dict[str, tuple[str, str]]:
@@ -170,8 +170,8 @@ class FitDialog(QDialog):
         data = parse_rows(QApplication.clipboard().text(), 2)
         self._table.setRowCount(len(data))
         for i, (a, b) in enumerate(data):
-            self._table.setItem(i, 0, QTableWidgetItem(repr(a)))
-            self._table.setItem(i, 1, QTableWidgetItem(repr(b)))
+            self._table.setItem(i, 0, QTableWidgetItem(localize(repr(a))))
+            self._table.setItem(i, 1, QTableWidgetItem(localize(repr(b))))
 
     def _data(self) -> tuple[np.ndarray, np.ndarray]:
         xs, ys = [], []
@@ -180,8 +180,8 @@ class FitDialog(QDialog):
             item_y = self._table.item(i, 1)
             if item_x is None or item_y is None or not item_x.text().strip() or not item_y.text().strip():
                 continue
-            xs.append(float(item_x.text()))
-            ys.append(float(item_y.text()))
+            xs.append(parse_number(item_x.text()))
+            ys.append(parse_number(item_y.text()))
         return np.array(xs), np.array(ys)
 
     # ----------------------------------------------------------------- fit
@@ -205,7 +205,7 @@ class FitDialog(QDialog):
         if key == "generalized_hoek_brown":
             lines.append("")
             lines.append(tr("Note: apply fills the classic Hoek-Brown criterion (mb, s; a is fixed to 0.5 there)."))
-        self._output.setPlainText("\n".join(lines))
+        self._output.setPlainText(localize("\n".join(lines)))
         self._apply_button.setEnabled(True)
 
     def _apply(self) -> None:

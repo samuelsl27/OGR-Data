@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import gsi_charts
+from .i18n import localize
 from .themes import mpl_colors
 
 SHORT_NAMES = {
@@ -239,7 +240,7 @@ class DigitizedGsiPage(QWidget):
             self._reset_hover()
             return
         value = "N/A" if result.gsi is None else f"{result.gsi:.1f}"
-        self._hover.setText(f"GSI ≈ {value}  ·  {result.summary(self.lang)}")
+        self._hover.setText(localize(f"GSI ≈ {value}") + f"  ·  {result.summary(self.lang)}")
 
     def _reset_hover(self) -> None:
         self._hover.setText("Clic en la carta para leer el GSI." if self.lang == "es" else "Click on the chart to read GSI.")  # i18n: ignore (chart language)

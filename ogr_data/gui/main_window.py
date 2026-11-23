@@ -1961,7 +1961,7 @@ class MainWindow(QMainWindow):
                     f"sigma3 = {units.stress_text(inst.point_x, self._stress_unit)}   sigma1 = {units.stress_text(inst.point_y, self._stress_unit)}   "
                     f"sigma_n = {units.stress_text(n_t, self._stress_unit)}   tau = {units.stress_text(t_t, self._stress_unit)}"
                 )
-            self.statusBar().showMessage(text)
+            self.statusBar().showMessage(i18n.localize(text))
             return
 
         # shear-space click
@@ -1988,7 +1988,7 @@ class MainWindow(QMainWindow):
                 f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
                 f"sigma_n = {units.stress_text(inst.point_x, self._stress_unit)}   tau = {units.stress_text(inst.point_y, self._stress_unit)}"
             )
-        self.statusBar().showMessage(text)
+        self.statusBar().showMessage(i18n.localize(text))
 
     # --------------------------------------------------------------- refresh
 
@@ -2051,7 +2051,7 @@ class MainWindow(QMainWindow):
             if key == "generalized_hoek_brown":
                 inp = self._ghb_input(params, sig3max)
                 result = compute(inp, self._modulus_method(params))
-                self._outputs.setText(
+                self._outputs.setText(i18n.localize(
                     f"mb   = {result.mb:.4f}\n"
                     f"s    = {result.s:.4f}\n"
                     f"a    = {result.a:.4f}\n"
@@ -2061,7 +2061,7 @@ class MainWindow(QMainWindow):
                     f"c    = {units.stress_text(result.mc.cohesion, self._stress_unit)}\n"
                     f"phi  = {result.mc.friction_deg:.2f} deg\n"
                     f"Erm  = {units.stress_text(result.erm, self._stress_unit, decimals=2)}"
-                )
+                ))
             else:
                 self._outputs.setText("")
         else:

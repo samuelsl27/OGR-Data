@@ -274,3 +274,24 @@ def test_window_add_view_manage_and_generate() -> None:
         assert len(w.report_views) == 0
     finally:
         w.deleteLater()
+
+
+def test_spanish_report_decimal_comma() -> None:
+    """Spec 024: in Spanish the numbers of the report tables use the decimal comma."""
+
+    import re
+    from datetime import datetime
+
+    from ogr_data.core import project as projects
+    from ogr_data.gui import i18n
+
+    proj = projects.Project.new()
+    proj.materials[0] = projects.Material.from_template("rock", "Granite")
+    when = datetime(2026, 11, 23, 12, 0)
+    point = report.build_html(proj, generated=when, translate=i18n.translator("es"), lang="es")
+    comma = report.build_html(proj, generated=when, translate=i18n.translator("es"), lang="es", decimal=",")
+    cells = re.findall(r"<td>(.*?)</td>", comma, re.S)
+    assert any(re.search(r"\d,\d", c) for c in cells) and not any(re.search(r"\d\.\d", c) for c in cells)
+    # only the table cells change, and only their decimal points
+    assert re.sub(r"(?<=\d),(?=\d)", ".", comma) == re.sub(r"(?<=\d),(?=\d)", ".", point)
+    assert "<style>" in comma and comma.count("<td>") == point.count("<td>")

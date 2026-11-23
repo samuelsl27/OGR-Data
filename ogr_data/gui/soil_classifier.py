@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core import uscs
-from .i18n import tr
+from .i18n import localize, tr
 
 
 class _PlasticityCanvas(FigureCanvasQTAgg):
@@ -183,12 +183,12 @@ class SoilClassifierDialog(QDialog):
             self._numeric.setText(tr("{0}: not listed in UFC 3-220-01N Table 8-3.1 (no numeric values).").format(self.symbol or tr("No class")))
         else:
             c_comp, c_sat = row["cohesion_compacted_kpa"], row["cohesion_saturated_kpa"]
-            fmt = lambda v: "-----" if v is None else f"{v:g} kPa"
+            fmt = lambda v: "-----" if v is None else localize(f"{v:g} kPa")
             self._numeric.setText(
                 tr(
                     "{0}: c' as compacted {1}, c' saturated {2}, phi' {3} deg (effective envelope); max dry unit weight "
                     "{4} g/cm3 (pcf). '>' = greater than the value shown."
-                ).format(row["symbol"], fmt(c_comp), fmt(c_sat), row["phi_effective"] or "-----", row["max_dry_unit_weight"])
+                ).format(row["symbol"], fmt(c_comp), fmt(c_sat), row["phi_effective"] or "-----", localize(str(row["max_dry_unit_weight"])))
             )
         self._create.setEnabled(self.numeric_parameters() is not None and self.on_create is not None)
 

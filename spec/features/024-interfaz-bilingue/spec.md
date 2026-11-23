@@ -14,7 +14,12 @@ código en inglés**.
    guarda en `QSettings("OpenGeoRock", "OGR-Data")` (clave `language`).
    Primer arranque: español si el idioma del sistema es español, inglés
    en otro caso.
-2. **Qué se traduce** (todo lo que el usuario lee en la ventana):
+2. **Separador decimal según el idioma** (decisión del propietario,
+   23-11-2026): coma en español y punto en inglés, sea cual sea la
+   configuración regional de Windows, en los campos numéricos (se puede
+   escribir con coma o con punto), las gráficas, los resultados, las tablas
+   de los diálogos y el informe HTML.
+3. **Qué se traduce** (todo lo que el usuario lee en la ventana):
    - menús, acciones, pestañas, botones, títulos de ventana y diálogos,
      etiquetas, textos de ayuda (tooltips), mensajes de la barra de estado
      y de los cuadros de aviso/error;
@@ -30,7 +35,7 @@ código en inglés**.
      (secciones, rótulos de tablas, nombres de parámetros);
    - las cartas GSI digitalizadas (spec 022) toman por defecto el idioma
      de la interfaz; su selector propio se mantiene.
-3. **Qué no se traduce**:
+4. **Qué no se traduce**:
    - el contenido de las tablas bibliográficas y de la base de datos
      (nombres de rocas de Hoek, descripciones de D y MR, registros CANMET
      y MnDOT, textos UFC): se citan en el idioma de la fuente; traducirlos
@@ -41,18 +46,17 @@ código en inglés**.
    - los ficheros: `.ogrdata`, CSV y el contrato del portapapeles no
      cambian con el idioma (un proyecto guardado en español abre igual en
      inglés);
-   - el separador decimal no depende del idioma de la interfaz: los
-     campos numéricos siguen la configuración regional de Windows (coma en
-     un Windows en español, ya antes de esta spec) y los textos, CSV y el
-     portapapeles usan el punto, en los dos idiomas.
-4. **Terminología**: un glosario único, coherente con el de las cartas GSI
+   - los ficheros de datos: CSV, portapapeles y `.ogrdata` escriben los
+     números con punto en los dos idiomas (lo que se pega en otro programa
+     o se lee de nuevo no cambia con el idioma).
+5. **Terminología**: un glosario único, coherente con el de las cartas GSI
    (spec 022: macizo rocoso, discontinuidad, meteorizado/alterado,
    «espejos de falla»…) y con el de OGR-Slip2D cuando el término es común
    (cohesión, ángulo de rozamiento, peso específico, tensión efectiva).
    Donde el nombre de RSData es la referencia del usuario (criterios,
    «Failure State», «Stress Path»), el texto español lleva el nombre
    inglés en el tooltip.
-5. **Mecanismo** (a fijar en el plan, con Slip2D como punto de partida):
+6. **Mecanismo** (a fijar en el plan, con Slip2D como punto de partida):
    `tr("texto inglés")` con diccionarios Python en `ogr_data/gui/i18n`,
    el inglés como clave (la interfaz inglesa no cambia ni un carácter).
    El núcleo no conoce idiomas (constitución): los textos que viven en el
@@ -94,7 +98,6 @@ código en inglés**.
 
 - Otros idiomas (la estructura debe permitirlos, sin traducirlos aún).
 - Traducir el contenido bibliográfico y la base de datos.
-- Coma decimal.
 - Traducir la API / MCP.
 
 ## Referencias

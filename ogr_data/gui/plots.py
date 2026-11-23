@@ -8,7 +8,7 @@ from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 from ..core.graph_options import PlotOptions
-from .i18n import tr
+from .i18n import localize, tr
 from .themes import mpl_colors
 
 _EMPTY_OFFSETS = np.empty((0, 2))
@@ -275,7 +275,7 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
 
         self.display_scale = scale
         for axis in (self.axes.xaxis, self.axes.yaxis):
-            axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: f"{v * k:g}"))
+            axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: localize(f"{v * k:g}")))
         self.draw_idle()
 
     def set_axes_labels(self, xlabel: str, ylabel: str) -> None:
@@ -402,7 +402,7 @@ class PathCanvas(FigureCanvasQTAgg):
         self.axes.set_ylabel(f"{ylabel} ({unit})" if self._stress_axes[1] else ylabel)
         for axis, is_stress in ((self.axes.xaxis, self._stress_axes[0]), (self.axes.yaxis, self._stress_axes[1])):
             if is_stress:
-                axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: f"{v * k:g}"))
+                axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: localize(f"{v * k:g}")))
         self.display_scale = scale
         self.apply_theme(self._theme)
 

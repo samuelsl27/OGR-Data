@@ -40,7 +40,7 @@ from PySide6.QtWidgets import (
 from ..core import gsi as qgsi
 from ..core import tables
 from .gsi_chart_view import DigitizedGsiPage
-from .i18n import current_language, tr
+from .i18n import current_language, decimal_point, localize, tr
 from .pickers import GsiPickerDialog
 from .themes import mpl_colors
 
@@ -339,7 +339,7 @@ class GsiDialog(QDialog):
             mode = self._rqd_mode.currentIndex()
             for widget, shown in ((self._rqd, mode == 0), (self._lambda, mode == 1), (self._jv, mode in (2, 3))):
                 self._rqd_form.setRowVisible(widget, shown)
-            self._rqd_value.setText(f"{self.rqd():.2f} %")
+            self._rqd_value.setText(localize(f"{self.rqd():.2f} %"))
         text = ""
         page = self._tabs.widget(tab)
         if page is self._chart2000:
@@ -359,7 +359,7 @@ class GsiDialog(QDialog):
         else:
             self.value, formula = self.calculator_gsi()
             text = f"{formula} = {self.value:.2f}"
-        self._result.setText(f"<b>{text}</b>")
+        self._result.setText(f"<b>{localize(text)}</b>")
 
     def set_language(self, lang: str) -> None:
         """Language of the digitized charts' texts: 'en' (literal) or 'es'."""
@@ -426,7 +426,7 @@ class FilteredTableDialog(QDialog):
         self.table.doubleClicked.connect(self.accept)
         for i, row in enumerate(rows):
             for j, key in enumerate(columns):
-                self.table.setItem(i, j, QTableWidgetItem("" if row.get(key) is None else str(row.get(key))))
+                self.table.setItem(i, j, QTableWidgetItem("" if row.get(key) is None else localize(str(row.get(key)))))
         self.table.resizeColumnsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
@@ -532,7 +532,7 @@ class ModulusRatioDialog(FilteredTableDialog):
         from ..core import units
 
         scale = units.stress_factor(self._unit) / 1000.0
-        self.ei_label.setText(f"{self.ei_kpa() * scale:,.0f} {self._unit}")
+        self.ei_label.setText((f"{self.ei_kpa() * scale:,.0f}" if decimal_point() == "." else f"{self.ei_kpa() * scale:.0f}") + f" {self._unit}")
 
     def value(self) -> float | None:  # Ei in kPa
         return self.ei_kpa()
@@ -598,7 +598,7 @@ class PhiRDialog(FilteredTableDialog):
         weathered = self.schmidt.currentIndex() == 1
         self._form.setRowVisible(self.r, weathered)
         self._form.setRowVisible(self.big_r, weathered)
-        self.result.setText(f"{self.phi_r():.2f} deg")
+        self.result.setText(localize(f"{self.phi_r():.2f} deg"))
 
     def value(self) -> float | None:
         return self.phi_r()
@@ -644,7 +644,7 @@ class JrcDialog(QDialog):
         return barton.jrc_scaled(self.jrc0.value(), self.length.value(), self.lab.value())
 
     def _update(self) -> None:
-        self.result.setText(f"{self.value():.3f}")
+        self.result.setText(localize(f"{self.value():.3f}"))
 
 
 class JcsDialog(FilteredTableDialog):
@@ -704,7 +704,7 @@ class JcsDialog(FilteredTableDialog):
         return barton.jcs_scaled(self.jcs0.value() / self._kpa_scale, self.jrc0.value(), self.length.value(), self.lab.value())
 
     def _update(self) -> None:
-        self.result.setText(f"{self.value() * self._kpa_scale:.4g} {self._unit}")
+        self.result.setText(localize(f"{self.value() * self._kpa_scale:.4g} {self._unit}"))
 
 
 class CompactedSoilDialog(FilteredTableDialog):
