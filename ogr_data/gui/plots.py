@@ -404,13 +404,21 @@ class PathCanvas(FigureCanvasQTAgg):
         self.draw_idle()
 
     def set_series(self, series) -> None:
-        """Iterable of (label, x, y, color) with stress values in MPa."""
+        """Iterable of (label, x, y, color[, style]) with stress values in MPa.
+
+        style (optional dict) overrides the line keywords: stress paths are
+        dotted lab steps, simulated tests (spec 013) plain lines.
+        """
 
         for line in self._lines:
             line.remove()
         self._lines = []
-        for label, x, y, color in series:
-            (line,) = self.axes.plot(x, y, color=color, marker=".", markersize=5.0, linewidth=1.4)
+        for entry in series:
+            label, x, y, color = entry[:4]
+            style = {"marker": ".", "markersize": 5.0, "linewidth": 1.4}
+            if len(entry) > 4 and entry[4]:
+                style.update(entry[4])
+            (line,) = self.axes.plot(x, y, color=color, **style)
             line.ogr_label = label
             self._lines.append(line)
         self.axes.relim()

@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Mapping, Union
 
 from .models import CRITERIA, defaults
+from .simulation import TestSimulation, stiffness_from
 from .states import FailureState, StressPath, failure_states_from_dicts
 
 FORMAT_V1 = "ogr-data-project/1"
@@ -35,7 +36,8 @@ DEFAULT_CRITERION = next(iter(CRITERIA))
 # each one starts with is an OGR Data choice: the rock-mass criterion of
 # reference (Generalized Hoek-Brown) and the soil one (Mohr-Coulomb), with
 # the registry defaults captured from RSData. Spec 012: the rock template
-# also brings an (empty) failure state and the soil one a stress path.
+# also brings an (empty) failure state and the soil one a stress path
+# (and, spec 013, a test simulation: RSData's default Test 1).
 TEMPLATES: dict[str, tuple[str, str]] = {
     "material": ("Material", DEFAULT_CRITERION),
     "rock": ("Rock", "generalized_hoek_brown"),
@@ -96,6 +98,9 @@ class Material:
     visible: bool = True
     failure_states: list[FailureState] = field(default_factory=list)  # spec 012
     stress_paths: list[StressPath] = field(default_factory=list)  # spec 012
+    # spec 013: Stiffness tab (Linear Isotropic) and test simulations
+    stiffness: dict = field(default_factory=lambda: stiffness_from(None))
+    test_simulations: list[TestSimulation] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if self.criterion not in CRITERIA:
@@ -104,6 +109,7 @@ class Material:
         self.parameters = {**defaults(self.criterion), **dict(self.parameters)}
         if self.symbol not in SYMBOLS:
             self.symbol = "o"
+        self.stiffness = stiffness_from(self.stiffness)
 
     @classmethod
     def from_template(cls, template: str, name: str | None = None, color: str = "") -> "Material":
@@ -114,6 +120,8 @@ class Material:
         if template == "rock":
             material.failure_states.append(FailureState())
         elif template == "soil":
+            # "Material Model + Test, Stress Path": spec 013 adds the test
+            material.test_simulations.append(TestSimulation())
             material.stress_paths.append(StressPath())
         return material
 
@@ -132,6 +140,8 @@ class Material:
             "visible": self.visible,
             "failure_states": [s.to_dict() for s in self.failure_states],
             "stress_paths": [p.to_dict() for p in self.stress_paths],
+            "stiffness": dict(self.stiffness),
+            "test_simulations": [t.to_dict() for t in self.test_simulations],
         }
 
     @classmethod
@@ -150,6 +160,8 @@ class Material:
             visible=bool(data.get("visible", True)),
             failure_states=failure_states_from_dicts(data.get("failure_states", [])),
             stress_paths=[StressPath.from_dict(p) for p in data.get("stress_paths", [])],
+            stiffness=stiffness_from(data.get("stiffness")),
+            test_simulations=[TestSimulation.from_dict(t) for t in data.get("test_simulations", [])],
         )
 
 

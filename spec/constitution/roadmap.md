@@ -22,8 +22,12 @@ escala; c/φ numéricos por grupo USCS de UFC 3-220-01N, y el clasificador
 crea el material; perfiles de JRC pendientes por copyright) y **015 —
 Informes** (Report Generator / Add View To Report / Manage Report View:
 HTML autocontenido con las secciones de RSData, vistas de gráficas con
-parámetros y resultados, secciones vacías omitidas). Siguiente del orden
-propuesto: **013** (simulación de ensayos).
+parámetros y resultados, secciones vacías omitidas). **013a —
+Simulación de ensayos** hecha (Tests / Compute: uniaxial, triaxial y
+biaxial, drenado/no drenado, compresión/extensión, cíclico básico;
+elastoplástico MC/HB/GHB con residual frágil; rigidez lineal isótropa;
+verificado contra soluciones cerradas). Siguiente: **013b** (modelos de
+suelo avanzados, Simple Shear y General) o **019** (API y MCP).
 
 Backlog de specs (spec.md redactadas; plan y tasks se hacen al
 desarrollar cada una). Orden propuesto tras la evaluación en profundidad

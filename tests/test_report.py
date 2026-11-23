@@ -145,13 +145,21 @@ def test_two_material_report_is_valid_and_self_contained() -> None:
     for text in ("Granite", "Clayey sand", "Generalized Hoek Brown", "Mohr Coulomb", "Triaxial UCS", "Path 1",
                  "Global strength sigcm", "120 MPa", "Metric, stress as MPa", "2026-11-23 10:30", "sigma1 = 50 MPa"):
         assert text in document, text
-    # excluded point listed as such; sections in RSData order, test simulations empty -> omitted
+    # excluded point listed as such; sections in RSData order (the soil template brings a test, spec 013)
     assert re.search(r"<td class=\"num\">10</td><td class=\"num\">210</td><td class=\"num\">Yes</td>", document)
     assert report.included_sections(proj, views) == [
-        "project_summary", "project_settings", "views", "samples", "material_models", "failure_states", "stress_paths",
+        "project_summary", "project_settings", "views", "samples", "material_models", "failure_states",
+        "test_simulations", "stress_paths",
     ]
     toc = re.search(r'<nav class="toc">(.*?)</nav>', document).group(1)
-    assert "Defined Test Simulations" not in toc and "Defined Stress Paths" in toc
+    assert "Defined Test Simulations" in toc and "Defined Stress Paths" in toc
+    tests = document[document.index('id="test_simulations"'):document.index('id="stress_paths"')]
+    # uniaxial MC test of the soil: peak q = 2 c sqrt(N_phi) = 40.34 kPa = 0.0403406 MPa
+    assert "Uniaxial Test" in tests and "<th>Peak deviator q</th><td>0.0403406 MPa</td>" in tests
+    assert "Young&#x27;s Modulus</th><td>20 MPa" in tests
+    # a test that cannot be simulated is listed with the reason
+    proj.materials[0].test_simulations.append(report.sm.TestSimulation(name="SS", test_type="simple_shear"))
+    assert "Not simulated: Simple Shear Test is simulated from spec 013b" in report.build_html(proj)
 
 
 def test_section_visibility_and_empty_sections() -> None:

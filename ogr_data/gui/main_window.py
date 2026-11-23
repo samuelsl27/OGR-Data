@@ -42,6 +42,7 @@ from ..core import criteria_envelopes as ce
 from ..core import project as projects
 from ..core import report
 from ..core import samplers
+from ..core import simulation as sm
 from ..core import states as st
 from ..core import units
 from ..core.graph_options import PlotOptions
@@ -83,6 +84,8 @@ class MainWindow(QMainWindow):
         # section visibility chosen in the Report Generator
         self.report_views = report.ReportViews()
         self.report_visibility = report.default_visibility()
+        # spec 013: simulated tests, cached by (model, stiffness, test) inputs
+        self._sim_cache: dict[str, object] = {}
         from PySide6.QtWidgets import QApplication
 
         apply_theme(QApplication.instance(), self._theme)
@@ -131,6 +134,32 @@ class MainWindow(QMainWindow):
         self._form_box = QGroupBox("Parameters")
         self._form_layout = QFormLayout(self._form_box)
         self._widgets: dict[str, object] = {}
+
+        # spec 013: Stiffness (RSData tab, Linear Isotropic)
+        self._stiffness_box = QGroupBox("Stiffness (Linear Isotropic)")
+        stiff_form = QFormLayout(self._stiffness_box)
+        self._poisson = QDoubleSpinBox()
+        self._poisson.setRange(-0.99, 0.4999)
+        self._poisson.setDecimals(4)
+        self._poisson.setSingleStep(0.01)
+        self._poisson.setValue(sm.DEFAULT_STIFFNESS["poisson"])
+        self._young = QDoubleSpinBox()
+        self._young.setRange(1e-9, 1e15)
+        self._young.setDecimals(4)
+        self._young.setValue(sm.DEFAULT_STIFFNESS["young"] * self._kpa_scale())
+        self._young.setSuffix(f" {self._stress_unit}")
+        for widget in (self._poisson, self._young):
+            widget.valueChanged.connect(self.refresh)
+        self._use_erm = QPushButton("Erm")
+        self._use_erm.setToolTip("Young's modulus = rock mass modulus Erm (Generalized Hoek-Brown)")
+        self._use_erm.clicked.connect(self.use_erm_as_young)
+        young_row = QWidget()
+        young_layout = QHBoxLayout(young_row)
+        young_layout.setContentsMargins(0, 0, 0, 0)
+        young_layout.addWidget(self._young, stretch=1)
+        young_layout.addWidget(self._use_erm)
+        stiff_form.addRow("Poisson's Ratio", self._poisson)
+        stiff_form.addRow("Young's Modulus", young_row)
 
         self._outputs = QLabel()
         self._outputs.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -195,6 +224,7 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(self._sig3max)
         sidebar.addWidget(self._app_fields)
         sidebar.addWidget(self._form_box)
+        sidebar.addWidget(self._stiffness_box)
         sidebar.addWidget(QLabel("Computed"))
         sidebar.addWidget(self._outputs, stretch=1)
 
@@ -281,11 +311,15 @@ class MainWindow(QMainWindow):
         # spec 012
         states_menu = bar.addMenu("Failure States")
         states_menu.addAction("Define Failure States…", lambda: self._define_failure_states())
+        tests_menu = bar.addMenu("Tests")  # spec 013
+        tests_menu.addAction("Define Test Simulations…", lambda: self._define_test_simulations())
         paths_menu = bar.addMenu("Stress Paths")
         paths_menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
         # spec 014
         calibrate_menu = bar.addMenu("Calibrate")
         calibrate_menu.addAction("Calibrate…", self._open_calibration)
+        compute_menu = bar.addMenu("Compute")  # spec 013
+        compute_menu.addAction("Compute", self.compute)
 
         analysis_menu = bar.addMenu("Analysis")
         self._stress_sampler_act = QAction("Stress Sampler", self, checkable=True)
@@ -395,6 +429,7 @@ class MainWindow(QMainWindow):
                 self._tree.addTopLevelItem(item)
                 # spec 012: failure states and stress paths of the material
                 children = [("state", i, s, st.FAILURE_TEST_TYPES[s.test_type]) for i, s in enumerate(material.failure_states)]
+                children += [("test", i, t, sm.TEST_TYPES[t.test_type]) for i, t in enumerate(material.test_simulations)]
                 children += [("path", i, p, st.PATH_TEST_TYPES[p.test_type]) for i, p in enumerate(material.stress_paths)]
                 for kind, index, obj, test_label in children:
                     child = QTreeWidgetItem([obj.name])
@@ -404,7 +439,7 @@ class MainWindow(QMainWindow):
                     child.setData(0, Qt.ItemDataRole.UserRole, (kind, index))
                     child.setCheckState(0, Qt.CheckState.Checked if obj.visible else Qt.CheckState.Unchecked)
                     child.setIcon(0, self._swatch(obj.color))
-                    noun = "Failure state" if kind == "state" else "Stress path"
+                    noun = {"state": "Failure state", "test": "Test simulation", "path": "Stress path"}[kind]
                     child.setToolTip(0, f"{noun}: {obj.name} ({test_label})")
                     item.addChild(child)
             self._tree.expandAll()
@@ -428,6 +463,7 @@ class MainWindow(QMainWindow):
         material.application = projects.Application(
             self._application_combo.currentData(), self._unit_weight.value(), self._app_depth.value()
         )
+        material.stiffness = self._stiffness()
         item = self._tree.topLevelItem(self._current)
         if item is not None:
             self._tree_updating = True
@@ -443,6 +479,11 @@ class MainWindow(QMainWindow):
         try:
             app = material.application
             for widget, value in ((self._unit_weight, app.unit_weight), (self._app_depth, app.depth)):
+                widget.blockSignals(True)
+                widget.setValue(value)
+                widget.blockSignals(False)
+            stiffness = sm.stiffness_from(material.stiffness)
+            for widget, value in ((self._poisson, stiffness["poisson"]), (self._young, stiffness["young"] * self._kpa_scale())):
                 widget.blockSignals(True)
                 widget.setValue(value)
                 widget.blockSignals(False)
@@ -477,8 +518,7 @@ class MainWindow(QMainWindow):
             # spec 012: visibility of a failure state / stress path
             kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
             material = self._project.materials[self._tree_material_index(item)]
-            objects = material.failure_states if kind == "state" else material.stress_paths
-            objects[sub].visible = item.checkState(0) == Qt.CheckState.Checked
+            self._children(material, kind)[sub].visible = item.checkState(0) == Qt.CheckState.Checked
             self.refresh()
             return
         index = self._tree.indexOfTopLevelItem(item)
@@ -589,6 +629,7 @@ class MainWindow(QMainWindow):
             menu.addAction("Copy material", self._copy_material)
             menu.addSeparator()
             menu.addAction("Define Failure States…", lambda: self._define_failure_states())
+            menu.addAction("Define Test Simulations…", lambda: self._define_test_simulations())
             menu.addAction("Define Stress Paths…", lambda: self._define_stress_paths())
             menu.addSeparator()
             delete = menu.addAction("Delete Material", lambda: self._delete_material())
@@ -602,6 +643,8 @@ class MainWindow(QMainWindow):
         menu = QMenu(self)
         if kind == "state":
             menu.addAction("Edit Failure State…", lambda: self._define_failure_states(sub))
+        elif kind == "test":
+            menu.addAction("Edit Test Simulation…", lambda: self._define_test_simulations(sub))
         else:
             menu.addAction("Edit Stress Path…", lambda: self._define_stress_paths(sub))
         menu.addAction("Delete", lambda: self._delete_child(kind, sub))
@@ -613,12 +656,13 @@ class MainWindow(QMainWindow):
         kind, sub = item.data(0, Qt.ItemDataRole.UserRole)
         if kind == "state":
             self._define_failure_states(sub)
+        elif kind == "test":
+            self._define_test_simulations(sub)
         else:
             self._define_stress_paths(sub)
 
     def _delete_child(self, kind: str, index: int) -> None:
-        material = self._current_material()
-        objects = material.failure_states if kind == "state" else material.stress_paths
+        objects = self._children(self._current_material(), kind)
         if 0 <= index < len(objects):
             del objects[index]
         self._populate_tree()
@@ -639,6 +683,25 @@ class MainWindow(QMainWindow):
         dialog = StressPathsDialog(self, material.name, material.stress_paths, self._stress_unit, initial)
         if dialog.exec():
             self.set_stress_paths(dialog.items)
+
+    @staticmethod
+    def _children(material: projects.Material, kind: str) -> list:
+        return {"state": material.failure_states, "test": material.test_simulations, "path": material.stress_paths}[kind]
+
+    def _define_test_simulations(self, initial: int = 0) -> None:
+        from .simulation_dialog import TestSimulationsDialog
+
+        material = self._current_material()
+        dialog = TestSimulationsDialog(self, material.name, material.test_simulations, self._stress_unit, initial)
+        if dialog.exec():
+            self.set_test_simulations(dialog.items)
+
+    def set_test_simulations(self, tests: list) -> None:
+        """Replace the selected material's test simulations (dialog OK)."""
+
+        self._current_material().test_simulations = list(tests)
+        self._populate_tree()
+        self.refresh()
 
     def set_failure_states(self, failure_states: list) -> None:
         """Replace the selected material's failure states (dialog OK)."""
@@ -813,6 +876,23 @@ class MainWindow(QMainWindow):
                         "export": (f"{label} sigma3", f"{label} sigma1"),
                     }
                 )
+            # spec 013: effective stress path of the simulated tests (sigma'3, sigma'1)
+            for test in material.test_simulations:
+                result = self.simulation_result(material, test) if test.visible else None
+                if not isinstance(result, sm.SimulationResult):
+                    continue
+                label = f"{prefix}{test.name}"
+                principal.append(
+                    {
+                        "x": result.sigma3 / 1000.0,
+                        "y": result.sigma1 / 1000.0,
+                        "color": test.color,
+                        "linestyle": "--",
+                        "linewidth": 1.3,
+                        "legend": label,
+                        "export": (f"{label} sigma'3", f"{label} sigma'1"),
+                    }
+                )
         self._principal.set_layers(principal)
         self._shear.set_layers(shear)
         self._draw_path_graphs()
@@ -835,6 +915,18 @@ class MainWindow(QMainWindow):
                 series["volumetric"].append((label, inv.eps_a, inv.eps_v, path.color))
                 series["deviatoric"].append((label, inv.eps_q, inv.q / kpa, path.color))
                 series["pq"].append((label, inv.p / kpa, inv.q / kpa, path.color))
+            # spec 013: simulated tests as plain lines
+            for test in material.test_simulations:
+                result = self.simulation_result(material, test) if test.visible else None
+                if not isinstance(result, sm.SimulationResult):
+                    continue
+                label = f"{material.name}: {test.name}" if multi else test.name
+                style = {"marker": "None", "linewidth": 1.6}
+                kpa = 1000.0
+                series["axial"].append((label, result.axial_strain, result.axial_stress / kpa, test.color, style))
+                series["volumetric"].append((label, result.axial_strain, result.eps_v, test.color, style))
+                series["deviatoric"].append((label, result.eps_q, result.q / kpa, test.color, style))
+                series["pq"].append((label, result.p / kpa, result.q / kpa, test.color, style))
         for key, canvas in self._path_canvases.items():
             canvas.set_series(series[key])
 
@@ -954,6 +1046,10 @@ class MainWindow(QMainWindow):
         self._sig3max.setValue(self._sig3max.value() * ratio)
         self._sig3max.setSuffix(f" {unit}")
         self._sig3max.blockSignals(False)
+        self._young.blockSignals(True)
+        self._young.setValue(self._young.value() * ratio)
+        self._young.setSuffix(f" {unit}")
+        self._young.blockSignals(False)
         self._set_plot_labels()
         self.refresh()
 
@@ -1023,6 +1119,67 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Export", "There is no series to export on this plot.")
             return
         series_export.write_series_csv(path, columns, unit=self._stress_unit)
+
+    # ---------------------------------------------------------- spec 013: test simulations
+
+    def _stiffness(self) -> dict:
+        return {
+            "type": "Linear Isotropic",
+            "poisson": self._poisson.value(),
+            "young": self._young.value() / self._kpa_scale(),
+        }
+
+    def use_erm_as_young(self) -> None:
+        """Young's modulus = Erm of the Generalized Hoek-Brown material (as RSData fills it)."""
+
+        computed = self._ghb_computed()
+        if not computed:
+            QMessageBox.information(self, "Stiffness", "Erm is computed for Generalized Hoek-Brown materials only.")
+            return
+        self._young.setValue(units.to_display(computed["erm_mpa"], self._stress_unit))
+
+    @staticmethod
+    def _simulation_key(material: projects.Material, test) -> str:
+        import json
+
+        return json.dumps(
+            [material.criterion, material.parameters, material.stiffness, test.to_dict()], sort_keys=True, default=str
+        )
+
+    def simulation_result(self, material: projects.Material, test):
+        """SimulationResult of a test (cached), or the error message (str)."""
+
+        key = self._simulation_key(material, test)
+        if key not in self._sim_cache:
+            try:
+                self._sim_cache[key] = sm.simulate_material(material, test)
+            except sm.SimulationError as exc:
+                self._sim_cache[key] = str(exc)
+            if len(self._sim_cache) > 256:
+                self._sim_cache.pop(next(iter(self._sim_cache)))
+        return self._sim_cache[key]
+
+    def compute(self, report_problems: bool = True) -> list[str]:
+        """Compute (RSData menu): re-run every test simulation; returns the problems."""
+
+        self._store_current()
+        self._sim_cache.clear()
+        problems, done = [], 0
+        for material in self._project.materials:
+            for test in material.test_simulations:
+                result = self.simulation_result(material, test)
+                if isinstance(result, str):
+                    problems.append(f"{material.name} / {test.name}: {result}")
+                else:
+                    done += 1
+        self.refresh()
+        message = f"Compute: {done} test simulation{'s' if done != 1 else ''} computed"
+        if problems:
+            message += f", {len(problems)} not simulated"
+            if report_problems:
+                QMessageBox.information(self, "Compute", "\n".join(problems))
+        self.statusBar().showMessage(message, 8000)
+        return problems
 
     # ---------------------------------------------------------- spec 015: report
 

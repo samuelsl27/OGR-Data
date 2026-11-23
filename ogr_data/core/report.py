@@ -27,6 +27,7 @@ from typing import Iterable, Mapping, Sequence
 
 from . import criteria_envelopes as ce
 from . import samplers
+from . import simulation as sm
 from . import units
 from .hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength
 from .models import CRITERIA, MODULUS_METHODS
@@ -382,6 +383,7 @@ class _Builder:
                 ("Date", self.generated.strftime("%Y-%m-%d %H:%M")),
                 ("Materials", str(len(p.materials))),
                 ("Failure states", str(n_states)),
+                ("Test simulations", str(sum(len(m.test_simulations) for m in p.materials))),
                 ("Stress paths", str(n_paths)),
                 ("Graph views", str(len(self.views))),
             ]
@@ -467,7 +469,47 @@ class _Builder:
         return "".join(parts)
 
     def test_simulations(self) -> str:
-        return ""  # spec 013 (test simulations) has no model yet
+        """Settings and computed summary of each test (spec 013)."""
+
+        parts = []
+        u = self.unit
+        for m in self.project.materials:
+            if not m.test_simulations:
+                continue
+            stiff = sm.stiffness_from(m.stiffness)
+            parts.append(
+                f"<h3>{_e(m.name)}</h3>"
+                + _kv_table([("Stiffness", stiff["type"]), ("Poisson's Ratio", _number(stiff["poisson"])),
+                             ("Young's Modulus", f"{_number(_kpa(stiff['young'], u))} {u}")])
+            )
+            for t in m.test_simulations:
+                rows: Rows = [("Test Type", sm.TEST_TYPES[t.test_type])]
+                if t.test_type != "uniaxial":
+                    rows.append(("Seepage Condition", t.seepage))
+                rows.append(("Loading Direction", t.loading))
+                if t.confined:
+                    rows.append(("Confining Stress", f"{_number(_kpa(t.confining, u))} {u}"))
+                rows += [("Maximum Strain", _number(t.max_strain)), ("Number of Steps", str(t.steps))]
+                if t.cyclic:
+                    rows.append(("Cyclic Loading Cycles", str(t.cycles)))
+                try:
+                    r = sm.simulate_material(m, t)
+                except sm.SimulationError as exc:
+                    result = f'<p class="muted">Not simulated: {_e(exc)}</p>'
+                else:
+                    end: Rows = [
+                        ("Peak deviator q", f"{_number(_kpa(r.peak_q, u))} {u}"),
+                        ("Final axial strain", _number(float(r.axial_strain[-1]))),
+                        ("Final axial stress sigma'a", f"{_number(_kpa(float(r.axial_stress[-1]), u))} {u}"),
+                        ("Final p'", f"{_number(_kpa(float(r.p[-1]), u))} {u}"),
+                        ("Final q", f"{_number(_kpa(float(r.q[-1]), u))} {u}"),
+                        ("Final volumetric strain", _number(float(r.eps_v[-1]))),
+                    ]
+                    if t.seepage == "Undrained":
+                        end.append(("Final pore pressure u", f"{_number(_kpa(float(r.pore_pressure[-1]), u))} {u}"))
+                    result = f"<h4>Computed</h4>{_kv_table(end)}"
+                parts.append(f"<h4>{_swatch(t.color)}{_e(t.name)}</h4>{_kv_table(rows)}{result}")
+        return "".join(parts)
 
     def stress_paths(self) -> str:
         parts = []

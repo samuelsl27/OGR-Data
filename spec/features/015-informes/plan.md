@@ -29,8 +29,9 @@ solo el **modelo de contenido**: secciones con visibilidad por casillas.
   sin recursos externos; índice con anclas; saltos de página para
   imprimir (`@media print`). **Las secciones vacías se omiten** también
   del índice: Samples sin lecturas, Graph Views sin vistas, estados o
-  rutas sin definir, y Defined Test Simulations siempre (la simulación de
-  ensayos es la spec 013, sin modelo todavía).
+  rutas sin definir, materiales sin ensayos simulados. Desde la spec 013,
+  Defined Test Simulations lista la configuración de cada ensayo, la
+  rigidez del material y un resumen calculado (q pico y estado final).
 - `write_report(path, html)`.
 
 Interpretación de **Samples** (RSData no documenta su contenido): las

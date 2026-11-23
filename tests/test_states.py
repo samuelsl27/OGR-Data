@@ -295,6 +295,7 @@ def test_stress_paths_dialog_and_plot() -> None:
     app, w = _window()
     try:
         w._add_material("soil")
+        w.set_test_simulations([])  # spec 013: only the stress paths are checked here
         material = w._current_material()
         dlg = StressPathsDialog(w, material.name, material.stress_paths, "kPa")
         try:
