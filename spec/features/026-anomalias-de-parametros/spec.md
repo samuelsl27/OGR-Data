@@ -1,6 +1,7 @@
 # Spec 026 — Anomalías de los parámetros de material
 
-> Estado: **borrador** (2026-11-24), pendiente de clarificación y aprobación.
+> Estado: **borrador listo para aprobar** (2026-11-24). Las dudas se resolvieron con las fuentes aportadas por la
+> propietaria o por deducción, como ella indicó («el resto dedúcelo con lógica»).
 
 ## Contexto y objetivo
 
@@ -40,38 +41,47 @@ y las capturas y exportaciones privadas del programa de referencia en
 
 ## Requisitos funcionales (EARS)
 
-- **RF-1**: EL SISTEMA propondrá como N de NorSand por defecto un valor
-  dentro del rango publicado, el de una calibración citada
-  [NECESITA ACLARACIÓN: ¿el de la arena de Fraser River de Jefferies,
-  Shuttle & Been (2015), o el centro del rango, 0,35?]. *(A1)*
+- **RF-1**: EL SISTEMA propondrá como N de NorSand por defecto 0,43, el
+  de la arena de Fraser River (Jefferies, Shuttle & Been 2015, tabla 2,
+  p. 78), dentro del rango publicado 0,2–0,5. *(A1)*
 - **RF-2**: EL SISTEMA propondrá como JCS por defecto la resistencia a
   compresión simple por defecto de la roca intacta del programa
-  (100 MPa), por ser la de labios sanos. *(A2)*
+  (100 MPa): con labios sanos JCS es la resistencia de la roca intacta
+  (Barton & Choubey 1977, pp. 6 y 8), y es también el valor de su ejemplo
+  resuelto (p. 7). *(A2)*
 - **RF-3**: MIENTRAS un campo no intervenga en ningún cálculo, EL SISTEMA
   lo mostrará deshabilitado con un tooltip que diga que OGR Data todavía
   no lo usa (el valor se sigue guardando y copiando tal cual, para no
   romper el contrato del portapapeles de la spec 005). *(A3, A9)*
-- **RF-4**: CUANDO haya una fuente citable de la Power Curve completa,
-  EL SISTEMA calculará la envolvente con c y la ondulación y habilitará
-  esos campos [NECESITA ACLARACIÓN: fuente; ver `fuentes-pendientes.md`]. *(A3)*
+- **RF-4**: EL SISTEMA calculará la Power Curve como
+  τ = a(σn + d)^b + c + σn·tan i, con i la ondulación, y habilitará c, i y
+  sus residuales. La parte a(σn + d)^b es la envolvente potencial de
+  Hoek y Brown (FHWA 1989, ec. 30, p. 5.25: a = A·σc^(1−B), b = B,
+  d = −T·σc); c e i se **deducen** (c, término de tipo cohesión que vale
+  la resistencia en σn = −d; i, ángulo de Patton que suma rozamiento,
+  Hoek 2023 ec. 3) y se comprueban contra valores del programa de
+  referencia (comparar está permitido; citarlo, no). *(A3)*
 - **RF-5**: EL SISTEMA interpretará *a* de la Power Curve con las
-  tensiones en kPa, como el resto del formulario y del registro, y lo
-  comprobará contra un valor del programa de referencia con b ≠ 1
-  [NECESITA ACLARACIÓN: una captura con a, b, d y una tensión de prueba]. *(A4)*
+  tensiones en kPa, como c, d y el resto del registro (hoy el cálculo usa
+  σn en MPa, `core/criteria_envelopes.py` y `core/calibration.py`); como
+  a = A·σc^(1−B) depende de la unidad, el ajuste y la calibración que
+  rellenan *a* lo harán también en kPa. Los proyectos guardados con b ≠ 1
+  se convierten al abrirlos (a_kPa = a_MPa·1000^(1−b)). *(A4)*
 - **RF-6**: EL SISTEMA usará compactación-dilatancia como tipo de
   dilatancia del cono por defecto, como el material por defecto exportado
   del programa de referencia. *(A5)*
-- **RF-7**: EL SISTEMA interpretará Lambda Kappa de una sola forma,
-  comprobada contra una simulación del programa de referencia
-  [NECESITA ACLARACIÓN: una simulación con capa y Lambda Kappa ≠ 0
-  exportada del programa de referencia]. *(A6)*
+- **RF-7**: EL SISTEMA dirá en la etiqueta y en la ayuda que Lambda Kappa
+  es Λ = (λ − κ)/v, que es lo que el cálculo ya usa
+  (pc·exp(Δεv^p/Λ), `core/simulation.py`), según la regla de
+  endurecimiento de Cam-Clay (Wood 1990, ec. 4.21, p. 94); el cálculo no
+  cambia. *(A6)*
 - **RF-8**: EL SISTEMA ofrecerá «Elastic» y «Plastic» como tipo de
   material; CUANDO el material sea elástico, las simulaciones de ensayo
   no plastificarán y la envolvente seguirá dibujándose. *(A7)*
-- **RF-9**: EL SISTEMA ofrecerá en «Define by» las opciones que tenga el
-  programa de referencia, cada una con su efecto
-  [NECESITA ACLARACIÓN: captura del desplegable y de los campos de cada
-  opción]. *(A8)*
+- **RF-9**: EL SISTEMA ofrecerá en «Define by» «GSI» (mb, s y a se
+  calculan con GSI, mi y D, Hoek et al. 2002, ecs. 3–5) y «mb, s, a»
+  (se introducen directamente, como en el Hoek-Brown clásico); la segunda
+  opción se deduce de la forma del criterio. *(A8)*
 - **RF-10**: EL SISTEMA tendrá un test que falle si un campo del registro
   no lo lee ningún cálculo y no está marcado como «no usado». *(A9)*
 
@@ -108,8 +118,7 @@ referencia cuando llegue; suite en verde.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: valor por defecto de N (RF-1)]
-- [NECESITA ACLARACIÓN: fuente citable de la Power Curve completa (RF-4)]
-- [NECESITA ACLARACIÓN: captura del programa de referencia para *a* con b ≠ 1 (RF-5)]
-- [NECESITA ACLARACIÓN: simulación exportada con Lambda Kappa ≠ 0 (RF-7)]
-- [NECESITA ACLARACIÓN: opciones de «Define by» (RF-9)]
+Ninguna: resueltas el 2026-11-24 con Jefferies, Shuttle & Been (2015),
+Barton & Choubey (1977), FHWA (1989), Wood (1990) y Hoek et al. (2002), y
+por deducción donde no hay fuente (RF-4 c e i, RF-9 segunda opción).
+Pendiente solo la aprobación para implementarla.

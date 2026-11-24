@@ -26,8 +26,25 @@ class ParameterHelp:
     criteria: tuple[str, ...]
     definition: dict[str, str]  # language -> text
     range: dict[str, str]  # language -> text; empty when no source gives one
-    sources: tuple[str, ...]  # short citations ("Hoek et al. (2002)")
+    source_ids: tuple[str, ...]
     locator: str
+
+    @property
+    def sources(self) -> tuple[str, ...]:
+        """Short citations in English ("Hoek et al. (2002)")."""
+
+        return self.citations("en")
+
+    def citations(self, language: str) -> tuple[str, ...]:
+        """Short citations in ``language`` (a deduction says so in each language)."""
+
+        return tuple(short_citation(s, language) for s in self.source_ids)
+
+    @property
+    def deduced(self) -> bool:
+        """True if part of the entry is deduced by OGR Data rather than read in a source."""
+
+        return DEDUCTION in self.source_ids
 
 
 @lru_cache(maxsize=1)
@@ -36,8 +53,15 @@ def _data() -> dict:
     return json.loads(text)
 
 
-def short_citation(source_id: str) -> str:
+#: Source id of what OGR Data deduced from the model's equations or the program
+#: itself because no published source was found (allowed by the owner, 2026-11-24).
+DEDUCTION = "ogr_deduction"
+
+
+def short_citation(source_id: str, language: str = "en") -> str:
     source = _data()["sources"][source_id]
+    if language != "en" and source.get(f"short_{language}"):
+        return source[f"short_{language}"]
     return source.get("short") or source["citation"]
 
 
@@ -53,7 +77,7 @@ def entries() -> list[ParameterHelp]:
             criteria=tuple(raw["criteria"]),
             definition={"en": raw["definition_en"], "es": raw["definition_es"]},
             range={k: v for k, v in (("en", raw.get("range_en")), ("es", raw.get("range_es"))) if v},
-            sources=tuple(short_citation(s) for s in raw["sources"]),
+            source_ids=tuple(raw["sources"]),
             locator=raw.get("locator", ""),
         ))
     return out

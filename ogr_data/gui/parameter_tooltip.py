@@ -23,6 +23,6 @@ def parameter_tooltip(criterion: str, key: str, label: str, unit: str = "") -> s
         lines.append(f"{tr('Unit')}: {html.escape(symbols(' ' + unit).strip())}")
     if entry.range:
         lines.append(f"{tr('Typical range')}: {html.escape(symbols(entry.range.get(language, entry.range.get('en', ''))))}")
-    lines.append(f"{tr('Source')}: {html.escape('; '.join(entry.sources))}")
+    lines.append(f"{tr('Source')}: {html.escape('; '.join(entry.citations(language)))}")
     # <qt> makes Qt wrap the tooltip instead of one very long line
     return "<qt>" + "<br>".join(lines) + "</qt>"

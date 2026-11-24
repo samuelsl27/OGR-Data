@@ -39,7 +39,7 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
 
 | RF | Test (`tests/test_ux_025f.py`) | Resultado |
 |---|---|---|
-| RF-1 | `test_every_parameter_has_sourced_help_or_is_pending`, `test_tooltips_show_definition_unit_range_and_source` | verde: 65 entradas con fuente citable y 35 pendientes, tras la regla 9 (ver abajo) |
+| RF-1 | `test_every_parameter_has_sourced_help_or_is_pending`, `test_tooltips_show_definition_unit_range_and_source` | verde: 101 entradas, 0 pendientes (59 con fuente, 39 con fuente y parte deducida, 3 deducidas) |
 | RF-2 | `test_every_menu_action_has_a_status_tip` (EN y ES) | verde |
 | RF-3 | `test_inputs_have_labels_or_names` (barra lateral con 4 criterios y 7 diálogos) | verde |
 | RF-4 | `test_tab_goes_down_the_sidebar` | verde |
@@ -73,3 +73,14 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
   guarda fuera del repositorio (`../Referencias/Ejemplos/ayuda_parametros_025f/`).
 - Las anomalías encontradas pasan a la spec 026; las menciones antiguas
   al fabricante en el resto del repositorio, a la spec 027.
+
+## Segunda ronda (2026-11-24)
+
+La propietaria aportó Cai et al. (2007), Barton & Choubey (1977),
+Jefferies & Shuttle (2002), Jefferies & Been (extracto), Kulhawy & Mayne
+(1990), Wood (1990) y Davis & Selvadurai (2002), archivados en
+`../Referencias/Bibliografia/`, y pidió **deducir con lógica** lo que no
+tenga fuente. Las 35 entradas pendientes y las que mejoran con las fuentes
+nuevas se rehicieron (57 entradas nuevas o sustituidas). Lo deducido se
+marca con la fuente «Deducido por OGR Data (sin fuente publicada)» y el
+localizador explica la deducción. Estado final en `fuentes-pendientes.md`.

@@ -1,5 +1,5 @@
 {
- "about": "Help of the material parameters (spec 025f RF-1): a short definition in English and Spanish written from the cited sources, the typical range only when a source gives it (a derived range says how it was derived), and where in the source it is stated. 'pending' lists what has no citable source yet.",
+ "about": "Help of the material parameters (spec 025f RF-1): a short definition in English and Spanish written from the cited sources, the typical range only when a source gives it or it follows from the equations (said in the locator), and where it is stated. Source 'ogr_deduction' marks what OGR Data deduced because no published source was found. 'pending' lists what is neither sourced nor deducible.",
  "sources": {
   "drucker_prager_1952": {
    "citation": "Drucker, D.C., Prager, W. (1952). Soil mechanics and plastic analysis or limit design. Quarterly of Applied Mathematics, 10(2), 157-165.",
@@ -28,7 +28,7 @@
   },
   "canmet_1995": {
    "citation": "Jackson, R., Gorski, B., Gyenge, M. (1995). Geotechnical Properties of Rock. CANMET, Natural Resources Canada, Ottawa.",
-   "short": "Jackson, Gorski & Gyenge, CANMET (1995)",
+   "short": "Jackson et al., CANMET (1995)",
    "kind": "paper"
   },
   "itasca_norsand": {
@@ -71,11 +71,6 @@
    "short": "Schofield & Wroth (1968)",
    "kind": "book"
   },
-  "utm_cssm_notes": {
-   "citation": "Zurairahetty, N. (n.d.). MAJ 1013 Advanced Soil Mechanics: Stress Paths; Critical State Soil Mechanics (university lecture notes, weeks 4-5). Universiti Teknologi Malaysia.",
-   "short": "Zurairahetty, UTM lecture notes (CSSM)",
-   "kind": "manual"
-  },
   "jefferies_shuttle_been_2015": {
    "citation": "Jefferies, M., Shuttle, D., Been, K. (2015). Principal stress rotation as cause of cyclic mobility. Geotechnical Research, 2(2), 66-96. doi:10.1680/jgere.15.00002 (open access, CC BY 4.0).",
    "short": "Jefferies et al. (2015)",
@@ -86,15 +81,91 @@
    "short": "Itasca, FLAC3D manual: NorSand (2025)",
    "kind": "manual"
   },
-  "norsand_power_barton.hoek_pre_2023": {
-   "citation": "Hoek, E. (2023). Practical Rock Engineering, chapters 'Shear strength of discontinuities' and 'Rock mass classification'. Course notes.",
+  "fhwa_1989": {
+   "citation": "Golder Associates for FHWA (1989). Rock Slopes: Design, Excavation, Stabilization. Publication FHWA-TS-89-045, U.S. Department of Transportation, Federal Highway Administration, Turner-Fairbank Highway Research Center, McLean, VA.",
+   "short": "FHWA (1989)",
+   "kind": "manual"
+  },
+  "ogr_deduction": {
+   "citation": "OGR Data: deduced from the equations of the model, the definition of the quantity or the program itself, because no published source was found (allowed by the owner, 2026-11-24).",
+   "short": "Deduced by OGR Data (no published source)",
+   "short_es": "Deducido por OGR Data (sin fuente publicada)",
+   "kind": "deduction"
+  },
+  "davis_selvadurai_2002": {
+   "citation": "Davis, R.O., Selvadurai, A.P.S. (2002). Plasticity and Geomechanics. Cambridge University Press, Cambridge.",
+   "short": "Davis & Selvadurai (2002)",
+   "kind": "book"
+  },
+  "plasticity.vermeer_deborst_1984": {
+   "citation": "Vermeer, P.A., de Borst, R. (1984). Non-associated plasticity for soils, concrete and rock. Heron, 29(3), 1-64.",
+   "short": "Vermeer & de Borst (1984)",
+   "kind": "paper"
+  },
+  "wood_1990": {
+   "citation": "Wood, D.M. (1990). Soil Behaviour and Critical State Soil Mechanics. Cambridge University Press, Cambridge.",
+   "short": "Wood (1990)",
+   "kind": "book"
+  },
+  "jefferies_shuttle_2002": {
+   "citation": "Jefferies, M.G., Shuttle, D.A. (2002). Dilatancy in general Cambridge-type models. Géotechnique, 52(9), 625-638.",
+   "short": "Jefferies & Shuttle (2002)",
+   "kind": "paper"
+  },
+  "jefferies_been_2016": {
+   "citation": "Jefferies, M., Been, K. (2016). Soil Liquefaction: A Critical State Approach, 2nd ed. CRC Press (Taylor & Francis), Boca Raton.",
+   "short": "Jefferies & Been (2016)",
+   "kind": "book"
+  },
+  "cai_et_al_2007": {
+   "citation": "Cai, M., Kaiser, P.K., Tasaka, Y., Minami, M. (2007). Determination of residual strength parameters of jointed rock masses using the GSI system. International Journal of Rock Mechanics and Mining Sciences, 44, 247-265.",
+   "short": "Cai et al. (2007)",
+   "kind": "paper"
+  },
+  "plasticity.hoek_2023": {
+   "citation": "Hoek, E. (2023). Practical Rock Engineering, 2023 edition. Chapter 'Rock mass properties'.",
    "short": "Hoek (2023)",
    "kind": "book"
   },
-  "fhwa_1989": {
-   "citation": "Golder Associates for FHWA (1989). Rock Slopes: Design, Excavation, Stabilization. Publication FHWA-TS-89-045, U.S. Department of Transportation, Federal Highway Administration, Turner-Fairbank Highway Research Center, McLean, VA.",
-   "short": "FHWA-TS-89-045 (1989)",
+  "soils.jefferies_been_2016": {
+   "citation": "Jefferies, M., Been, K. (2016). Soil Liquefaction: A Critical State Approach, 2nd edn. CRC Press (Taylor & Francis), Boca Raton, FL.",
+   "short": "Jefferies & Been (2016)",
+   "kind": "book"
+  },
+  "kulhawy_mayne_1990": {
+   "citation": "Kulhawy, F.H., Mayne, P.W. (1990). Manual on Estimating Soil Properties for Foundation Design. Report EL-6800, Electric Power Research Institute, Palo Alto, CA.",
+   "short": "Kulhawy & Mayne (1990)",
    "kind": "manual"
+  },
+  "soils.hoek_2023": {
+   "citation": "Hoek, E. (2023). Practical Rock Engineering. Online edition (course notes), chapter 4 'Shear strength of discontinuities'.",
+   "short": "Hoek (2023)",
+   "kind": "book"
+  },
+  "cai_2007": {
+   "citation": "Cai, M., Kaiser, P.K., Tasaka, Y., Minami, M. (2007). Determination of residual strength parameters of jointed rock masses using the GSI system. International Journal of Rock Mechanics and Mining Sciences, 44(2), 247-265. doi:10.1016/j.ijrmms.2006.07.005",
+   "short": "Cai et al. (2007)",
+   "kind": "paper"
+  },
+  "barton_choubey_1977": {
+   "citation": "Barton, N., Choubey, V. (1977). The shear strength of rock joints in theory and practice. Rock Mechanics, 10(1-2), 1-54.",
+   "short": "Barton & Choubey (1977)",
+   "kind": "paper"
+  },
+  "rock.hoek_pre_2023": {
+   "citation": "Hoek, E. (2023). Practical Rock Engineering (2023 edition, course notes). Chapter 4 'Shear strength of discontinuities' (PDF pp. 78-91), chapter 'Rock mass properties' (PDF pp. 91-111) and chapter 'Rock mass classification' (Table 6).",
+   "short": "Hoek (2023)",
+   "kind": "book"
+  },
+  "rock.hoek_pre_ch11": {
+   "citation": "Hoek, E. (n.d., edition after 2006). Practical Rock Engineering, Chapter 11 'Rock mass properties' (course notes).",
+   "short": "Hoek, Practical Rock Engineering, ch. 11",
+   "kind": "book"
+  },
+  "rock.davis_selvadurai_2002": {
+   "citation": "Davis, R.O., Selvadurai, A.P.S. (2002). Plasticity and Geomechanics. Cambridge University Press.",
+   "short": "Davis & Selvadurai (2002)",
+   "kind": "book"
   }
  },
  "parameters": [
@@ -134,38 +205,6 @@
     "ufc_3_220_01n_2005"
    ],
    "locator": "Definition: Drucker & Prager 1952 eq. 1, Fig. 1; Hoek 2023 ch. 4 eq. 1 (PDF p. 79). Ranges: Vermeer & de Borst 1984 §3.4 p. 15; GEC 5 §5.6.2.4 p. 163; UFC 3-220-01N Table 8-1.4 (PDF pp. 48-52), column 'Effective stress envelope, deg'; Hoek 2023 ch. 12 Table 4 part D after Bieniawski 1989 (PDF p. 246)."
-  },
-  {
-   "key": "peak_tensile",
-   "criteria": [
-    "mohr_coulomb",
-    "drucker_prager",
-    "softening_hardening"
-   ],
-   "definition_en": "Tension cut-off T: the minor principal stress cannot exceed this tensile value (yield surface sigma3 - T = 0, associated flow). It truncates the apex of the shear envelope, which on its own would allow too large tensile stresses in a cohesive material.",
-   "definition_es": "Corte a tracción T: la tensión principal menor no puede superar este valor de tracción (superficie sigma3 - T = 0, flujo asociado). Trunca el vértice de la envolvente de corte, que por sí sola admitiría tracciones excesivas en un material con cohesión.",
-   "range_en": "0 for a material without tensile strength (program default). Intact rock (77 Canadian rocks, CANMET Table 1): about 0.4-26 MPa.",
-   "range_es": "0 para un material sin resistencia a tracción (valor por defecto). Roca intacta (77 rocas canadienses, tabla 1 de CANMET): de unos 0,4 a 26 MPa.",
-   "sources": [
-    "vermeer_deborst_1984",
-    "canmet_1995"
-   ],
-   "locator": "Vermeer & de Borst 1984 §6/7, pp. 43-44 (why the Coulomb apex is cut off); CANMET 1995 Table 1, column sigma_t (PDF pp. 102-109), min 0.43 MPa (coal) to 25.96 MPa (andesite), range computed from the table."
-  },
-  {
-   "key": "residual_cohesion",
-   "criteria": [
-    "mohr_coulomb"
-   ],
-   "definition_en": "Cohesion intercept of the Mohr-Coulomb envelope after failure, once the strength has dropped from peak to residual. For discontinuities and clays sheared to large displacement it is usually taken as zero.",
-   "definition_es": "Cohesión de la envolvente de Mohr-Coulomb tras la rotura, cuando la resistencia ha caído del pico al residual. En discontinuidades y arcillas cizalladas a grandes desplazamientos suele tomarse nula.",
-   "range_en": "0 at residual for discontinuities and clays; not greater than peak cohesion.",
-   "range_es": "0 en estado residual para discontinuidades y arcillas; no mayor que la cohesión de pico.",
-   "sources": [
-    "hoek_2023",
-    "sabatini_2002_gec5"
-   ],
-   "locator": "Hoek 2023 ch. 4 eq. 2 and Fig. 1 (PDF p. 79: at residual c has dropped to zero); GEC 5 §5.6.2.2 eq. 59 p. 162 (tau_r = sigma' tan phi_r)"
   },
   {
    "key": "residual_friction",
@@ -254,39 +293,6 @@
    "locator": "Drucker & Prager 1952 eqs. 3-5 (p. 158: associated flow, plastic dilatation 3 alpha lambda); Vermeer & de Borst 1984 §3.4 p. 15-16 (friction much greater than dilatancy, so non-associated flow is needed)."
   },
   {
-   "key": "poisson",
-   "criteria": [
-    "*"
-   ],
-   "definition_en": "Poisson's ratio nu of the linear isotropic elastic response: minus the ratio of lateral to axial strain under uniaxial loading. With Young's modulus it fixes the shear modulus, G = E / (2(1 + nu)).",
-   "definition_es": "Coeficiente de Poisson nu de la respuesta elástica lineal isótropa: cociente, cambiado de signo, entre la deformación lateral y la axial en carga uniaxial. Junto con el módulo de Young fija el módulo de corte, G = E / (2(1 + nu)).",
-   "range_en": "Soils: 0-0.3; drained soils at working loads 0.1-0.2; saturated soil in undrained loading tends to 0.5. Intact rock: typically 0.25-0.4 (0.11-0.58 measured on 72 Canadian rocks).",
-   "range_es": "Suelos: 0-0,3; suelos drenados en cargas de servicio 0,1-0,2; el suelo saturado en carga no drenada tiende a 0,5. Roca intacta: normalmente 0,25-0,4 (0,11-0,58 medidos en 72 rocas canadienses).",
-   "sources": [
-    "vermeer_deborst_1984",
-    "sabatini_2002_gec5",
-    "ufc_3_220_01n_2005",
-    "canmet_1995"
-   ],
-   "locator": "Vermeer & de Borst 1984 §3.1 p. 11 (soils 0.0-0.3; concrete 0.15-0.2); GEC 5 §5.5.3 p. 151 (0.1-0.2, citing Jamiolkowski et al. 1994) and §6.4.1 p. 205 (rock 0.25-0.4) with Table 41; UFC 3-220-01N eq. 12-21 p. 12-18 (G = E/(2(1+nu)); saturated soils nu = 0.5); CANMET 1995 Table 1 column nu (PDF pp. 102-109), min 0.11 (mudstone) to max 0.58 (talc-carbonate), computed from the table."
-  },
-  {
-   "key": "young",
-   "criteria": [
-    "*"
-   ],
-   "definition_en": "Young's modulus E of the linear isotropic elastic response: ratio of axial stress to axial strain under uniaxial loading, before yield.",
-   "definition_es": "Módulo de Young E de la respuesta elástica lineal isótropa: cociente entre la tensión axial y la deformación axial en carga uniaxial, antes de la plastificación.",
-   "range_en": "Soils (equivalent modulus): 2,000-200,000 kPa, e.g. soft sensitive clay 2,500-15,000, dense sand 50,000-80,000, dense gravel 100,000-200,000 kPa. Intact rock: typically 0.1-100 GPa (1.8-166 GPa measured on 72 Canadian rocks).",
-   "range_es": "Suelos (módulo equivalente): 2.000-200.000 kPa, p. ej. arcilla blanda sensible 2.500-15.000, arena densa 50.000-80.000 y grava densa 100.000-200.000 kPa. Roca intacta: normalmente 0,1-100 GPa (1,8-166 GPa medidos en 72 rocas canadienses).",
-   "sources": [
-    "vermeer_deborst_1984",
-    "sabatini_2002_gec5",
-    "canmet_1995"
-   ],
-   "locator": "Definition: Vermeer & de Borst 1984 §3.1 p. 11 (Hooke's law, E and nu). Ranges: GEC 5 Table 28 p. 148 (modified after AASHTO 1996); GEC 5 §6.4.1 p. 205 (intact rock 0.1-100 GPa); CANMET 1995 Table 1 column E (PDF pp. 102-109), min 1.76 GPa (coal) to max 166.3 GPa (sulphide pyrite), computed from the table."
-  },
-  {
    "key": "elastic_parameter",
    "criteria": [
     "cam_clay",
@@ -300,36 +306,6 @@
     "itasca_norsand"
    ],
    "locator": "either G or nu must be given) and Figs. 8.5-8.6 (constant nu vs constant G). Relation K = 2(1+nu)G / (3(1-2nu)): Itasca NorSand page, Elastic Law."
-  },
-  {
-   "key": "shear_modulus",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "Elastic shear modulus G held constant in Cam-Clay when 'Constant Shear Modulus' is chosen: ratio of shear stress to elastic shear strain.",
-   "definition_es": "Módulo de corte elástico G que se mantiene constante en Cam-Clay al elegir «Módulo de corte constante»: cociente entre la tensión tangencial y la deformación angular elástica.",
-   "range_en": "Small-strain values: soft clays 2,750-13,750 kPa; firm clays 6,900-34,500 kPa (silty sands 27,600-138,000; dense sands and gravels 69,000-345,000 kPa).",
-   "range_es": "Valores a pequeñas deformaciones: arcillas blandas 2.750-13.750 kPa; arcillas firmes 6.900-34.500 kPa (arenas limosas 27.600-138.000; arenas densas y gravas 69.000-345.000 kPa).",
-   "sources": [
-    "ufc_3_220_01n_2005",
-    "sabatini_2002_gec5"
-   ],
-   "locator": "UFC 3-220-01N eq. 12-21 p. 12-18 (G = E / (2(1+nu))); GEC 5 Table 30 p. 154."
-  },
-  {
-   "key": "g_ref",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Elastic shear modulus at the reference mean stress p_ref in the NorSand power law G = G_ref (p'/p_ref)^m.",
-   "definition_es": "Módulo de corte elástico a la tensión media de referencia p_ref en la ley potencial de NorSand G = G_ref (p'/p_ref)^m.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "itasca_norsand"
-   ],
-   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law', Case 1"
   },
   {
    "key": "p_ref",
@@ -525,20 +501,6 @@
     "hoek_pre_2023"
    ],
    "locator": "Hoek & Diederichs 2006, eq. 2 (simplified, p. 208), eq. 4 (generalized, p. 209), section 6 (recommendation, p. 209) and Table 1 eq. 7 (2002 equation, σci ≤ 100 MPa, p. 204); Hoek et al. 2002, eq. 11; Hoek 2023, Rock mass properties, eqs. 20 and 22 (PDF p. 108)"
-  },
-  {
-   "key": "d_residual",
-   "criteria": [
-    "generalized_hoek_brown"
-   ],
-   "definition_en": "Disturbance factor D used to compute the residual (post-peak) strength parameters; only active when residual is not set to peak.",
-   "definition_es": "Factor de alteración D con el que se calculan los parámetros resistentes residuales (postpico); solo se usa si el residual no se iguala al pico.",
-   "range_en": "0 to 1",
-   "range_es": "0 a 1",
-   "sources": [
-    "hoek_2002"
-   ],
-   "locator": "bounds of D from Hoek et al. 2002, text after eq. 5"
   },
   {
    "key": "tensile_cutoff_type",
@@ -762,131 +724,6 @@
    "locator": "Hoek & Diederichs 2006, eqs. 2 and 4; Hoek et al. 2002, eq. 11"
   },
   {
-   "key": "critical_state_slope",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "M, the slope of the critical state line in the p'-q plane (q = M p'): the stress ratio at which the soil keeps shearing at constant stress and constant volume. In Cam-Clay and Modified Cam-Clay it also fixes the shape of the yield surface, whose peak q lies on this line.",
-   "definition_es": "M, pendiente de la línea de estado crítico en el plano p'-q (q = M p'): relación de tensiones con la que el suelo sigue deformándose por corte a tensión y volumen constantes. En Cam-Clay y Cam-Clay Modificado fija además la forma de la superficie de fluencia, cuyo máximo de q está sobre esa línea.",
-   "range_en": "0.845-1.02 for five remoulded clays (Klein Belt Ton, Wiener Tegel V, London, Weald, kaolin); equivalent friction angles 21.75-26 deg",
-   "range_es": "0,845-1,02 en cinco arcillas remoldeadas (Klein Belt Ton, Wiener Tegel V, Londres, Weald, caolín); ángulos de rozamiento equivalentes 21,75-26°",
-   "sources": [
-    "schofield_wroth_1968",
-    "utm_cssm_notes"
-   ],
-   "locator": "Schofield & Wroth 1968, §5.9 eq. (5.22) p. 73, §6.8 p. 104, Table 6.1 p. 109, eq. (8.9) p. 151 (q/p = 6 sin ρ / (3 − sin ρ) in triaxial compression); UTM notes slides 17-18 (M = 6 sin φ'c / (3 − sin φ'c))."
-  },
-  {
-   "key": "volume_reference",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "Chooses which line the specific volume entered below refers to: N, the normal compression line at unit pressure, or Γ (Gamma), the critical state line at unit pressure. Only one is needed because the model links them: Γ = N − (λ − κ) in Cam-Clay and Γ = N − (λ − κ)·ln 2 in Modified Cam-Clay.",
-   "definition_es": "Elige a qué línea se refiere el volumen específico que se introduce: N, la línea de compresión normal a presión unidad, o Γ (Gamma), la línea de estado crítico a presión unidad. Basta uno de los dos porque el modelo los relaciona: Γ = N − (λ − κ) en Cam-Clay y Γ = N − (λ − κ)·ln 2 en Cam-Clay Modificado.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "schofield_wroth_1968"
-   ],
-   "locator": "Schofield & Wroth 1968, eq. (6.20) p. 100 and eq. (7.18) p. 139 (for an isotropically normally compressed Cam-clay specimen the λ-line lies (λ − κ) above the critical state line, which is the Cam-Clay relation)."
-  },
-  {
-   "key": "specific_volume_unit_pressure",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "Specific volume v = 1 + e of the selected reference line (N for the normal compression line, Γ for the critical state line) at a mean effective stress of one pressure unit. It locates the line in the v-ln p' plane; its value depends on the pressure unit used.",
-   "definition_es": "Volumen específico v = 1 + e de la línea de referencia elegida (N, línea de compresión normal; Γ, línea de estado crítico) para una tensión media efectiva igual a una unidad de presión. Sitúa la línea en el plano v-ln p'; su valor depende de la unidad de presión empleada.",
-   "range_en": "Γ = 1.88-3.99 for five remoulded clays, with pressure in lb/in² (Schofield & Wroth Table 6.1); no table of N values found",
-   "range_es": "Γ = 1,88-3,99 en cinco arcillas remoldeadas, con la presión en lb/in² (Schofield & Wroth, tabla 6.1); no se encontró tabla de valores de N",
-   "sources": [
-    "schofield_wroth_1968",
-    "utm_cssm_notes"
-   ],
-   "locator": "Schofield & Wroth 1968, eq. (5.23) p. 73, Table 6.1 p. 109, text on Γ and units p. 111; UTM notes slides 14, 17 and 23."
-  },
-  {
-   "key": "kappa",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "κ, slope of the swelling (unloading-reloading) line in the v-ln p' plane. It governs the recoverable volume change; in these models the elastic bulk modulus is K = v p'/κ, so it grows with mean stress.",
-   "definition_es": "κ, pendiente de la línea de hinchamiento (descarga-recarga) en el plano v-ln p'. Controla el cambio de volumen recuperable; en estos modelos el módulo volumétrico elástico es K = v p'/κ, que crece con la tensión media.",
-   "range_en": "0.026-0.184 (average κ of five remoulded clays); London clay 0.062 ± 0.016",
-   "range_es": "0,026-0,184 (κ medio de cinco arcillas remoldeadas); arcilla de Londres 0,062 ± 0,016",
-   "sources": [
-    "schofield_wroth_1968",
-    "utm_cssm_notes"
-   ],
-   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (6.3) p. 94, §7.4 p. 120 (London clay), Table 6.1 p. 109; UTM notes slides 14 and 26 (κ = Cs/2.3)."
-  },
-  {
-   "key": "lambda",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "λ, slope of the normal (virgin) compression line in the v-ln p' plane; the critical state line has the same slope. It measures the irrecoverable compressibility and controls the hardening of the yield surface with plastic volumetric strain.",
-   "definition_es": "λ, pendiente de la línea de compresión normal (noval) en el plano v-ln p'; la línea de estado crítico tiene la misma pendiente. Mide la compresibilidad irrecuperable y controla el endurecimiento de la superficie de fluencia con la deformación volumétrica plástica.",
-   "range_en": "0.093-0.356 for five remoulded clays (kaolin 0.26, London clay 0.161, Weald clay 0.093)",
-   "range_es": "0,093-0,356 en cinco arcillas remoldeadas (caolín 0,26, arcilla de Londres 0,161, arcilla de Weald 0,093)",
-   "sources": [
-    "schofield_wroth_1968",
-    "utm_cssm_notes"
-   ],
-   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (5.23) p. 73, Table 6.1 p. 109, eq. (6.33) p. 107 (λ ≈ 0.585·PI, PI as a ratio), eq. (6.38) p. 110 (Cc = 2.303 λ); UTM notes slides 14, 23 and 26."
-  },
-  {
-   "key": "initial_consolidation",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "Chooses how the initial size of the yield surface is given: by the overconsolidation ratio (OCR) applied to the initial stresses, or directly by the preconsolidation pressure p0.",
-   "definition_es": "Elige cómo se da el tamaño inicial de la superficie de fluencia: mediante el índice de sobreconsolidación (OCR) aplicado a las tensiones iniciales, o directamente con la presión de preconsolidación p0.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "utm_cssm_notes"
-   ],
-   "locator": "UTM lecture notes (CSSM), slide 23: OCR and preconsolidation pressure"
-  },
-  {
-   "key": "ocr",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "Overconsolidation ratio: preconsolidation pressure divided by the current mean effective stress. OCR = 1 is a normally consolidated soil (stress state on the yield surface); OCR > 1 is overconsolidated and starts inside the yield surface, responding elastically at first.",
-   "definition_es": "Índice de sobreconsolidación: presión de preconsolidación dividida por la tensión media efectiva actual. OCR = 1 es un suelo normalmente consolidado (estado sobre la superficie de fluencia); OCR > 1 es sobreconsolidado, parte del interior de la superficie y responde al principio de forma elástica.",
-   "range_en": "≥ 1 (1 = normally consolidated, > 1 = overconsolidated)",
-   "range_es": "≥ 1 (1 = normalmente consolidado, > 1 = sobreconsolidado)",
-   "sources": [
-    "schofield_wroth_1968",
-    "utm_cssm_notes"
-   ],
-   "locator": "Schofield & Wroth 1968, §7.10 p. 139, Fig. 7.25 and eqs. (7.16)-(7.18) ('overcompression ratio' N: compressed to N·p0 and swollen back to p0)"
-  },
-  {
-   "key": "preconsolidation_stress",
-   "criteria": [
-    "cam_clay",
-    "modified_cam_clay"
-   ],
-   "definition_en": "pc (p0), the largest mean effective stress the soil has carried; it is where the yield surface meets the p' axis and so sets its size. Plastic volumetric compression makes it grow (hardening) and dilation on the dry side makes it shrink (softening).",
-   "definition_es": "pc (p0), la mayor tensión media efectiva que ha soportado el suelo; es el punto donde la superficie de fluencia corta el eje p' y fija su tamaño. La compresión volumétrica plástica lo aumenta (endurecimiento) y la dilatancia en el lado seco lo reduce (reblandecimiento).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "schofield_wroth_1968"
-   ],
-   "locator": "Schofield & Wroth 1968, §7.10 p. 139 (virgin compression to N·p0)."
-  },
-  {
    "key": "m_tc",
    "criteria": [
     "norsand"
@@ -899,20 +736,6 @@
     "jefferies_shuttle_been_2015"
    ],
    "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, symbol M) and Table 2 'NorSand soil properties with typical range for sands' (p. 78)"
-  },
-  {
-   "key": "lambda",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Slope of the critical state line (CSL) in void ratio versus natural logarithm of mean effective stress, e_c = Gamma - lambda ln(p'). It measures how much the critical void ratio falls as the stress level rises.",
-   "definition_es": "Pendiente de la línea de estado crítico (LEC) en el plano índice de poros - logaritmo natural de la tensión media efectiva, e_c = Gamma - lambda ln(p'). Mide cuánto baja el índice de poros crítico al aumentar el nivel de tensiones.",
-   "range_en": "0.03-0.15 when defined on base 10 (lambda_10); about 0.013-0.065 in natural log (lambda_10 ~ 2.3 lambda_e)",
-   "range_es": "0,03-0,15 en base 10 (lambda_10); del orden de 0,013-0,065 en logaritmo natural (lambda_10 ~ 2,3 lambda_e)",
-   "sources": [
-    "jefferies_shuttle_been_2015"
-   ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67: lambda_e, lambda_10, 'lambda_10 ~ 2.3 lambda_e'), Table 1 (p. 77, e_c = Gamma - lambda ln(p')), Table 2 (p. 78, lambda_10 range for sands). The natural-log range is the Table 2 range divided by 2.3 (conversion given in the same paper)."
   },
   {
    "key": "gamma",
@@ -944,21 +767,6 @@
    "locator": "Jefferies, Shuttle & Been 2015, Table 2 (p. 78, H: 50-500) and eq. 14 (p. 85, H = H0 - Hy psi; Fraser River sand H0 = 60, Hy = 280); Itasca 2025, property hardening-0 ('plastic hardening modulus when psi = 0')"
   },
   {
-   "key": "hy",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Rate of change of the plastic hardening modulus with the state parameter, in H = H0 - Hy psi. With Hy = 0 the modulus is constant and equal to H0.",
-   "definition_es": "Variación del módulo de endurecimiento plástico con el parámetro de estado, en H = H0 - Hy psi. Con Hy = 0 el módulo es constante e igual a H0.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "jefferies_shuttle_been_2015",
-    "itasca_norsand_2025"
-   ],
-   "locator": "Jefferies, Shuttle & Been 2015, eq. 14 (p. 85; Fraser River sand Hy = 280) and Table 2 (p. 78, H '60-280 psi' for Fraser River sand); Itasca 2025, property hardening-y (default 0)"
-  },
-  {
    "key": "chi_tc",
    "criteria": [
     "norsand"
@@ -987,36 +795,6 @@
    "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, N 'volumetric coupling parameter (from Nova's flow rule)'), text p. 76 ('N the volumetric coupling following Nova (1982)') and Table 2 (p. 78)"
   },
   {
-   "key": "psi0",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Initial state parameter: the difference between the initial void ratio and the critical-state void ratio at the same mean effective stress (psi = e - e_c). Negative values mean a soil denser than critical (dilatant), positive values a looser, contractive soil.",
-   "definition_es": "Parámetro de estado inicial: diferencia entre el índice de poros inicial y el índice de poros crítico a la misma tensión media efectiva (psi = e - e_c). Valores negativos indican un suelo más denso que el crítico (dilatante) y positivos uno más suelto y contractivo.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "jefferies_shuttle_been_2015",
-    "itasca_norsand_2025"
-   ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, psi = e - e_c; subscript 0 = initial condition); Itasca 2025, property state-parameter-initial"
-  },
-  {
-   "key": "ocr",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Overconsolidation ratio of the initial state, a scalar measure of how far the initial stress lies inside the yield surface. In the FLAC3D implementation it is the ratio of the initial image stress to the image stress that would put the initial stress exactly on the yield surface (OCR = 1).",
-   "definition_es": "Índice de sobreconsolidación del estado inicial, medida escalar de cuánto queda la tensión inicial dentro de la superficie de fluencia. En la implementación de FLAC3D es el cociente entre la tensión imagen inicial y la que situaría la tensión inicial justo sobre la superficie de fluencia (OCR = 1).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "jefferies_shuttle_been_2015",
-    "itasca_norsand_2025"
-   ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, R 'scalar measure of overconsolidation'); Itasca 2025, section on initial state ('OCR ... defined as the ratio of the current p_i over the calculated p_i,OCR=1') and property over-consolidation-ratio (default 1)"
-  },
-  {
    "key": "cap_softening",
    "criteria": [
     "norsand"
@@ -1032,73 +810,21 @@
    "locator": "Jefferies, Shuttle & Been 2015, Table 1 (p. 77, hardening rule on outer yield surface, 'S = 0 or 1 (a Boolean switch)'); Itasca 2025, property index-softening ('additional cap softening term S T_S ... optional'; not recommended for drained loading)"
   },
   {
-   "key": "phi_r",
-   "criteria": [
-    "barton_bandis"
-   ],
-   "definition_en": "Residual friction angle of the joint surface in Barton's criterion tau = sigma_n tan(phi_r + JRC log10(JCS/sigma_n)). It can be estimated from the basic friction angle of sawn surfaces and Schmidt rebounds: phi_r = (phi_b - 20) + 20 r/R.",
-   "definition_es": "Ángulo de rozamiento residual de la superficie de la junta en el criterio de Barton tau = sigma_n tan(phi_r + JRC log10(JCS/sigma_n)). Puede estimarse a partir del ángulo de rozamiento básico de superficies serradas y del rebote del esclerómetro Schmidt: phi_r = (phi_b - 20) + 20 r/R.",
-   "range_en": "About 25-35 deg for unaltered joint walls, 25-30 deg slightly altered, 20-25 deg with silty or sandy-clay coatings, 8-16 deg with softening clay coatings; basic friction angles of common rocks 23-40 deg",
-   "range_es": "Del orden de 25-35° en paredes no alteradas, 25-30° ligeramente alteradas, 20-25° con recubrimientos limo-arcillosos o areno-arcillosos y 8-16° con recubrimientos arcillosos blandos; ángulos de rozamiento básicos de rocas comunes 23-40°",
-   "sources": [
-    "norsand_power_barton.hoek_pre_2023",
-    "fhwa_1989"
-   ],
-   "locator": "Hoek 2023, ch. 4, eqs. 4-5 (PDF p. 82, after Barton & Choubey 1977); Hoek 2023, ch. 12, Table 6, joint alteration number Ja, column phi_r approx. (PDF pp. 252-253, after Barton et al. 1974); FHWA 1989, p. 5.18, margin table 'basic friction angle for different rocks' (after Barton)"
-  },
-  {
-   "key": "jrc",
-   "criteria": [
-    "barton_bandis"
-   ],
-   "definition_en": "Joint roughness coefficient: a number that rates the roughness of the joint surface, estimated by visual comparison with Barton and Choubey's standard profiles or from asperity amplitude over a straight edge. It decreases with block size (scale effect, Barton and Bandis 1982).",
-   "definition_es": "Coeficiente de rugosidad de la junta: número que califica la rugosidad de la superficie, estimado por comparación visual con los perfiles tipo de Barton y Choubey o a partir de la amplitud de las asperezas bajo una regla. Disminuye con el tamaño del bloque (efecto escala, Barton y Bandis 1982).",
-   "range_en": "0-20 (0-2 smooth planar profile to 18-20 very rough profile)",
-   "range_es": "0-20 (0-2 perfil liso y plano a 18-20 perfil muy rugoso)",
-   "sources": [
-    "norsand_power_barton.hoek_pre_2023",
-    "fhwa_1989"
-   ],
-   "locator": "Hoek 2023, ch. 4, eq. 4 and Figure 5 (PDF pp. 82-83, profiles JRC 0-2 ... 18-20 after Barton & Choubey 1977), Figure 6 (Barton 1982), eq. 6 scale correction (PDF p. 85); FHWA 1989, Figure 5.2 (p. 5.8: rough undulating JRC = 20, smooth undulating 10, smooth nearly planar 5) and p. 5.19"
-  },
-  {
-   "key": "jcs",
-   "criteria": [
-    "barton_bandis"
-   ],
-   "definition_en": "Joint wall compressive strength: the uniaxial compressive strength of the rock right at the joint walls. It equals that of the intact rock for fresh walls and is lower for weathered walls; it also decreases with block size (Barton and Bandis 1982).",
-   "definition_es": "Resistencia a compresión de las paredes de la junta: resistencia a compresión simple de la roca en las propias paredes de la discontinuidad. Coincide con la de la roca intacta en paredes sanas y es menor en paredes meteorizadas; además disminuye con el tamaño del bloque (Barton y Bandis 1982).",
-   "range_en": "From the uniaxial compressive strength of the intact rock (fresh walls) down to about one quarter of it (weathered walls)",
-   "range_es": "Desde la resistencia a compresión simple de la roca intacta (paredes sanas) hasta aproximadamente una cuarta parte de ella (paredes meteorizadas)",
-   "sources": [
-    "norsand_power_barton.hoek_pre_2023",
-    "fhwa_1989"
-   ],
-   "locator": "Hoek 2023, ch. 4, eq. 4 (PDF p. 82) and eq. 7 scale correction (PDF p. 85); FHWA 1989, p. 5.18 (weathering can reduce the near-surface strength to as low as one quarter of the intact uniaxial strength, after Barton)"
-  }
- ],
- "pending": [
-  {
-   "key": "initial_mean_stress",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "missing": "no citable document read defines it (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "residual_strength",
-   "criteria": [
-    "barton_bandis"
-   ],
-   "missing": "no citable document read defines it (see fuentes-pendientes.md)"
-  },
-  {
    "key": "material_type",
    "criteria": [
     "mohr_coulomb",
     "hoek_brown"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Elastic: the material stays linear elastic at any stress, so the failure criterion never limits the stress and only shows how close the stress is to failure. Plastic: the stress cannot pass the yield (failure) surface; on reaching it the material deforms plastically and irreversibly, following the peak and residual strength and the flow rule.",
+   "definition_es": "Elástico: el material es elástico lineal para cualquier tensión, de modo que el criterio de rotura no limita la tensión y solo indica lo cerca que está de la rotura. Plástico: la tensión no puede superar la superficie de fluencia (rotura); al alcanzarla el material se deforma plásticamente, de forma irreversible, según la resistencia de pico y residual y la regla de flujo.",
+   "range_en": "Options: Elastic | Plastic (OGR Data offers only Plastic)",
+   "range_es": "Opciones: Elástico | Plástico (OGR Data solo ofrece Plástico)",
+   "sources": [
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Davis & Selvadurai 2002, §4.1 p. 83 (elastic response inside the yield surface, irreversible plastic flow on it) and §4.6 p. 95 (elastic inside, plastic on the surface); §4.3 p. 91 (perfectly plastic and work-hardening flow). The Elastic option is deduced from the definition of a linear elastic material (no yield surface active). Program: core/models.py lines 69 and 84 offer only 'Plastic'; no calculation reads the field (core/simulation.py build_model, lines 1218-1247, always builds a plastic model).",
+   "not_used": true
   },
   {
    "key": "set_residual_to_peak",
@@ -1108,7 +834,18 @@
     "hoek_brown",
     "generalized_hoek_brown"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "On: the residual strength equals the peak strength, so after yielding the material is elastic-perfectly plastic and keeps a constant strength. Off: at the first yield the strength drops at once from the peak to the residual parameters and stays there (elastic-brittle-plastic, with no gradual softening).",
+   "definition_es": "Activado: la resistencia residual es igual a la de pico, de modo que tras plastificar el material es elastoplástico perfecto y conserva una resistencia constante. Desactivado: en la primera plastificación la resistencia cae de golpe de los parámetros de pico a los residuales y se mantiene en ellos (elastofrágil-plástico, sin reblandecimiento gradual).",
+   "range_en": "On | Off (default On)",
+   "range_es": "Activado | Desactivado (por defecto, Activado)",
+   "sources": [
+    "davis_selvadurai_2002",
+    "cai_et_al_2007",
+    "plasticity.hoek_2023",
+    "plasticity.vermeer_deborst_1984",
+    "ogr_deduction"
+   ],
+   "locator": "Perfect plasticity: Davis & Selvadurai 2002 §4.3 p. 91, Fig. 4.6; abrupt post-peak loss of strength (strain softening): ibid. §2.8 p. 49. Perfectly brittle drop from peak to residual parameters with no strain-dependent softening, and peak/residual definitions: Cai et al. 2007 p. 248 (Fig. 1) and p. 250. Choice by rock mass quality (elastic-brittle, strain softening, elastic-plastic): Hoek 2023, 'Rock mass properties', section 'Post-failure behaviour' and Fig. 14 (chapter pp. 19-21); Cai et al. 2007 p. 251. Peak versus residual strength of a sandstone: Vermeer & de Borst 1984 p. 38, Fig. 7.1. Program behaviour: core/simulation.py PerfectBrittleModel lines 635-663 (switch to the residual set in the first yielded step) and build_model/strengths lines 1222-1281."
   },
   {
    "key": "residual_tensile",
@@ -1116,217 +853,907 @@
     "mohr_coulomb",
     "drucker_prager"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Tension cut-off T of the failed material: once the strength has dropped to the residual values, no principal effective stress may become more tensile than -T.",
+   "definition_es": "Corte a tracción T del material ya roto: una vez que la resistencia ha caído a los valores residuales, ninguna tensión efectiva principal puede ser más traccionante que -T.",
+   "range_en": "0 <= T_res <= T_peak; 0 is the usual value after failure",
+   "range_es": "0 <= T_res <= T_pico; tras la rotura lo habitual es 0",
+   "sources": [
+    "plasticity.vermeer_deborst_1984",
+    "cai_et_al_2007",
+    "ogr_deduction"
+   ],
+   "locator": "Tension cut-off on a cohesive-frictional Coulomb surface: Vermeer & de Borst 1984 §7.5 pp. 43-44. Residual tensile strength taken as zero after a brittle drop: Cai et al. 2007 p. 250. Bounds deduced: a residual (failed) state cannot be stronger than the peak one; negative values are read as 0 (core/simulation.py TensionCutoff, lines 421-430). Used only when Set Residual to Peak is off (core/simulation.py lines 1236 and 1241)."
   },
   {
    "key": "residual_k",
    "criteria": [
     "drucker_prager"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Constant k of the residual Drucker-Prager cone sqrt(J2) = k + q·p' (p' mean effective stress, compression positive), which applies after the drop from peak: the shear strength sqrt(J2) at zero mean stress, the cohesion-like term of the cone.",
+   "definition_es": "Constante k del cono residual de Drucker-Prager sqrt(J2) = k + q·p' (p' tensión media efectiva, compresión positiva), que se aplica tras la caída desde el pico: la resistencia al corte sqrt(J2) con tensión media nula, el término análogo a la cohesión.",
+   "range_en": "k >= 0 and, for the residual cone to lie inside the peak one, k_res <= k_peak (with q_res <= q_peak). From Mohr-Coulomb c and phi: k = 2·sqrt(3)·c·cos(phi)/(3 - sin(phi)) (triaxial compression) or k = 3c/sqrt(9 + 12·tan²(phi)) (plane strain). A residual cohesion close to 0 gives k close to 0.",
+   "range_es": "k >= 0 y, para que el cono residual quede dentro del de pico, k_res <= k_pico (con q_res <= q_pico). A partir de c y phi de Mohr-Coulomb: k = 2·sqrt(3)·c·cos(phi)/(3 - sen(phi)) (compresión triaxial) o k = 3c/sqrt(9 + 12·tan²(phi)) (deformación plana). Una cohesión residual próxima a 0 da k próximo a 0.",
+   "sources": [
+    "drucker_prager_1952",
+    "davis_selvadurai_2002",
+    "cai_et_al_2007",
+    "ogr_deduction"
+   ],
+   "locator": "Yield function alpha·J1 + sqrt(J2) = k: Drucker & Prager 1952 eq. 2, p. 158; plane-strain match to Mohr-Coulomb: eq. 10, p. 159. Triaxial-compression match q - xi·p = k with k = 6c·cos(phi)/(3 - sin(phi)): Davis & Selvadurai 2002 §3.5 eqs 3.19 and 3.22, p. 65 (divided by sqrt(3) because q = sqrt(3·J2)). Residual cohesion near zero: Cai et al. 2007 p. 250. Program form sqrt(J2) - k - q·p <= 0, compression positive: core/simulation.py DruckerPragerCone lines 446-482; used only when Set Residual to Peak is off (line 1236). Bounds deduced from the yield function (the cone shrinks when k and q decrease)."
   },
   {
    "key": "dilation_parameter",
    "criteria": [
     "hoek_brown"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "g_min",
-   "criteria": [
-    "norsand"
+   "definition_en": "m_psi, the value that replaces mb in the Hoek-Brown plastic potential and so sets the plastic volume change: m_psi = mb gives associated flow, smaller values less dilation, and m_psi = 0 none. The implied dilation angle falls with confinement: sin(psi) = (D - 1)/(D + 1), with D = 1 + m_psi/(2·sqrt(m_psi·sigma3/sigma_ci + s)).",
+   "definition_es": "m_psi, el valor que sustituye a mb en el potencial plástico de Hoek-Brown y fija así el cambio de volumen plástico: m_psi = mb da flujo asociado, valores menores menos dilatancia y m_psi = 0 ninguna. El ángulo de dilatancia implícito disminuye con el confinamiento: sen(psi) = (D - 1)/(D + 1), con D = 1 + m_psi/(2·sqrt(m_psi·sigma3/sigma_ci + s)).",
+   "range_en": "0 <= m_psi <= mb",
+   "range_es": "0 <= m_psi <= mb",
+   "sources": [
+    "davis_selvadurai_2002",
+    "plasticity.vermeer_deborst_1984",
+    "ogr_deduction"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "residual_mb",
-   "criteria": [
-    "hoek_brown"
-   ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "residual_s",
-   "criteria": [
-    "hoek_brown"
-   ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "gsi_residual",
-   "criteria": [
-    "generalized_hoek_brown"
-   ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
-  },
-  {
-   "key": "mi_residual",
-   "criteria": [
-    "generalized_hoek_brown"
-   ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "locator": "Non-associated flow with a plastic potential of the same form as the yield function but with the friction term replaced by a dilatancy term: Davis & Selvadurai 2002 §4.5 eqs 4.20-4.24, pp. 94-95; Vermeer & de Borst 1984 eq. 4.14, p. 18. The Hoek-Brown form (mb -> m_psi) is deduced by that analogy and from the program: core/simulation.py Strength.hoek_brown and dSg, lines 341-372 (dS_g/dsigma3 = 1 + a·m_psi·(m_psi·sigma3/sigma_ci + s)^(a-1), a = 0.5); with m_psi = 0 the slope is 1 and, by Davis & Selvadurai eq. 4.24, the plastic volume change is zero; the angle formula follows from eq. 4.22, N = (1 + sin psi)/(1 - sin psi). Upper bound deduced from psi <= phi (dilatancy angle smaller than friction angle: Davis & Selvadurai p. 43; Vermeer & de Borst p. 16). Dilatancy fading at high confinement: Vermeer & de Borst p. 14."
   },
   {
    "key": "cone_hardening_type",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Law that gives the mobilized friction angle phi_m of the shear cone as the plastic deviatoric strain eps_q^p accumulates. Hyperbolic: tan(phi_m) = tan(phi_f)·eps_q^p/(eps_q^p + A), with the cohesion scaled so that the cone apex stays at c·cot(phi_f); Tabular: phi_m and c_m are read by linear interpolation from the Cone Hardening Table, which can also soften.",
+   "definition_es": "Ley que da el ángulo de rozamiento movilizado phi_m del cono de corte según se acumula la deformación desviadora plástica eps_q^p. Hiperbólica: tan(phi_m) = tan(phi_f)·eps_q^p/(eps_q^p + A), con la cohesión escalada para que el vértice del cono quede fijo en c·cot(phi_f); Tabular: phi_m y c_m se interpolan linealmente en la tabla de endurecimiento del cono, que también permite reblandecimiento.",
+   "range_en": "Hyperbolic | Tabular (default Hyperbolic)",
+   "range_es": "Hiperbólica | Tabular (por defecto, Hiperbólica)",
+   "sources": [
+    "plasticity.vermeer_deborst_1984",
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Friction hardening with a mobilized friction angle that grows with an effective plastic strain: Vermeer & de Borst 1984 §6.1-6.2, eqs 6.3 and 6.7-6.8, pp. 33-35; variant with a fixed apex at c·cot(phi): eq. 6.14, p. 37; friction hardening combined with cohesion softening: §7.1, pp. 37-39. Hardening and softening concepts: Davis & Selvadurai 2002 §4.3 p. 91 and §7.3 p. 199. The hyperbolic law and the tabular option are read from the program: core/simulation.py SofteningHardeningModel.mobilized and .cohesion, lines 780-790; eps_q^p is the accumulated sqrt(2/3·e:e) of the deviatoric plastic strain increments of the cone (lines 828-838)."
   },
   {
    "key": "hardening_property",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Constant A of the hyperbolic cone hardening law tan(phi_m) = tan(phi_f)·eps_q^p/(eps_q^p + A): the plastic deviatoric strain at which tan(phi_m) reaches half of tan(phi_f) (and 90 % at 9A). A smaller A gives faster hardening.",
+   "definition_es": "Constante A de la ley hiperbólica de endurecimiento del cono tan(phi_m) = tan(phi_f)·eps_q^p/(eps_q^p + A): la deformación desviadora plástica con la que tan(phi_m) alcanza la mitad de tan(phi_f) (y el 90 % con 9A). Un A menor da un endurecimiento más rápido.",
+   "range_en": "A > 0 (dimensionless strain, decimal)",
+   "range_es": "A > 0 (deformación adimensional, en tanto por uno)",
+   "sources": [
+    "ogr_deduction",
+    "plasticity.vermeer_deborst_1984"
+   ],
+   "locator": "Deduced from the hardening law as implemented (core/simulation.py line 785): with eps_q^p = A, tan(phi_m) = tan(phi_f)/2; with eps_q^p = 9A, 0.9·tan(phi_f). A <= 0 is rejected (line 770). It plays the role of the constant of the friction-hardening law of Vermeer & de Borst 1984 (eq. 6.8, p. 35; p. 44: the strain needed to mobilize the limit friction angle)."
   },
   {
    "key": "cone_hardening_table",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Rows of plastic deviatoric strain eps_q^p (decimal, not %), mobilized friction angle (degrees) and mobilized cohesion; values are interpolated linearly between rows and the last row holds beyond the end. A drop after a maximum models softening, e.g. the loss of cohesion of a cemented material.",
+   "definition_es": "Filas de deformación desviadora plástica eps_q^p (en tanto por uno, no en %), ángulo de rozamiento movilizado (grados) y cohesión movilizada; los valores se interpolan linealmente entre filas y la última fila se mantiene más allá del final. Un descenso tras un máximo modela reblandecimiento, por ejemplo la pérdida de cohesión de un material cementado.",
+   "range_en": "Strain >= 0 (rows sorted by strain); cohesion below 0 is read as 0; at least one row",
+   "range_es": "Deformación >= 0 (las filas se ordenan por deformación); una cohesión negativa se lee como 0; al menos una fila",
+   "sources": [
+    "plasticity.vermeer_deborst_1984",
+    "ogr_deduction"
+   ],
+   "locator": "Friction hardening and cohesion softening as functions of an effective plastic strain: Vermeer & de Borst 1984 §7.1, eqs 7.1-7.2, pp. 37-39, Fig. 7.2; post-peak test data are not objective: p. 13 and p. 44. Table handling from the program: core/simulation.py _table and _interp_table, lines 725-735 (rows sorted, linear interpolation, end values held), cohesion floor 0 at line 789."
   },
   {
    "key": "dilation_angle",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "With the Mohr-Coulomb dilation type it is psi_f, the dilation angle reached when phi_m = phi_f; while hardening the program uses psi = psi_f·phi_m/phi_f. With the Compaction-Dilation type it is the angle whose stress ratio M_psi = 6·sin(psi)/(3 - sin(psi)) separates plastic compaction (q/p' < M_psi) from dilation (q/p' > M_psi), like a constant-volume friction angle.",
+   "definition_es": "Con el tipo de dilatancia Mohr-Coulomb es psi_f, el ángulo de dilatancia que se alcanza cuando phi_m = phi_f; durante el endurecimiento el programa usa psi = psi_f·phi_m/phi_f. Con el tipo Compactación-Dilatancia es el ángulo cuyo cociente de tensiones M_psi = 6·sen(psi)/(3 - sen(psi)) separa la compactación plástica (q/p' < M_psi) de la dilatancia (q/p' > M_psi), como un ángulo de rozamiento a volumen constante.",
+   "range_en": "Mohr-Coulomb type: 0 <= psi_f <= phi_f, usually 0-20° (about 15° very dense sand, a few degrees loose sand, 0° normally consolidated clay, 12-20° rocks). Compaction-Dilation type: about 25-38° for sands (constant-volume friction angle).",
+   "range_es": "Tipo Mohr-Coulomb: 0 <= psi_f <= phi_f, normalmente 0-20° (unos 15° arena muy densa, pocos grados arena suelta, 0° arcilla normalmente consolidada, 12-20° rocas). Tipo Compactación-Dilatancia: unos 25-38° en arenas (ángulo de rozamiento a volumen constante).",
+   "sources": [
+    "plasticity.vermeer_deborst_1984",
+    "davis_selvadurai_2002",
+    "jefferies_shuttle_2002",
+    "jefferies_been_2016",
+    "ogr_deduction"
+   ],
+   "locator": "Dilatancy angle and its values: Vermeer & de Borst 1984 pp. 13-14 (dense sand 15°, loose sand a few degrees, NC clay 0, rocks 12-20°, all 0-20°) and p. 16 (psi much smaller than phi); Davis & Selvadurai 2002 p. 43 (psi < phi). Constant-volume angle: Vermeer & de Borst eqs 7.8-7.10, pp. 42-43 (contraction below phi_cv, dilation above; 25-33° for quartz sands). Cam-clay stress-dilatancy D = M - eta: Jefferies & Shuttle 2002 eq. 2, p. 626. Mtc = 1.13-1.53 for the sands of Jefferies & Been 2016 Table 2.1, pp. 46-47 (part in the extract), i.e. about 28-38° by M = 6·sin(phi)/(3 - sin(phi)) (Davis & Selvadurai eq. 3.22, p. 65, and p. 70). Program: core/simulation.py line 795 (psi = psi_f·phi_m/phi_f) and _n_psi lines 803-815 (D = M_psi - eta)."
   },
   {
    "key": "cone_dilation_type",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Flow rule of the shear cone. Mohr-Coulomb: Mohr-Coulomb plastic potential with a mobilized dilation angle psi = psi_f·phi_m/phi_f that grows with hardening; Compaction-Dilation: Cam-clay-type stress-dilatancy D = d(eps_v^p)/d(eps_q^p) = M_psi - eta, so the soil compacts while eta = q/p' is below M_psi and dilates above it.",
+   "definition_es": "Regla de flujo del cono de corte. Mohr-Coulomb: potencial plástico de Mohr-Coulomb con un ángulo de dilatancia movilizado psi = psi_f·phi_m/phi_f que crece con el endurecimiento; Compactación-Dilatancia: relación tensión-dilatancia tipo Cam-Clay D = d(eps_v^p)/d(eps_q^p) = M_psi - eta, de modo que el suelo compacta mientras eta = q/p' es menor que M_psi y dilata por encima.",
+   "range_en": "Mohr-Coulomb | Compaction-Dilation (default Mohr-Coulomb)",
+   "range_es": "Mohr-Coulomb | Compactación-Dilatancia (por defecto, Mohr-Coulomb)",
+   "sources": [
+    "plasticity.vermeer_deborst_1984",
+    "jefferies_shuttle_2002",
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Mobilized dilatancy angle growing with hardening: Vermeer & de Borst 1984 §7.2 and §7.4, pp. 39-43. Stress-dilatancy D = M - eta of Cambridge-type models: Jefferies & Shuttle 2002 eqs 1-2, p. 626. Loose soil compacts, dense soil dilates: Davis & Selvadurai 2002 §7.3, pp. 193-194. Implementation: core/simulation.py lines 795-796 and 803-815 (M_psi = 6·sin(psi)/(3 - sin(psi)) of triaxial compression, converted to the flow of the Mohr-Coulomb faces)."
   },
   {
    "key": "cap_type",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Optional yield surface (cap) that closes the shear cone on the mean-stress axis, so that isotropic or one-dimensional compression can cause plastic compaction. None: cone only; Vertical: p' <= pc; Elliptical: Modified-Cam-Clay-type ellipse (q/M)² + (p' + c·cot(phi_f))(p' - pc) = 0, shifted by the cohesion, whose top lies on the failure cone.",
+   "definition_es": "Superficie de fluencia opcional (capa o cap) que cierra el cono de corte sobre el eje de tensión media, de modo que la compresión isótropa o unidimensional pueda producir compactación plástica. None: solo el cono; Vertical: p' <= pc; Elíptica: elipse tipo Cam-Clay Modificado (q/M)² + (p' + c·cot(phi_f))(p' - pc) = 0, desplazada por la cohesión, cuyo vértice está sobre el cono de rotura.",
+   "range_en": "None | Vertical | Elliptical (default None)",
+   "range_es": "None (ninguna) | Vertical | Elíptica (por defecto, None)",
+   "sources": [
+    "davis_selvadurai_2002",
+    "plasticity.vermeer_deborst_1984",
+    "ogr_deduction"
+   ],
+   "locator": "Capped (closed) yield surface: Davis & Selvadurai 2002 §3.6, pp. 68-71, Fig. 3.17; Modified Cam Clay ellipse eq. 3.32, p. 71; closed surfaces need hardening: §7.1, p. 185. A cap closing the Coulomb surface to capture compaction under hydrostatic load: Vermeer & de Borst 1984 p. 44. Shapes from the program: core/simulation.py VerticalCap lines 666-683 and EllipticalCap lines 686-722 (M = 6·sin(phi_f)/(3 - sin(phi_f)), shift c/tan(phi_f), associated flow)."
   },
   {
    "key": "cap_hardening_type",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Law by which the cap pressure pc grows with the plastic volumetric (compaction) strain of the cap eps_v^p. Cam-Clay: pc_new = pc·exp(Δeps_v^p/Λ), with Λ = Lambda Kappa, the Cam-clay normal-compression hardening; Tabular: pc read by linear interpolation from the Cap Hardening Table.",
+   "definition_es": "Ley con la que crece la presión de capa pc con la deformación volumétrica plástica (de compactación) de la capa eps_v^p. Cam-Clay: pc_nueva = pc·exp(Δeps_v^p/Λ), con Λ = Lambda Kappa, el endurecimiento de compresión normal de Cam-Clay; Tabular: pc se interpola linealmente en la tabla de endurecimiento de la capa.",
+   "range_en": "Cam-Clay | Tabular (default Cam-Clay)",
+   "range_es": "Cam-Clay | Tabular (por defecto, Cam-Clay)",
+   "sources": [
+    "wood_1990",
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Cam-clay hardening d(eps_p^p) = (lambda - kappa)·dp'o/(v·p'o): Wood 1990 §4.3, eqs 4.17-4.21, pp. 93-94. Logarithmic hardening with plastic volumetric strain: Davis & Selvadurai 2002 eqs 7.12-7.13, p. 196, and 7.25, p. 201. Implementation: core/simulation.py _cap_pressure, lines 840-850 (only compaction hardens; pc is updated at the end of each step)."
   },
   {
    "key": "lambda_kappa",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Plastic compressibility Λ of the Cam-Clay cap law pc_new = pc·exp(Δeps_v^p/Λ). By the Cam-clay hardening rule d(eps_v^p) = (lambda - kappa)·dpc/(v·pc), Λ = (lambda - kappa)/v: enter (lambda - kappa) divided by the specific volume v = 1 + e, not (lambda - kappa) alone.",
+   "definition_es": "Compresibilidad plástica Λ de la ley de capa Cam-Clay pc_nueva = pc·exp(Δeps_v^p/Λ). Por la regla de endurecimiento de Cam-Clay d(eps_v^p) = (lambda - kappa)·dpc/(v·pc), Λ = (lambda - kappa)/v: hay que introducir (lambda - kappa) dividido por el volumen específico v = 1 + e, no (lambda - kappa) solo.",
+   "range_en": "Λ >= 0; 0 = cap that does not harden (rigid). Λ = (lambda - kappa)/v from the soil's lambda, kappa and specific volume.",
+   "range_es": "Λ >= 0; 0 = capa que no endurece (rígida). Λ = (lambda - kappa)/v a partir de lambda, kappa y el volumen específico del suelo.",
+   "sources": [
+    "wood_1990",
+    "ogr_deduction"
+   ],
+   "locator": "Wood 1990 §4.3, eq. 4.21, p. 94 (d(eps_p^p) = (lambda - kappa)·dp'o/(v·p'o)); integrated at constant v it gives p'o,new = p'o·exp(v·Δeps_p^p/(lambda - kappa)). Compared with the program's law, core/simulation.py line 847 (pc·exp(Δeps_v^p/Λ)), this gives Λ = (lambda - kappa)/v. Λ = 0 keeps pc constant (line 849), and so do negative values (line 846)."
   },
   {
    "key": "cap_hardening_table",
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Rows of accumulated plastic volumetric (compaction) strain of the cap eps_v^p (decimal) and cap pressure pc, interpolated linearly; the first row's pc is the initial cap position and pc stays constant beyond the last row.",
+   "definition_es": "Filas de deformación volumétrica plástica acumulada (de compactación) de la capa eps_v^p (en tanto por uno) y presión de capa pc, interpoladas linealmente; la pc de la primera fila es la posición inicial de la capa y pc se mantiene constante más allá de la última fila.",
+   "range_en": "eps_v^p >= 0; pc should increase with eps_v^p for hardening (a decrease would soften the cap); at least one row",
+   "range_es": "eps_v^p >= 0; pc debe crecer con eps_v^p para que haya endurecimiento (un descenso reblandecería la capa); al menos una fila",
+   "sources": [
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Cap size as a function of plastic volumetric strain: Davis & Selvadurai 2002 §7.3, eq. 7.13, p. 196. Table handling and initial pc = first row (raised to the initial mean stress if lower): core/simulation.py lines 776, 823-825 and 844-845; only compactive plastic strain of the cap is accumulated (line 843)."
+  },
+  {
+   "key": "initial_mean_stress",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "definition_en": "Initial cap pressure pc0: the mean effective stress at which the cap first yields under isotropic compression (both cap shapes cut the p' axis at pc). It plays the role of a preconsolidation pressure for the cap.",
+   "definition_es": "Presión inicial de la capa pc0: la tensión media efectiva a la que la capa plastifica por primera vez en compresión isótropa (las dos formas de capa cortan el eje p' en pc). Hace el papel de una presión de preconsolidación para la capa.",
+   "range_en": "pc0 >= initial mean effective stress of the test (a lower value is raised to it)",
+   "range_es": "pc0 >= tensión media efectiva inicial del ensayo (un valor menor se eleva hasta ella)",
+   "sources": [
+    "ogr_deduction",
+    "davis_selvadurai_2002",
+    "wood_1990"
+   ],
+   "locator": "Deduced from the program's use of the field: core/simulation.py line 766 (pc0), initial_state lines 822-825 (pc = max(pc0, p0)), VerticalCap line 675 (f = p - pc) and EllipticalCap lines 704-707 (q = 0 at p = pc). Cap position as a preconsolidation (yield) pressure: Davis & Selvadurai 2002 §3.6, pp. 68-69, and §7.3, p. 196; Wood 1990 §4.3, p. 94 (p'o sets the size of the yield locus)."
   },
   {
    "key": "initial_consolidation_condition",
    "criteria": [
     "norsand"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Chooses how the initial consolidation state of the NorSand sample is specified; the only option is OCR, the ratio by which the initial yield surface is larger than the one passing through the initial stress.",
+   "definition_es": "Elige cómo se especifica el estado inicial de consolidación de la muestra NorSand; la única opción es OCR, el factor por el que la superficie de fluencia inicial es mayor que la que pasa por la tensión inicial.",
+   "range_en": "OCR (only option)",
+   "range_es": "OCR (única opción)",
+   "sources": [
+    "ogr_deduction",
+    "jefferies_shuttle_2002"
+   ],
+   "locator": "Deduced from the program: models.py line 210 (enum with the single option 'OCR'); simulation.py NorSandModel.initial_state, line 1129 (p_i = OCR x the image stress that puts the initial stress on the yield surface). Meaning of the overconsolidation ratio in NorSand: Jefferies & Shuttle 2002, Fig. 1 p. 626 (R = sigma_m,max / sigma_m; R = 1 normally consolidated, R > 1 overconsolidated)."
+  },
+  {
+   "key": "ocr",
+   "criteria": [
+    "norsand"
+   ],
+   "definition_en": "Overconsolidation ratio of the initial state: the factor by which the initial NorSand yield surface (its image stress) is enlarged over the surface that passes through the initial stress. For an isotropic initial stress it equals the ratio of the largest past mean effective stress to the current one.",
+   "definition_es": "Índice de sobreconsolidación del estado inicial: factor por el que se amplía la superficie de fluencia inicial de NorSand (su tensión imagen) respecto de la que pasa por la tensión inicial. Con tensión inicial isótropa coincide con el cociente entre la máxima tensión media efectiva pasada y la actual.",
+   "range_en": "≥ 1 (1 = normally consolidated, on the yield surface). Calibration-chamber sands were prepared at OCR 1 to about 15.",
+   "range_es": "≥ 1 (1 = normalmente consolidado, sobre la superficie de fluencia). Las arenas de cámara de calibración se prepararon con OCR de 1 a unos 15.",
+   "sources": [
+    "jefferies_shuttle_2002",
+    "jefferies_shuttle_been_2015",
+    "kulhawy_mayne_1990",
+    "ogr_deduction"
+   ],
+   "locator": "Jefferies & Shuttle 2002, Fig. 1 p. 626 (R = sigma_m,max / sigma_m); Jefferies, Shuttle & Been 2015, Notation p. 66 (R, scalar measure of overconsolidation); Kulhawy & Mayne 1990, App. H p. H-1 and Table H-1 pp. H-2/H-3 (24 calibration-chamber sands, OCR 1 to about 14.7). Program: simulation.py line 1129 (p_i = OCR x image stress on the surface) and line 1066 (OCR < 1 rejected). Deduction: the NorSand yield surface scales with p_i, so its size on the p' axis is proportional to p_i; for an isotropic initial stress the factor OCR is therefore the ratio of past maximum to current mean stress, R."
+  },
+  {
+   "key": "psi0",
+   "criteria": [
+    "norsand"
+   ],
+   "definition_en": "Initial state parameter: initial void ratio minus the critical-state void ratio at the initial mean effective stress (psi0 = e0 - e_c(p0)). Negative values mean a soil denser than critical, which dilates; positive values a looser, contractive soil.",
+   "definition_es": "Parámetro de estado inicial: índice de poros inicial menos el índice de poros crítico a la tensión media efectiva inicial (psi0 = e0 - e_c(p0)). Valores negativos indican un suelo más denso que el crítico, que dilata; positivos, un suelo más suelto y contractivo.",
+   "range_en": "Sands: about -0.25 (dense) to +0.1 (very loose); about -0.05 is lightly dilatant. Brasted sand tests: -0.02 (loose) to -0.20 (dense).",
+   "range_es": "Arenas: de unos -0,25 (densa) a +0,1 (muy suelta); en torno a -0,05 es ligeramente dilatante. Ensayos en arena de Brasted: -0,02 (suelta) a -0,20 (densa).",
+   "sources": [
+    "soils.jefferies_been_2016",
+    "jefferies_shuttle_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Definition: Jefferies & Been 2016, Fig. 1.1 and text p. 4 (dense soils negative, loose positive), eq. 2.6 p. 42 and p. 45 (psi_o measured with initial void ratio and e_c at initial mean stress). Values: Jefferies & Shuttle 2002, Table 4 p. 634 (Brasted sand psi0 -0.02, -0.11, -0.20) and Fig. 14 p. 636 (range of behaviour of sands, psi_i axis -0.25 to 0); Jefferies & Been 2016 p. 10 (Nerlerk fill 'extremely loose', psi ~ +0.1; psi < -0.03 marginally dilatant), p. 20 (Erksak hydraulic fill psi < -0.05), p. 25 (lightly dilatant sands psi ~ -0.05), Fig. 2.4 p. 42 (Kogyuk tests -0.04 to +0.11). Program: simulation.py line 1128 (e0 = e_c(p0) + psi0)."
+  },
+  {
+   "key": "hy",
+   "criteria": [
+    "norsand"
+   ],
+   "definition_en": "Rate at which the plastic hardening modulus changes with the state parameter, H = H0 - Hy psi: denser states (negative psi) get a stiffer plastic response. With Hy = 0 the modulus is constant and equal to H0.",
+   "definition_es": "Ritmo de variación del módulo de endurecimiento plástico con el parámetro de estado, H = H0 - Hy psi: los estados más densos (psi negativo) tienen una respuesta plástica más rígida. Con Hy = 0 el módulo es constante e igual a H0.",
+   "range_en": "No general range published. Calibrated values: 280 (Fraser River sand, H = 60 - 280 psi) and about 1125 (Brasted sand, H = 50 - 1125 psi_i). H itself is typically 50-500.",
+   "range_es": "No hay rango general publicado. Valores calibrados: 280 (arena del río Fraser, H = 60 - 280 psi) y unos 1125 (arena de Brasted, H = 50 - 1125 psi_i). El propio H suele valer 50-500.",
+   "sources": [
+    "jefferies_shuttle_been_2015",
+    "jefferies_shuttle_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Jefferies, Shuttle & Been 2015, Table 2 p. 78 (Fraser River sand H '60-280 psi'; typical H 50-500); Jefferies & Shuttle 2002, eq. 25 p. 635 (Brasted sand Htc = 50 - 1125 psi_i, from fits H = 75, 150, 275 for psi0 = -0.02, -0.11, -0.20) and Table 3 p. 634 (H 50-500, 'often f(psi)'). Program: simulation.py line 1152 (H = H0 - Hy psi, with the current psi). Deduced bound: H must stay positive in the loosest state reached, so Hy < H0 / psi_max when psi > 0."
   },
   {
    "key": "fluid_bulk_modulus",
    "criteria": [
     "norsand"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Bulk modulus of the pore fluid: the pressure change needed per unit relative change of fluid volume, i.e. the inverse of its compressibility. In an undrained test it sets how much the pore fluid lets the soil change volume.",
+   "definition_es": "Módulo de compresibilidad volumétrica del fluido intersticial: cambio de presión necesario por unidad de cambio relativo de volumen del fluido, es decir, la inversa de su compresibilidad. En un ensayo no drenado fija cuánto deja el fluido cambiar de volumen al suelo.",
+   "range_en": "Water: about 2 x 10^6 kPa (2 GPa). Much larger values (e.g. the default 10^9 kPa) make the fluid practically incompressible.",
+   "range_es": "Agua: unos 2 x 10^6 kPa (2 GPa). Valores mucho mayores (p. ej. el de defecto, 10^9 kPa) hacen el fluido prácticamente incompresible.",
+   "sources": [
+    "schofield_wroth_1968",
+    "davis_selvadurai_2002",
+    "ogr_deduction"
+   ],
+   "locator": "Schofield & Wroth 1968, §4.1 p. 47 (typical compressibility of water 48 x 10^-6 cm²/kg, against 3000 x 10^-6 cm²/kg for London clay). Deduced: K_w = 1 / compressibility = 1 / (48 x 10^-6 cm²/kgf) = 20 800 kgf/cm² ≈ 2.0 x 10^6 kPa (1 kgf/cm² = 98.07 kPa). Davis & Selvadurai 2002, p. 33 (saturated soil in undrained deformation behaves as incompressible, Poisson's ratio 0.5). Program: simulation.py lines 60-69 and 1368-1395 (undrained tests impose zero volume change, i.e. an incompressible fluid).",
+   "not_used": true
   },
   {
-   "key": "a",
+   "key": "g_ref",
    "criteria": [
-    "power_curve"
+    "norsand"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Elastic shear modulus at the reference mean stress p_ref in the NorSand power law G = G_ref (p'/p_ref)^m. It equals the dimensionless shear rigidity (G/p') at p_ref times p_ref.",
+   "definition_es": "Módulo de corte elástico a la tensión media de referencia p_ref en la ley potencial de NorSand G = G_ref (p'/p_ref)^m. Equivale a la rigidez a cortante adimensional (G/p') en p_ref multiplicada por p_ref.",
+   "range_en": "Sands, at p_ref = 100 kPa: 40 000-80 000 kPa (rigidity 400-800); the 2015 summary gives a rigidity of 100-800, i.e. 10 000-80 000 kPa. Brasted sand calibration: 50 000 kPa.",
+   "range_es": "Arenas, con p_ref = 100 kPa: 40.000-80.000 kPa (rigidez 400-800); el resumen de 2015 da una rigidez de 100-800, es decir, 10.000-80.000 kPa. Calibración de la arena de Brasted: 50.000 kPa.",
+   "sources": [
+    "jefferies_shuttle_2002",
+    "jefferies_shuttle_been_2015"
+   ],
+   "locator": "Jefferies & Shuttle 2002, eq. 23 p. 633 (G / sigma_ref = Gref (sigma_m / sigma_ref)^g, sigma_ref commonly 100 kPa), Table 3 p. 634 (Gref 400-800, dimensionless, sigma_ref = 100 kPa) and p. 635 (Brasted sand Gref = 500); Jefferies, Shuttle & Been 2015, Notation p. 67 (Ir = G / sigma_m) and Table 2 p. 78 (Ir typical 100-800; Fraser River sand 450-750). kPa values computed as dimensionless rigidity x 100 kPa."
   },
   {
-   "key": "b",
+   "key": "g_min",
    "criteria": [
-    "power_curve"
+    "norsand"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Lower limit of the NorSand elastic shear modulus: the program uses the larger of G_ref (p'/p_ref)^m and G_min, so that G does not vanish as the mean stress tends to zero.",
+   "definition_es": "Límite inferior del módulo de corte elástico de NorSand: el programa usa el mayor de G_ref (p'/p_ref)^m y G_min, para que G no se anule cuando la tensión media tiende a cero.",
+   "range_en": "≥ 0. It takes over only where G_ref (p'/p_ref)^m < G_min; with the defaults (G_min = 1 kPa, G_ref = 40 000 kPa, p_ref = 100 kPa, m = 0.5) only below p' ≈ 10^-7 kPa.",
+   "range_es": "≥ 0. Solo actúa donde G_ref (p'/p_ref)^m < G_min; con los valores por defecto (G_min = 1 kPa, G_ref = 40.000 kPa, p_ref = 100 kPa, m = 0,5) solo por debajo de p' ≈ 10^-7 kPa.",
+   "sources": [
+    "ogr_deduction"
+   ],
+   "locator": "Deduced from the program: simulation.py NorSandModel.moduli, line 1085 (G = max(G_ref (p/p_ref)^m, G_min)); stiffness_panel.py line 36 (input minimum 0). The threshold follows from G_ref (p'/p_ref)^m = G_min, i.e. p' = p_ref (G_min/G_ref)^(1/m) = 100 x (1/40 000)^2 kPa = 6 x 10^-8 kPa."
   },
   {
-   "key": "c",
+   "key": "lambda",
    "criteria": [
-    "power_curve"
+    "norsand"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Slope of the critical state line in void ratio versus natural logarithm of mean effective stress, e_c = Gamma - lambda ln(p'). It measures how fast the critical void ratio falls as the stress rises.",
+   "definition_es": "Pendiente de la línea de estado crítico en el plano índice de poros - logaritmo natural de la tensión media efectiva, e_c = Gamma - lambda ln(p'). Mide lo rápido que baja el índice de poros crítico al aumentar la tensión.",
+   "range_en": "Sands: 0.01-0.07 (natural log). In base 10 (lambda_10 ≈ 2.3 lambda): 0.03-0.15.",
+   "range_es": "Arenas: 0,01-0,07 (logaritmo natural). En base 10 (lambda_10 ≈ 2,3 lambda): 0,03-0,15.",
+   "sources": [
+    "jefferies_shuttle_2002",
+    "jefferies_shuttle_been_2015",
+    "soils.jefferies_been_2016"
+   ],
+   "locator": "Jefferies & Shuttle 2002, Table 3 p. 634 (lambda 0.01-0.07, 'defined on base e'); Jefferies, Shuttle & Been 2015, Notation p. 67 and Table 2 p. 78 (lambda_10 0.03-0.15); Jefferies & Been 2016, Table 2.1 pp. 46-47 (lambda_10 of some 60 sands, silts and tailings)."
   },
   {
-   "key": "d",
+   "key": "critical_state_slope",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "M, slope of the critical state line in the p'-q plane (q = M p'): the stress ratio at which the soil keeps shearing at constant stress and volume. It also fixes the shape of the Cam-Clay and Modified Cam-Clay yield surfaces, whose top lies on this line.",
+   "definition_es": "M, pendiente de la línea de estado crítico en el plano p'-q (q = M p'): relación de tensiones con la que el suelo sigue cortando a tensión y volumen constantes. Fija además la forma de las superficies de fluencia de Cam-Clay y Cam-Clay Modificado, cuyo punto más alto está sobre esa línea.",
+   "range_en": "Clays: about 0.8-1.45 for PI 10-100 %, average about 1.0 (phi' ≈ 25°); Weald clay 0.87; five remoulded clays 0.85-1.02. Sands: 1.13-1.53. M = 6 sin phi' / (3 - sin phi') in triaxial compression.",
+   "range_es": "Arcillas: de 0,8 a 1,45 para IP del 10 al 100 %, con media en torno a 1,0 (phi' ≈ 25°); arcilla de Weald 0,87; cinco arcillas remoldeadas 0,85-1,02. Arenas: 1,13-1,53. M = 6 sen phi' / (3 - sen phi') en compresión triaxial.",
+   "sources": [
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "schofield_wroth_1968",
+    "soils.jefferies_been_2016"
+   ],
+   "locator": "Wood 1990, eq. 6.3 p. 141 (q_cs = M p'_cs), eq. 9.22 p. 271 (M from phi'), eq. 9.23 and Fig. 9.14 p. 271 (sin phi' = 0.35 - 0.1 ln Ip; average M ~ 1.0, phi' = 25.4°), eq. 6.25 p. 156 (Weald clay q = 0.872 p'); Kulhawy & Mayne 1990, eq. G-1 p. G-2 and Fig. 4-20 p. 4-22 (sin phi_cv ≈ 0.8 - 0.094 ln PI, PI in %); Schofield & Wroth 1968, Table 6.1 p. 109; Jefferies & Been 2016, Table 2.1 pp. 46-47 (Mtc of the sands and tailings listed in the extract: 1.13 Ottawa to 1.53 Northwest Brook Pit). Clay range computed from the Kulhawy & Mayne correlation with G-1 (PI 10 %: 1.45; PI 100 %: 0.84)."
   },
   {
-   "key": "waviness",
+   "key": "volume_reference",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Chooses which line the specific volume entered below belongs to: N, the isotropic normal compression line at unit pressure, or Gamma, the critical state line at unit pressure. The model links them: Gamma = N - (lambda - kappa) in Cam-Clay and Gamma = N - (lambda - kappa) ln 2 in Modified Cam-Clay.",
+   "definition_es": "Elige a qué línea pertenece el volumen específico que se introduce: N, la línea de compresión normal isótropa a presión unidad, o Gamma, la línea de estado crítico a presión unidad. El modelo las relaciona: Gamma = N - (lambda - kappa) en Cam-Clay y Gamma = N - (lambda - kappa) ln 2 en Cam-Clay Modificado.",
+   "range_en": null,
+   "range_es": null,
+   "sources": [
+    "wood_1990",
+    "davis_selvadurai_2002",
+    "schofield_wroth_1968",
+    "ogr_deduction"
+   ],
+   "locator": "Modified Cam-Clay (Roscoe & Burland 1968, as presented by Wood 1990 §5.1 p. 112 and Davis & Selvadurai 2002 p. 202; elliptical yield locus Wood eq. 5.5 p. 115): Wood 1990, eqs. 6.6-6.9 p. 143 and eqs. 6.10-6.11 p. 144 (Gamma = N - (lambda - kappa) ln 2), Table 11.1 p. 356 (Gamma + (lambda - kappa) ln 2 = N). Original Cam-Clay yield locus: Wood 1990 eq. 8.23 p. 237 (η/M = ln(p'o/p')). Cam-Clay: Schofield & Wroth 1968, eq. 6.20 p. 100 and eq. 7.18 p. 139 (normal compression line (lambda - kappa) above the critical state line). Program: simulation.py lines 891-896 (a Gamma value is converted to N with these relations)."
   },
   {
-   "key": "residual_a",
+   "key": "specific_volume_unit_pressure",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Specific volume v = 1 + e of the selected reference line (N: isotropic normal compression line; Gamma: critical state line) at a mean effective stress of 1 kPa. It places the line in the v-ln p' plane, so its value depends on the stress unit.",
+   "definition_es": "Volumen específico v = 1 + e de la línea de referencia elegida (N: línea de compresión normal isótropa; Gamma: línea de estado crítico) para una tensión media efectiva de 1 kPa. Sitúa la línea en el plano v-ln p', por lo que su valor depende de la unidad de tensión.",
+   "range_en": "With p' in kPa: Weald clay Gamma = 2.07; soft clay example Gamma = 2.5, N = 2.64. Five remoulded clays: Gamma ≈ 2.06-4.68 (converted from lb/in²).",
+   "range_es": "Con p' en kPa: arcilla de Weald Gamma = 2,07; ejemplo de arcilla blanda Gamma = 2,5 y N = 2,64. Cinco arcillas remoldeadas: Gamma ≈ 2,06-4,68 (convertido desde lb/in²).",
+   "sources": [
+    "wood_1990",
+    "schofield_wroth_1968",
+    "ogr_deduction"
+   ],
+   "locator": "Wood 1990, eq. 5.8 and Fig. 5.1c pp. 114-116 (N: v on the isotropic normal compression line at p' = 1), p. 144 (Gamma and N depend on the stress unit; the book uses kPa, so they are v at p' = 1 kPa), eq. 6.26 p. 156 (Weald clay csl v = 2.072 - 0.091 ln p', p' in kPa), Table 11.1 p. 356 (Gamma = 2.5, N = 2.64). Schofield & Wroth 1968, eq. 5.23 p. 73 and Table 6.1 p. 109 (Gamma 1.880-3.990 with p in lb/in²). Deduced conversion from v = Gamma - lambda ln p: Gamma(kPa) = Gamma(lb/in²) + lambda ln 6.895, giving Weald 2.06, Wiener Tegel V 2.37, London 2.76, kaolin 3.77, Klein Belt Ton 4.68; the Weald value agrees with Wood's 2.072. Program: simulation.py line 946 (v = N - lambda ln p with p in kPa) and line 947 (initial v must exceed 1)."
   },
   {
-   "key": "residual_b",
+   "key": "kappa",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "κ, slope of the unloading-reloading (swelling) line in the v-ln p' plane. It controls the recoverable volume change: the elastic bulk modulus is K = v p'/κ, so the soil stiffens as the mean stress grows.",
+   "definition_es": "κ, pendiente de la línea de descarga-recarga (hinchamiento) en el plano v-ln p'. Controla el cambio de volumen recuperable: el módulo volumétrico elástico es K = v p'/κ, por lo que el suelo se rigidiza al aumentar la tensión media.",
+   "range_en": "Usually about 0.2-0.25 λ (Λ = 1 - κ/λ ≈ 0.75-0.8); five remoulded clays 0.026-0.184; soft clay example 0.05 with λ = 0.25. From an oedometer swelling index: κ ≈ Cs/2.303 (Cs ≈ 0.2 Cc ≈ PI/370).",
+   "range_es": "Normalmente en torno a 0,2-0,25 λ (Λ = 1 - κ/λ ≈ 0,75-0,8); cinco arcillas remoldeadas 0,026-0,184; ejemplo de arcilla blanda 0,05 con λ = 0,25. A partir del índice de hinchamiento edométrico: κ ≈ Cs/2,303 (Cs ≈ 0,2 Cc ≈ IP/370).",
+   "sources": [
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "schofield_wroth_1968"
+   ],
+   "locator": "Wood 1990, eq. 5.1 p. 113 (δε_p^e = κ δp'/(v p')), eq. 6.19 p. 147 (Λ = (λ - κ)/λ), Table 11.1 p. 356; Kulhawy & Mayne 1990, eq. G-2 p. G-2 (Λ = 1 - Cs/Cc, typically ≈ 0.8), Table 4-8 p. 4-48 (Λ 0.72-0.82, overall mean 0.75 from 138 tests), eqs. 6-8 and 6-9 p. 6-5 (Cur = Cc (1 - Λ) ≈ PI/370; average Cur about 20 % of Cc); Schofield & Wroth 1968, Table 6.1 p. 109 (average κ and Λ = 0.48-0.81 of five clays)."
   },
   {
-   "key": "residual_c",
+   "key": "lambda",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "λ, slope of the isotropic normal (virgin) compression line in the v-ln p' plane; the critical state line is parallel to it. It measures the irrecoverable compressibility and drives the hardening of the yield surface with plastic volumetric strain.",
+   "definition_es": "λ, pendiente de la línea de compresión normal (noval) isótropa en el plano v-ln p'; la línea de estado crítico es paralela. Mide la compresibilidad irrecuperable y gobierna el endurecimiento de la superficie de fluencia con la deformación volumétrica plástica.",
+   "range_en": "Clays: λ ≈ 0.6 Ip (Ip as a ratio); five remoulded clays 0.093-0.356; Weald clay 0.091; soft clay example 0.25. From an oedometer: λ = Cc/2.303, with Cc < 0.2 low, 0.2-0.4 moderate, > 0.4 high compressibility (λ < 0.09, 0.09-0.17, > 0.17).",
+   "range_es": "Arcillas: λ ≈ 0,6 IP (IP en tanto por uno); cinco arcillas remoldeadas 0,093-0,356; arcilla de Weald 0,091; ejemplo de arcilla blanda 0,25. A partir del edómetro: λ = Cc/2,303, con Cc < 0,2 compresibilidad baja, 0,2-0,4 media y > 0,4 alta (λ < 0,09; 0,09-0,17; > 0,17).",
+   "sources": [
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "schofield_wroth_1968"
+   ],
+   "locator": "Wood 1990, eq. 5.8 p. 116, eqs. 9.13-9.17 pp. 264-265 (λ = Ip Gs / ln 100 ≈ 0.6 Ip; Cc = 2.303 λ) and Fig. 9.6 p. 264 (data), eq. 6.26 p. 156 (Weald 0.091), Table 11.1 p. 356; Kulhawy & Mayne 1990, Table 6-1 p. 6-4 (degree of compressibility by Cc), eqs. 6-5 to 6-7 pp. 6-4 (Cc = 0.009 (wL - 10); Cc ≈ PI/74), App. G p. G-2 (λ isotropic compression index); Schofield & Wroth 1968, Table 6.1 p. 109. λ limits of the compressibility classes computed as Cc/2.303."
   },
   {
-   "key": "residual_d",
+   "key": "initial_consolidation",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Chooses how the initial size of the yield surface is given: by the overconsolidation ratio OCR applied to the surface through the initial stress, or directly by the preconsolidation pressure Po.",
+   "definition_es": "Elige cómo se da el tamaño inicial de la superficie de fluencia: mediante el índice de sobreconsolidación OCR aplicado a la superficie que pasa por la tensión inicial, o directamente con la presión de preconsolidación Po.",
+   "range_en": "OCR | Preconsolidation Pressure (Po)",
+   "range_es": "OCR | Presión de preconsolidación (Po)",
+   "sources": [
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "ogr_deduction"
+   ],
+   "locator": "Wood 1990, eq. 5.3 p. 115 (the yield locus size is set by p'_o); Kulhawy & Mayne 1990, eq. G-3 p. G-2 (OCR_i = p_max / p_0). Program: models.py line 43 (options), simulation.py lines 897-900 and 939-945 (pc = OCR x pc on the surface, or Po)."
   },
   {
-   "key": "residual_waviness",
+   "key": "ocr",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Isotropic overconsolidation ratio: preconsolidation mean effective stress divided by the current one (OCR_i = p'max / p'0). OCR = 1 starts on the yield surface (normally consolidated); OCR > 1 starts inside it and responds elastically first.",
+   "definition_es": "Índice de sobreconsolidación isótropo: tensión media efectiva de preconsolidación dividida por la actual (OCR_i = p'max / p'0). OCR = 1 parte de la superficie de fluencia (normalmente consolidado); OCR > 1 parte del interior y responde primero de forma elástica.",
+   "range_en": "≥ 1. Intact clays: about 1 to 40 (vertical OCR, database of 96 clays); a reconstituted clay swelled from 827 to 34 kPa reaches 24 (heavily overconsolidated).",
+   "range_es": "≥ 1. Arcillas inalteradas: de 1 a unos 40 (OCR vertical, base de datos de 96 arcillas); una arcilla reconstituida descargada de 827 a 34 kPa llega a 24 (fuertemente sobreconsolidada).",
+   "sources": [
+    "kulhawy_mayne_1990",
+    "wood_1990",
+    "schofield_wroth_1968",
+    "ogr_deduction"
+   ],
+   "locator": "Kulhawy & Mayne 1990, eq. G-3 p. G-2 (isotropic OCR_i), eq. 3-2 p. 3-2 and p. 6-1 (vertical OCR = σ'p/σ'v0; NC = 1), Fig. 3-17 p. 3-17 (96 intact clays, OCR from 1 to about 40, read from the chart), eqs. 3-17 to 3-22 pp. 3-15/3-17 (OCR from liquidity index or su), Table 4-7 p. 4-33 (NC, lightly and heavily OC classes); Wood 1990, p. 151 (Weald clay compressed to 827 kPa and swollen to 34 kPa, OCR 24); Schofield & Wroth 1968, §7.10 p. 139. Program: simulation.py lines 939-945 (pc = OCR x the pc that puts the initial stress on the surface; for an isotropic initial stress this is p'0, so OCR = pc/p'0) and line 908 (OCR < 1 rejected)."
   },
   {
-   "key": "dilation_ratio",
+   "key": "preconsolidation_stress",
    "criteria": [
-    "power_curve"
+    "cam_clay",
+    "modified_cam_clay"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Po (p'c), the largest mean effective stress the soil has carried: the point where the yield surface meets the p' axis, which sets its size. Plastic compression makes it grow (hardening) and dilation on the dry side makes it shrink (softening).",
+   "definition_es": "Po (p'c), la mayor tensión media efectiva que ha soportado el suelo: punto donde la superficie de fluencia corta el eje p', que fija su tamaño. La compresión plástica lo aumenta (endurecimiento) y la dilatancia en el lado seco lo reduce (reblandecimiento).",
+   "range_en": "Site-specific. In the program: not below the value that puts the initial stress on the yield surface (p'0 for an isotropic start); lower values are raised to it.",
+   "range_es": "Depende del emplazamiento. En el programa: no menor que el valor que sitúa la tensión inicial sobre la superficie de fluencia (p'0 si el estado inicial es isótropo); los valores menores se elevan a ese.",
+   "sources": [
+    "wood_1990",
+    "davis_selvadurai_2002",
+    "kulhawy_mayne_1990",
+    "ogr_deduction"
+   ],
+   "locator": "Wood 1990, eq. 5.3 and Fig. 5.1 pp. 114-115 (p'_o, size of the yield locus) and eqs. 5.8-5.10 p. 116 (hardening with plastic volumetric strain); Davis & Selvadurai 2002, p. 196 (initial yield stress = upper point of the virgin compression curve, the preconsolidation stress); Kulhawy & Mayne 1990, p. 3-2 and §3 'Effective preconsolidation stress' pp. 3-6 to 3-14 (correlations, vertical σ'p). Program: simulation.py line 945 (pc = max(Po, pc on the surface))."
+  },
+  {
+   "key": "shear_modulus",
+   "criteria": [
+    "cam_clay",
+    "modified_cam_clay"
+   ],
+   "definition_en": "Elastic shear modulus G kept constant in Cam-Clay when 'Constant Shear Modulus' is chosen: ratio of shear stress to elastic shear strain. With this choice Poisson's ratio varies with the mean stress.",
+   "definition_es": "Módulo de corte elástico G que se mantiene constante en Cam-Clay al elegir «Módulo de corte constante»: cociente entre la tensión tangencial y la deformación angular elástica. Con esta opción el coeficiente de Poisson varía con la tensión media.",
+   "range_en": "Clays (G = Eu/3, secant at design stress): soft 500-1300 kPa, medium 1300-2700 kPa, stiff 2700-6700 kPa; soft clay example 500 kPa. Small-strain Gmax is about 10-20 times larger (static G ≈ 5-10 % of Gmax).",
+   "range_es": "Arcillas (G = Eu/3, secante a tensiones de proyecto): blandas 500-1300 kPa, medias 1300-2700 kPa, firmes 2700-6700 kPa; ejemplo de arcilla blanda 500 kPa. El Gmax a pequeñas deformaciones es unas 10-20 veces mayor (G estático ≈ 5-10 % de Gmax).",
+   "sources": [
+    "kulhawy_mayne_1990",
+    "wood_1990",
+    "sabatini_2002_gec5"
+   ],
+   "locator": "Kulhawy & Mayne 1990, eq. 5-3 p. 5-2 (G = E / 2(1 + ν)), p. 5-4 (undrained Eu = 3G), Table 5-2 p. 5-6 (Eu/pa: soft 15-40, medium 40-80, stiff 80-200), p. 5-12 (static G about 5-10 % of dynamic Gmax), App. I p. I-1 (pa ≈ 100 kPa); Wood 1990, eq. 5.2 p. 114 (constant G') and Table 11.1 p. 356 (G' = 500 kPa); GEC 5 Table 30 p. 154 (small-strain G0 by soil type, round 1). kPa values computed as G = Eu/3 with pa = 100 kPa."
+  },
+  {
+   "key": "poisson",
+   "criteria": [
+    "*"
+   ],
+   "definition_en": "Poisson's ratio ν of the linear isotropic elastic response: minus the ratio of lateral to axial strain under axial loading. With Young's modulus it fixes the shear modulus, G = E / (2(1 + ν)).",
+   "definition_es": "Coeficiente de Poisson ν de la respuesta elástica lineal isótropa: cociente, cambiado de signo, entre la deformación lateral y la axial en carga axial. Junto con el módulo de Young fija el módulo de corte, G = E / (2(1 + ν)).",
+   "range_en": "Soils, drained: clay 0.2-0.4, loose sand 0.1-0.3, dense sand 0.3-0.4 (0.1-0.2 is also quoted at working loads). Saturated soil, undrained: 0.5. Intact rock: typically 0.25-0.4 (0.11-0.58 measured on 72 Canadian rocks).",
+   "range_es": "Suelos, drenado: arcilla 0,2-0,4, arena suelta 0,1-0,3, arena densa 0,3-0,4 (también se citan 0,1-0,2 en cargas de servicio). Suelo saturado no drenado: 0,5. Roca intacta: normalmente 0,25-0,4 (0,11-0,58 medidos en 72 rocas canadienses).",
+   "sources": [
+    "kulhawy_mayne_1990",
+    "davis_selvadurai_2002",
+    "sabatini_2002_gec5",
+    "vermeer_deborst_1984",
+    "canmet_1995"
+   ],
+   "locator": "Kulhawy & Mayne 1990, eq. 5-2 and eq. 5-3 p. 5-2, p. 5-3 (range 0-0.5 for isotropic elastic materials; undrained νu = 0.5) and Table 5-1 p. 5-4 (typical drained ν); Davis & Selvadurai 2002, eq. 2.13 p. 31 (-1 < ν ≤ 0.5) and p. 33 (undrained saturated soil ν = 0.5); GEC 5 §5.5.3 p. 151 (0.1-0.2 at working loads) and §6.4.1 p. 205 (rock 0.25-0.4); Vermeer & de Borst 1984 §3.1 p. 11 (definition); CANMET 1995 Table 1 (0.11-0.58, computed from the table)."
+  },
+  {
+   "key": "young",
+   "criteria": [
+    "*"
+   ],
+   "definition_en": "Young's modulus E of the linear isotropic elastic response: ratio of axial stress to axial strain under axial loading, before yield.",
+   "definition_es": "Módulo de Young E de la respuesta elástica lineal isótropa: cociente entre la tensión axial y la deformación axial en carga axial, antes de la plastificación.",
+   "range_en": "Sand (drained): loose 10 000-20 000, medium 20 000-50 000, dense 50 000-100 000 kPa. Clay (undrained): soft 1500-4000, medium 4000-8000, stiff 8000-20 000 kPa. Intact rock: typically 0.1-100 GPa (1.8-166 GPa measured on 72 Canadian rocks).",
+   "range_es": "Arena (drenado): suelta 10.000-20.000, media 20.000-50.000, densa 50.000-100.000 kPa. Arcilla (no drenado): blanda 1500-4000, media 4000-8000, firme 8000-20.000 kPa. Roca intacta: normalmente 0,1-100 GPa (1,8-166 GPa medidos en 72 rocas canadienses).",
+   "sources": [
+    "kulhawy_mayne_1990",
+    "sabatini_2002_gec5",
+    "canmet_1995",
+    "vermeer_deborst_1984"
+   ],
+   "locator": "Kulhawy & Mayne 1990, eq. 5-1 p. 5-1 (definition; tangent and secant moduli), Table 5-5 p. 5-15 (drained sand Ed/pa: loose 100-200, medium 200-500, dense 500-1000), Table 5-2 p. 5-6 (undrained clay Eu/pa: soft 15-40, medium 40-80, stiff 80-200), App. I p. I-1 (pa ≈ 100 kPa); GEC 5 Table 28 p. 148 and §6.4.1 p. 205 (intact rock 0.1-100 GPa); CANMET 1995 Table 1 (1.76-166.3 GPa, computed from the table); Vermeer & de Borst 1984 §3.1 p. 11. kPa values computed with pa = 100 kPa."
+  },
+  {
+   "key": "peak_tensile",
+   "criteria": [
+    "mohr_coulomb"
+   ],
+   "definition_en": "Tension cut-off T: no principal effective stress may become more tensile than -T (yield surface σ3 = -T, associated flow). It truncates the apex of the Mohr-Coulomb envelope; 0 means the material carries no tension.",
+   "definition_es": "Corte a tracción T: ninguna tensión principal efectiva puede ser más traccionante que -T (superficie σ3 = -T, flujo asociado). Trunca el vértice de la envolvente de Mohr-Coulomb; 0 significa que el material no admite tracciones.",
+   "range_en": "Uncemented soils: 0. Effective range 0 to c·cot φ: larger values have no effect. Intact rock (77 Canadian rocks): about 0.4-26 MPa.",
+   "range_es": "Suelos no cementados: 0. Rango efectivo de 0 a c·cotg φ: valores mayores no tienen efecto. Roca intacta (77 rocas canadienses): de unos 0,4 a 26 MPa.",
+   "sources": [
+    "ogr_deduction",
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "vermeer_deborst_1984",
+    "canmet_1995"
+   ],
+   "locator": "Program: simulation.py class TensionCutoff lines 421-440 (σ_i ≥ -T, associated; negative input taken as 0) and _pyramid_set lines 600-607 (apex = max(MC apex, -T)). Deduced bound: the Mohr-Coulomb pyramid alone keeps every principal stress ≥ -sc/(Nφ - 1) = -c·cot φ (Strength.apex, line 351), so T ≥ c·cot φ never acts. Soils: Wood 1990, p. 115 (unless the particles are cemented, soil cannot carry an all-round tensile effective stress); Kulhawy & Mayne 1990, p. 4-2 (effective cohesion only in special cases: truly cemented, partially saturated or heavily overconsolidated clays). Rock: CANMET 1995 Table 1 (σt 0.43 MPa coal to 25.96 MPa andesite). Why the apex is cut: Vermeer & de Borst 1984 §6-7 pp. 43-44."
+  },
+  {
+   "key": "residual_cohesion",
+   "criteria": [
+    "mohr_coulomb"
+   ],
+   "definition_en": "Cohesion intercept of the Mohr-Coulomb envelope after failure, once the strength has dropped from peak to residual. Clays sheared to large displacement and rock joints are usually taken as cohesionless at residual.",
+   "definition_es": "Cohesión de la envolvente de Mohr-Coulomb tras la rotura, cuando la resistencia ha caído del pico al residual. Las arcillas cizalladas a grandes desplazamientos y las juntas de roca suelen tomarse sin cohesión en estado residual.",
+   "range_en": "0 (residual envelopes of clays and joints pass through the origin); never above the peak cohesion.",
+   "range_es": "0 (las envolventes residuales de arcillas y juntas pasan por el origen); nunca mayor que la cohesión de pico.",
+   "sources": [
+    "wood_1990",
+    "kulhawy_mayne_1990",
+    "soils.hoek_2023",
+    "sabatini_2002_gec5",
+    "ogr_deduction"
+   ],
+   "locator": "Wood 1990, pp. 221-222 and Fig. 7.37 (London clay: failures consistent with φ'cs = 20° and c' = 0; residual envelope through the origin; ring-shear residual φ'r ~ 9° for Kalabagh clay, Fig. 7.38); Kulhawy & Mayne 1990, p. 4-2 (c' = 0 except special cases) and pp. 4-24/4-25 (residual strength develops at very large strain with re-oriented clay particles); Hoek 2023 ch. 4 eq. 2 and Fig. 1 (c drops to zero at residual); GEC 5 §5.6.2.2 eq. 59 p. 162 (τr = σ' tan φr). Program: simulation.py lines 1255-1260 (read only when 'Set Residual to Peak' is off); upper bound deduced from the meaning of residual strength."
+  },
+  {
+   "key": "residual_mb",
+   "criteria": [
+    "hoek_brown"
+   ],
+   "definition_en": "Hoek-Brown constant mb of the broken rock mass, used for the residual (post-peak) strength when residual is not set to peak. Cai et al. obtain it from a reduced residual GSI with σci and mi unchanged: mr = mi·exp((GSIr − 100)/28).",
+   "definition_es": "Constante mb de Hoek-Brown del macizo rocoso roto, usada para la resistencia residual (postpico) cuando el residual no se iguala al pico. Cai et al. la obtienen de un GSI residual reducido, manteniendo σci y mi: mr = mi·exp((GSIr − 100)/28).",
+   "range_en": "Below the peak mb: about 0.05·mi to 0.11·mi for residual GSI of 15 to 37 (0.96 to 2.14 with mi = 20)",
+   "range_es": "Inferior al mb de pico: del orden de 0,05·mi a 0,11·mi para GSI residual de 15 a 37 (0,96 a 2,14 con mi = 20)",
+   "sources": [
+    "cai_2007",
+    "ogr_deduction"
+   ],
+   "locator": "Cai et al. 2007, section 1 (p. 248: residual parameters lower than peak), sections 3.2-3.3, eqs. 13 and 15 (pp. 253-255), Table 1 (p. 256: residual m = 0.964-2.138 for GSIr = 15.1-37.4, σc = 100 MPa, mi = 20); eq. 1 (p. 251: Ribacchi's alternative mr = 0.65 mb). The factor 0.05-0.11 is deduced: exp((GSIr − 100)/28) evaluated at GSIr = 15.1 and 37.4."
+  },
+  {
+   "key": "residual_s",
+   "criteria": [
+    "hoek_brown"
+   ],
+   "definition_en": "Hoek-Brown constant s of the broken rock mass, used for the residual (post-peak) strength when residual is not set to peak; Cai et al. compute it as sr = exp((GSIr − 100)/9). For residual GSI below about 40 it is so small that it can be taken as zero.",
+   "definition_es": "Constante s de Hoek-Brown del macizo rocoso roto, usada para la resistencia residual (postpico) cuando el residual no se iguala al pico; Cai et al. la calculan como sr = exp((GSIr − 100)/9). Para GSI residual inferior a 40 aproximadamente es tan pequeña que puede tomarse nula.",
+   "range_en": "0 to about 0.001 (residual GSI 15 to 37); always below the peak s",
+   "range_es": "0 a 0,001 aproximadamente (GSI residual 15 a 37); siempre inferior a la s de pico",
+   "sources": [
+    "cai_2007"
+   ],
+   "locator": "Cai et al. 2007, eq. 16 (p. 255), section 3.3.1 (p. 256: s negligible for GSI < 40) and Table 1 (p. 256: residual s = 0.000-0.001); eq. 1 (p. 251: Ribacchi's alternative sr = 0.04 s)"
+  },
+  {
+   "key": "gsi_residual",
+   "criteria": [
+    "generalized_hoek_brown"
+   ],
+   "definition_en": "GSI of the rock mass in its broken, residual state; the residual mb, s and a follow from it with the same equations as the peak values. Cai et al. obtain it by taking a residual block volume of about 10 cm³ and halving the large-scale waviness and small-scale smoothness ratings of the joints.",
+   "definition_es": "GSI del macizo rocoso en su estado roto, residual; de él se obtienen mb, s y a residuales con las mismas ecuaciones que los valores de pico. Cai et al. lo calculan tomando un volumen de bloque residual de unos 10 cm³ y reduciendo a la mitad los factores de ondulación a gran escala y de rugosidad a pequeña escala de las juntas.",
+   "range_en": "Below the peak GSI: GSIr/GSI = 0.37-0.51 for peak GSI 40-80 (residual GSI about 15-37 in the examples and case histories); for very weak rock masses GSIr ≈ GSI. Trend: GSIr ≈ GSI·exp(−0.0134·GSI)",
+   "range_es": "Inferior al GSI de pico: GSIr/GSI = 0,37-0,51 para GSI de pico 40-80 (GSI residual de 15 a 37 aproximadamente en los ejemplos y casos reales); en macizos muy débiles GSIr ≈ GSI. Tendencia: GSIr ≈ GSI·exp(−0,0134·GSI)",
+   "sources": [
+    "cai_2007"
+   ],
+   "locator": "Cai et al. 2007, sections 3.2.1-3.3 (pp. 253-255: residual block volume 10 cm³; eqs. 9-11 residual joint condition; eq. 13 GSIr), Table 1 (p. 256), Tables 3-6 (pp. 257-261), eq. 18 and Fig. 18 (pp. 262-263: GSIr/GSI 0.37-0.51 for peak GSI 40-80); p. 251 (Russo's alternative GSIr = 0.36 GSI)"
+  },
+  {
+   "key": "mi_residual",
+   "criteria": [
+    "generalized_hoek_brown"
+   ],
+   "definition_en": "mi used to compute the residual (post-peak) strength. Cai et al. keep it equal to the peak mi, because fracturing and shearing change the block size and joint condition but not the properties of the intact rock.",
+   "definition_es": "mi con el que se calcula la resistencia residual (postpico). Cai et al. lo mantienen igual al mi de pico, porque la fracturación y el corte cambian el tamaño de bloque y el estado de las juntas, pero no las propiedades de la roca intacta.",
+   "range_en": "Equal to the peak mi (about 4 for claystones to 32 for granite)",
+   "range_es": "Igual al mi de pico (de unos 4 en argilitas a 32 en granito)",
+   "sources": [
+    "cai_2007",
+    "rock.hoek_pre_ch11"
+   ],
+   "locator": "Cai et al. 2007, section 3.3 (p. 255: σc and mi unchanged) and Conclusions (p. 263); range of mi: Hoek, Practical Rock Engineering ch. 11, Table 3, p. 6"
+  },
+  {
+   "key": "d_residual",
+   "criteria": [
+    "generalized_hoek_brown"
+   ],
+   "definition_en": "Disturbance factor D used to compute the residual (post-peak) strength parameters. Cai et al. use D = 0 for the residual state, because the rock mass is already damaged and the reduced residual GSI accounts for it.",
+   "definition_es": "Factor de alteración D con el que se calculan los parámetros resistentes residuales (postpico). Cai et al. emplean D = 0 en el estado residual, porque el macizo ya está dañado y el GSI residual reducido lo tiene en cuenta.",
+   "range_en": "0 to 1 (definition of D); D = 0 recommended for residual parameters",
+   "range_es": "0 a 1 (definición de D); se recomienda D = 0 para los parámetros residuales",
+   "sources": [
+    "cai_2007",
+    "hoek_2002"
+   ],
+   "locator": "Cai et al. 2007, section 3.3, text after eq. 17 (p. 255); bounds of D: Hoek et al. 2002, text after eq. 5"
+  },
+  {
+   "key": "phi_r",
+   "criteria": [
+    "barton_bandis"
+   ],
+   "definition_en": "Residual friction angle of the joint walls in Barton's criterion τ = σn·tan(φr + JRC·log10(JCS/σn)); it is the minimum shear strength of the joint. Barton and Choubey estimate it as φr = (φb − 20°) + 20·r/R, with φb the basic friction angle of dry sawn surfaces, r the Schmidt rebound on the wet joint walls and R on dry sawn surfaces.",
+   "definition_es": "Ángulo de rozamiento residual de las paredes de la junta en el criterio de Barton τ = σn·tan(φr + JRC·log10(JCS/σn)); representa la resistencia al corte mínima de la junta. Barton y Choubey lo estiman como φr = (φb − 20°) + 20·r/R, con φb el ángulo de rozamiento básico de superficies serradas secas, r el rebote del esclerómetro Schmidt en las paredes húmedas de la junta y R en superficies serradas secas.",
+   "range_en": "φr ≤ φb; φb of unweathered rocks 21-38° (most smooth unweathered surfaces 25-35°); 19-31° (mean 27.5°) in 136 tested joints; down to about 12° for weathered walls at low normal stress; 8-16° with softening clay coatings",
+   "range_es": "φr ≤ φb; φb de rocas no meteorizadas 21-38° (la mayoría de superficies lisas no meteorizadas 25-35°); 19-31° (media 27,5°) en 136 juntas ensayadas; hasta unos 12° con paredes meteorizadas a baja tensión normal; 8-16° con recubrimientos arcillosos blandos",
+   "sources": [
+    "barton_choubey_1977",
+    "rock.hoek_pre_2023",
+    "fhwa_1989"
+   ],
+   "locator": "Barton & Choubey 1977, eqs. 2 and 6 (pp. 4 and 15), eq. 7 (p. 15), Table 1 (p. 6: φb 21-38°), p. 4 (φb 25-35° for most smooth unweathered surfaces), p. 14 and Fig. 3 (φr as low as 12°, Richards 1975), p. 17 (φr 19-31°; conservative first estimate 20°), pp. 24 and 30 (mean 27.5°), p. 48 (Conclusions 1-2: minimum shear strength, independent of scale); Hoek 2023, ch. 4, eqs. 4-5 (PDF p. 82); Hoek 2023, Table 6, Ja column φr (PDF pp. 252-253, coated joints); FHWA 1989, p. 5.18"
+  },
+  {
+   "key": "jrc",
+   "criteria": [
+    "barton_bandis"
+   ],
+   "definition_en": "Joint roughness coefficient: rates the roughness of the joint walls from 0 (smooth, planar) to 20 (very rough), by visual comparison with Barton and Choubey's ten standard 10 cm profiles or by back-analysis of tilt, push or shear tests. It decreases as the joint length grows (scale effect).",
+   "definition_es": "Coeficiente de rugosidad de la junta: califica la rugosidad de las paredes de 0 (lisa y plana) a 20 (muy rugosa), por comparación visual con los diez perfiles tipo de 10 cm de Barton y Choubey o por retroanálisis de ensayos de inclinación, empuje o corte. Disminuye al aumentar la longitud de la junta (efecto escala).",
+   "range_en": "0-20 (standard profiles in steps of 2, from 0-2 smooth planar to 18-20 rough irregular); mean 8.9 in 136 laboratory joints",
+   "range_es": "0-20 (perfiles tipo en tramos de 2, desde 0-2 liso y plano hasta 18-20 rugoso irregular); media 8,9 en 136 juntas de laboratorio",
+   "sources": [
+    "barton_choubey_1977",
+    "rock.hoek_pre_2023",
+    "fhwa_1989"
+   ],
+   "locator": "Barton & Choubey 1977, Fig. 1 (p. 5: JRC 20 rough undulating, 10 smooth undulating, 5 smooth nearly planar; completely smooth planar joints JRC = 0), eq. 3 (p. 7), Table 4 (p. 18), Fig. 8 (p. 19: profiles 0-2 ... 18-20), eqs. 11-12 (pp. 23-24: tilt test), p. 30 (mean 8.9), pp. 40-42 (scale effect: JRC 8.7 on 10 cm samples, 5.5 on a 45 cm joint); Hoek 2023, ch. 4, Figs. 5-6 and eq. 6 (PDF pp. 83-85, scale correction of Barton & Bandis 1982); FHWA 1989, Fig. 5.2 (p. 5.8)"
+  },
+  {
+   "key": "jcs",
+   "criteria": [
+    "barton_bandis"
+   ],
+   "definition_en": "Joint wall compressive strength: the uniaxial compressive strength of the thin layer of rock at the joint walls. It equals the UCS of the intact rock for fresh (unweathered) joints and is lower for weathered walls; it is measured with the Schmidt hammer on the walls and decreases with joint size.",
+   "definition_es": "Resistencia a compresión de las paredes de la junta: resistencia a compresión simple de la delgada capa de roca de las paredes. Es igual a la de la roca intacta en juntas sanas (no meteorizadas) y menor en paredes meteorizadas; se mide con el esclerómetro Schmidt sobre las paredes y disminuye con el tamaño de la junta.",
+   "range_en": "From the UCS of the fresh rock (unweathered walls) down to about UCS/4 (conservative value for weathered walls when no Schmidt tests are available); 20-200 MPa (mean 92 MPa) in Barton and Choubey's tests; the Schmidt L-hammer covers about 20-300 MPa",
+   "range_es": "Desde la resistencia a compresión simple de la roca sana (paredes no meteorizadas) hasta aproximadamente su cuarta parte (valor conservador para paredes meteorizadas sin ensayos con esclerómetro); 20-200 MPa (media 92 MPa) en los ensayos de Barton y Choubey; el esclerómetro tipo L cubre unos 20-300 MPa",
+   "sources": [
+    "barton_choubey_1977",
+    "rock.hoek_pre_2023",
+    "fhwa_1989"
+   ],
+   "locator": "Barton & Choubey 1977, p. 4 (JCS 20-200 MPa in the tests), p. 6 and p. 8 (JCS = σc for unweathered joints; weathering stages 1-5), eq. 4 and p. 9 (Schmidt hammer, Miller 1965; 20 to at least 300 MPa), p. 7 and p. 12 (wet JCS 5-20 % lower), p. 12 and p. 17 (σc/JCS up to about 4; JCS = σc/4 conservative), p. 30 (mean 92 MPa), p. 42 (in situ reduction factors 2.5, 5 and 10), p. 47 (JCS rises to the confined strength when σn ≥ σc); Hoek 2023, ch. 4, eq. 7 (PDF p. 85) and upper limit σn = JCS (PDF p. 89); Hoek 2023, Fig. 1, UCS grades (R6 extremely strong > 250 MPa, PDF p. 93); FHWA 1989, pp. 5.7 and 5.18"
   },
   {
    "key": "residual_dilation",
    "criteria": [
     "barton_bandis"
    ],
-   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+   "definition_en": "Dilation angle of the joint (program label 'Dilation Angle'): the angle between the shear movement and the joint plane, caused by the asperities riding over each other. Barton and Choubey found the peak value dn ≈ ½·JRC·log10(JCS/σn) as a lower bound (≈ JRC·log10(JCS/σn) when asperities suffer little damage), and zero for planar, clay-filled or previously sheared joints.",
+   "definition_es": "Ángulo de dilatancia de la junta (etiqueta del programa 'Dilation Angle'): ángulo entre el movimiento de corte y el plano de la junta, debido a que las asperezas montan unas sobre otras. Barton y Choubey hallaron para el valor de pico dn ≈ ½·JRC·log10(JCS/σn) como límite inferior (≈ JRC·log10(JCS/σn) si las asperezas apenas se dañan), y nulo en juntas planas, rellenas de arcilla o ya cizalladas.",
+   "range_en": "0 (planar, filled or pre-sheared joints; also at the residual state) up to about JRC·log10(JCS/σn); mean peak values 6.8-26.5° by rock type in 136 laboratory joints",
+   "range_es": "0 (juntas planas, rellenas o ya cizalladas; también en estado residual) hasta aproximadamente JRC·log10(JCS/σn); valores medios de pico de 6,8 a 26,5° según el tipo de roca en 136 juntas de laboratorio",
+   "sources": [
+    "barton_choubey_1977",
+    "cai_2007",
+    "ogr_deduction"
+   ],
+   "locator": "Barton & Choubey 1977, eq. 8 (p. 21), pp. 30-31 (peak dilation angle; assumed zero for clay-filled, planar or pre-sheared joints; total friction ≥ φr + dn), Fig. 15 and eqs. 13-16 (pp. 32-34: dn between 0.5 and 2 times the asperity component), eqs. 20-21 and Tables 5-6 (pp. 35-36: means 6.8-26.5°, overall 20.0°); Cai et al. 2007, Fig. 3 (p. 250, after Barton et al.: roughness mobilized at peak and destroyed towards the residual state). Deduced: with the roughness destroyed (mobilized JRC → 0), eq. 13 gives a dilation that tends to 0 at the residual state.",
+   "not_used": true
+  },
+  {
+   "key": "residual_strength",
+   "criteria": [
+    "barton_bandis"
+   ],
+   "definition_en": "Shear strength of the joint after large displacement, once its roughness has been worn away. In Barton and Choubey's framework it is purely frictional, τr = σn·tan φr, with no cohesion and no roughness term.",
+   "definition_es": "Resistencia al corte de la junta tras un desplazamiento grande, una vez desgastada su rugosidad. En el planteamiento de Barton y Choubey es puramente friccional, τr = σn·tan φr, sin cohesión ni término de rugosidad.",
+   "range_en": null,
+   "range_es": null,
+   "sources": [
+    "barton_choubey_1977",
+    "rock.hoek_pre_2023",
+    "ogr_deduction"
+   ],
+   "locator": "Barton & Choubey 1977, p. 48 (Conclusion 1: φr is the minimum shear strength of a joint; planar or pre-sheared joints must be designed with it); Hoek 2023, ch. 4, eq. 2 and Fig. 1 (PDF pp. 78-79: residual cohesion drops to zero, slope φr). Deduced from the registry: the field has no unit (core/models.py, line 245), so it is not a stress in kPa; its role in the reference program is not documented in any source read.",
+   "not_used": true
+  },
+  {
+   "key": "a",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Coefficient of the power-law shear strength envelope τ = a·(σn + d)^b + c; it sets the level of the strength. With b = 1 the envelope is a straight line and a is the friction coefficient tan φ.",
+   "definition_es": "Coeficiente de la envolvente potencial de resistencia al corte τ = a·(σn + d)^b + c; fija el nivel de la resistencia. Con b = 1 la envolvente es una recta y a es el coeficiente de rozamiento tan φ.",
+   "range_en": "> 0 (deduced); with b = 1, a = tan φ (e.g. 0.7 ≈ tan 35°)",
+   "range_es": "> 0 (deducido); con b = 1, a = tan φ (p. ej. 0,7 ≈ tan 35°)",
+   "sources": [
+    "fhwa_1989",
+    "ogr_deduction"
+   ],
+   "locator": "FHWA 1989, eq. 30 (p. 5.25) and Appendix 1, eqs. 30-31 (p. A1-3): Hoek and Brown's curved Mohr envelope τ = A·σc·(σn/σc − T)^B, the same law with a = A·σc^(1−B), b = B, d = −T·σc and c = 0; Table IV (p. 5.26: A = 0.042-1.220). Deduced from the form of the criterion: a > 0 so that strength grows with σn; a has units of stress^(1−b); with b = 1 and d = c = 0, τ = a·σn = σn·tan φ."
+  },
+  {
+   "key": "b",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Exponent of the power-law envelope τ = a·(σn + d)^b + c. b < 1 gives an envelope that flattens as σn grows (the instantaneous friction angle falls with stress), as observed for rough joints and jointed rock; b = 1 gives a straight line.",
+   "definition_es": "Exponente de la envolvente potencial τ = a·(σn + d)^b + c. b < 1 da una envolvente que se aplana al crecer σn (el ángulo de rozamiento instantáneo disminuye con la tensión), como se observa en juntas rugosas y macizos fracturados; b = 1 da una recta.",
+   "range_en": "0 < b ≤ 1 for a concave or straight envelope (deduced); B = 0.53-0.71 in Hoek and Brown's envelopes for intact rock and rock masses",
+   "range_es": "0 < b ≤ 1 para una envolvente cóncava o recta (deducido); B = 0,53-0,71 en las envolventes de Hoek y Brown para roca intacta y macizos rocosos",
+   "sources": [
+    "fhwa_1989",
+    "barton_choubey_1977",
+    "ogr_deduction"
+   ],
+   "locator": "FHWA 1989, eq. 30 (p. 5.25) and Table IV (p. 5.26: B = 0.534-0.712); Barton & Choubey 1977, p. 3 (peak envelopes of non-planar joints are strongly curved; c and φ are stress-dependent). Deduced: the slope dτ/dσn = a·b·(σn + d)^(b−1) decreases with σn only if b < 1 and is constant if b = 1."
+  },
+  {
+   "key": "c",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Constant shear strength added to the power term of τ = a·(σn + d)^b + c: a cohesion-like offset that lifts the whole envelope. At σn = −d the power term vanishes and the strength equals c.",
+   "definition_es": "Resistencia al corte constante que se suma al término potencial de τ = a·(σn + d)^b + c: un término de tipo cohesión que eleva toda la envolvente. Para σn = −d el término potencial se anula y la resistencia vale c.",
+   "range_en": null,
+   "range_es": null,
+   "sources": [
+    "ogr_deduction"
+   ],
+   "locator": "Deduced from the form of the criterion τ = a(σn + d)^b + c: for σn = −d the first term is zero, so τ = c, and c has stress units. The documented Hoek-Brown power envelope (FHWA 1989, eq. 30, p. 5.25) has no such term (c = 0).",
+   "not_used": true
+  },
+  {
+   "key": "d",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Shift of the normal stress in τ = a·(σn + d)^b + c: the envelope starts at σn = −d, so d is the tensile strength entered as a positive number. With d = 0 the material has no tensile strength.",
+   "definition_es": "Desplazamiento de la tensión normal en τ = a·(σn + d)^b + c: la envolvente empieza en σn = −d, por lo que d es la resistencia a tracción, introducida como número positivo. Con d = 0 el material no tiene resistencia a tracción.",
+   "range_en": "≥ 0 (deduced); in Hoek and Brown's envelopes d = −T·σc with T from 0 to −0.14, i.e. 0 to 0.14·σc",
+   "range_es": "≥ 0 (deducido); en las envolventes de Hoek y Brown d = −T·σc con T de 0 a −0,14, es decir, de 0 a 0,14·σc",
+   "sources": [
+    "fhwa_1989",
+    "ogr_deduction"
+   ],
+   "locator": "FHWA 1989, eq. 30 and T = ½(m − √(m² + 4s)) (p. 5.25), Table IV (p. 5.26: T = −0.140 to 0). Deduced from the form of the criterion: (σn + d) = 0 at σn = −d, the most tensile normal stress the envelope reaches."
+  },
+  {
+   "key": "waviness",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Waviness angle i of the large-scale undulations of a joint (Patton's first-order projections): sliding has to climb the undulations, which adds i to the friction, τ = σn·tan(φ + i) for a cohesionless surface. A positive angle raises the strength; 0 means a planar surface.",
+   "definition_es": "Ángulo de ondulación i de las ondulaciones a gran escala de la junta (proyecciones de primer orden de Patton): el deslizamiento tiene que remontarlas, lo que suma i al rozamiento, τ = σn·tan(φ + i) en una superficie sin cohesión. Un ángulo positivo aumenta la resistencia; 0 corresponde a una superficie plana.",
+   "range_en": "≥ 0 (0 = planar surface; deduced)",
+   "range_es": "≥ 0 (0 = superficie plana; deducido)",
+   "sources": [
+    "rock.hoek_pre_2023",
+    "fhwa_1989",
+    "ogr_deduction"
+   ],
+   "locator": "Hoek 2023, ch. 4, eq. 3 and Fig. 4 (PDF pp. 81-82: Patton 1966, saw-tooth specimens; valid at low normal stress); FHWA 1989, p. 5.3 (Patton's equation for regular projections) and p. 5.4 (first-order projections = major undulations, which control field slopes; second-order = small steep bumps, sheared off as stress rises; Patton's sketch shows average first-order i of about 13-15°). Deduced: the lower bound 0 follows from the definition; how the angle combines with a power envelope (which has no single friction angle) is not stated in these sources.",
+   "not_used": true
+  },
+  {
+   "key": "residual_a",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Coefficient a of the residual (large-displacement) power-law envelope τr = ar·(σn + dr)^br + cr, fitted to residual shear strengths in the same way as the peak a.",
+   "definition_es": "Coeficiente a de la envolvente potencial residual (gran desplazamiento) τr = ar·(σn + dr)^br + cr, ajustado a las resistencias residuales igual que el a de pico.",
+   "range_en": "> 0; it should give a residual envelope not above the peak one (deduced)",
+   "range_es": "> 0; debe dar una envolvente residual no superior a la de pico (deducido)",
+   "sources": [
+    "rock.hoek_pre_2023",
+    "ogr_deduction"
+   ],
+   "locator": "Hoek 2023, ch. 4, Fig. 1 and eqs. 1-2 (PDF pp. 78-79: peak and residual envelopes; residual strength remains constant at large displacement). Deduced: same form and bounds as a; residual strength is the minimum the joint keeps, so it cannot exceed the peak."
+  },
+  {
+   "key": "residual_b",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Exponent b of the residual power-law envelope τr = ar·(σn + dr)^br + cr; same meaning as the peak b.",
+   "definition_es": "Exponente b de la envolvente potencial residual τr = ar·(σn + dr)^br + cr; mismo significado que la b de pico.",
+   "range_en": "0 < b ≤ 1 for a concave or straight envelope (deduced)",
+   "range_es": "0 < b ≤ 1 para una envolvente cóncava o recta (deducido)",
+   "sources": [
+    "ogr_deduction"
+   ],
+   "locator": "Deduced from the form of the criterion, as for b."
+  },
+  {
+   "key": "residual_c",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Constant shear strength c of the residual power-law envelope. The residual strength of rock discontinuities is usually taken as cohesionless, so this term is normally zero.",
+   "definition_es": "Resistencia al corte constante c de la envolvente potencial residual. La resistencia residual de las discontinuidades suele considerarse sin cohesión, por lo que este término es normalmente nulo.",
+   "range_en": "Normally 0",
+   "range_es": "Normalmente 0",
+   "sources": [
+    "rock.hoek_pre_2023",
+    "cai_2007",
+    "ogr_deduction"
+   ],
+   "locator": "Hoek 2023, ch. 4, eq. 2 (PDF p. 79: in the residual state the cohesion has dropped to zero); Cai et al. 2007, section 2.3 (p. 250: residual strength generally Mohr-Coulomb with near-zero cohesion). Deduced: c is the cohesion-like term of the residual envelope (see c).",
+   "not_used": true
+  },
+  {
+   "key": "residual_d",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Normal-stress shift d (tensile strength) of the residual power-law envelope. A broken joint or rock mass keeps no tensile strength, so it is normally zero.",
+   "definition_es": "Desplazamiento d de la tensión normal (resistencia a tracción) de la envolvente potencial residual. Una junta o un macizo roto no conserva resistencia a tracción, por lo que normalmente es nulo.",
+   "range_en": "≥ 0; normally 0",
+   "range_es": "≥ 0; normalmente 0",
+   "sources": [
+    "rock.hoek_pre_2023",
+    "ogr_deduction"
+   ],
+   "locator": "Hoek 2023, ch. 4, eq. 2 (PDF p. 79: residual envelope τr = σn·tan φr through the origin). Deduced from the form of the criterion, as for d."
+  },
+  {
+   "key": "residual_waviness",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Waviness angle of the large-scale joint undulations used in the residual envelope; same meaning as the peak waviness. Large displacements and higher normal stress can shear off the projections and reduce the effective angle.",
+   "definition_es": "Ángulo de ondulación de las ondulaciones a gran escala de la junta usado en la envolvente residual; mismo significado que la ondulación de pico. Los grandes desplazamientos y las tensiones normales altas pueden cortar las proyecciones y reducir el ángulo efectivo.",
+   "range_en": "≥ 0 (deduced)",
+   "range_es": "≥ 0 (deducido)",
+   "sources": [
+    "fhwa_1989",
+    "cai_2007",
+    "ogr_deduction"
+   ],
+   "locator": "FHWA 1989, p. 5.4 (as normal stress increases the first-order projections are sheared off and the effective roughness angle falls towards zero); Cai et al. 2007, section 3.2.2 (p. 255: the large-scale waviness rating of the joints is halved for the residual state). Deduced: lower bound 0 from the definition.",
+   "not_used": true
+  },
+  {
+   "key": "dilation_ratio",
+   "criteria": [
+    "power_curve"
+   ],
+   "definition_en": "Ratio of the dilation angle to the friction angle mobilized on the Power Curve envelope at the current normal stress (the instantaneous, tangent friction angle): ψ = ratio·φi. 0 gives no dilation and 1 gives associated flow (ψ = φi).",
+   "definition_es": "Razón entre el ángulo de dilatancia y el ángulo de rozamiento movilizado en la envolvente Power Curve a la tensión normal actual (ángulo de rozamiento instantáneo, tangente): ψ = razón·φi. 0 no da dilatancia y 1 da flujo asociado (ψ = φi).",
+   "range_en": "0 to 1 (deduced: 0 = no plastic volume change, 1 = associated flow; the dilation angle is generally smaller than the friction angle)",
+   "range_es": "0 a 1 (deducido: 0 = sin cambio de volumen plástico, 1 = flujo asociado; el ángulo de dilatancia es en general menor que el de rozamiento)",
+   "sources": [
+    "rock.davis_selvadurai_2002",
+    "rock.hoek_pre_2023",
+    "ogr_deduction"
+   ],
+   "locator": "Deduced from the definition of the quantity (ratio of two angles). Instantaneous friction angle: Hoek 2023, ch. 4, Fig. 7 and eqs. 8-10 (PDF p. 88). Dilation angle generally smaller than the friction angle, and associated flow overpredicting dilation: Davis & Selvadurai 2002, sec. 2.6 (p. 43) and sec. 4.5 (pp. 94-95).",
+   "not_used": true
+  },
+  {
+   "key": "peak_tensile",
+   "criteria": [
+    "drucker_prager",
+    "softening_hardening"
+   ],
+   "definition_en": "Tension cut-off T: the minor principal stress cannot exceed this tensile value (yield surface sigma3 - T = 0, associated flow). It truncates the apex of the shear envelope, which on its own would allow too large tensile stresses in a cohesive material.",
+   "definition_es": "Corte a tracción T: la tensión principal menor no puede superar este valor de tracción (superficie sigma3 - T = 0, flujo asociado). Trunca el vértice de la envolvente de corte, que por sí sola admitiría tracciones excesivas en un material con cohesión.",
+   "range_en": "0 for a material without tensile strength (program default). Intact rock (77 Canadian rocks, CANMET Table 1): about 0.4-26 MPa.",
+   "range_es": "0 para un material sin resistencia a tracción (valor por defecto). Roca intacta (77 rocas canadienses, tabla 1 de CANMET): de unos 0,4 a 26 MPa.",
+   "sources": [
+    "vermeer_deborst_1984",
+    "canmet_1995"
+   ],
+   "locator": "Vermeer & de Borst 1984 §6/7, pp. 43-44 (why the Coulomb apex is cut off); CANMET 1995 Table 1, column sigma_t (PDF pp. 102-109), min 0.43 MPa (coal) to 25.96 MPa (andesite), range computed from the table."
   }
- ]
+ ],
+ "pending": []
 }
