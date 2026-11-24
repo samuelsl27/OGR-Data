@@ -9,7 +9,7 @@ NUMBER is in the short one.
 SOURCE_URL = "https://github.com/samuelsl27/OGR-Data"
 
 INSTRUCTIONS = """\
-OGR Data: rock and soil strength properties (RSData / RocData style): ten
+OGR Data: rock and soil strength properties (in the style of the reference program): ten
 strength criteria, envelopes and equivalent Mohr-Coulomb, Hoek-Brown from
 GSI/mi/D, test data fitting and calibration, element test simulation, and
 estimation without tests (GSI charts and calculator, mi, D, MR, USCS).

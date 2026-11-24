@@ -1,4 +1,4 @@
-"""Spec 007: project files and RocData .roc import."""
+"""Spec 007: project files and .roc import."""
 
 from __future__ import annotations
 
@@ -6,8 +6,9 @@ from pathlib import Path
 
 from ogr_data.core import project, roc_import
 from ogr_data.core.models import CRITERIA, defaults
+from tests._references import roc_examples
 
-EXAMPLES = Path("C:/Desarrollo/OGR_Suite/Data/Referencias/Doc_Guia/Doc_Roc_Data3_0/Examples")
+EXAMPLES = roc_examples()  # found by search (spec 027)
 
 
 def test_project_round_trip(tmp_path=None):
@@ -42,7 +43,7 @@ def test_project_rejects_bad_format(tmp_path=None):
 
 def test_import_all_official_examples():
     files = sorted(EXAMPLES.glob("*.roc"))
-    assert len(files) >= 10  # the RocData 3.0 guide ships 10 .roc examples
+    assert len(files) >= 10  # the user's guide of the format ships 10 .roc examples
     imported = {}
     for f in files:
         imported[f.name] = roc_import.parse_roc(f)
@@ -85,7 +86,7 @@ def test_import_rejects_non_roc():
         try:
             roc_import.parse_roc(path)
         except ValueError as exc:
-            assert "not a RocData file" in str(exc)
+            assert "not a .roc file" in str(exc)
         else:
             raise AssertionError("expected ValueError")
 
@@ -95,7 +96,7 @@ def test_import_rejects_unsupported_units():
 
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "u.roc"
-        path.write_text("RocData:\n  version: 3.013\n\nproject settings:\n  units: 4\n  failure criterion: 0\n", encoding="utf-8")
+        path.write_text(roc_import.FORMAT_TAG + "\n  version: 3.013\n\nproject settings:\n  units: 4\n  failure criterion: 0\n", encoding="utf-8")
         try:
             roc_import.parse_roc(path)
         except ValueError as exc:

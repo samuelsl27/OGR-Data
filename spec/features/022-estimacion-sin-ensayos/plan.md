@@ -18,7 +18,7 @@
 
 - `core/gsi.py` (sin Qt): ecs. 1-6, JCond89 desde las 5 valoraciones de
   la tabla 1, `chart_gsi(A, B)`, `chart_row(B)`. Sin truncar.
-  - Diferencias con RSData documentadas en el JSON: RSData usa 1,95 para
+  - Diferencias con el programa de referencia documentadas en el JSON: el programa de referencia usa 1,95 para
     JCond76 (sustitución exacta 1,5×1,3; el paper publica 2) y una forma
     logarítmica para Jr/Ja que no está en el paper. OGR sigue el paper.
   - Ec. 4: el signo menos del exponente se pierde en el PDF; se usa
@@ -42,7 +42,7 @@
 - `MainWindow.pick_value` / `_pick`: un clic, y conversión kPa → unidad
   de visualización (corrige un fallo previo: el pick de σci escribía kPa
   en el campo aunque la unidad fuera MPa).
-- σci: valores de RSData/ORMAS (35 y 0,6 MPa) — hecho en la revisión
+- σci: valores del programa de referencia y ORMAS (35 y 0,6 MPa) — hecho en la revisión
   anterior.
 
 ## Pendiente (no implementado, con motivo)

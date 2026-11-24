@@ -2,7 +2,7 @@
 
 ## Qué se construye
 
-Los diálogos "Pick" del viejo RocData, con datos reales extraídos de la
+Los diálogos "Pick" del programa de referencia antiguo, con datos reales extraídos de la
 bibliografía oficial de la suite:
 
 1. **sigci** (GHB y HB): Tabla 2 de Hoek, Practical Rock Engineering cap. 11
@@ -14,7 +14,7 @@ bibliografía oficial de la suite:
    de la masa** (6 categorías) × **condición superficial de las
    discontinuidades** (5 categorías) → rango GSI. Las celdas se leen de las
    curvas de nivel impresas en la carta (lectura aproximada, indicativa —
-   igual que el propio RocData: "Quoting a range from 33 to 37 is more
+   igual que el propio programa de referencia antiguo: "Quoting a range from 33 to 37 is more
    realistic than stating that GSI = 35").
 
 Los datos viven en `ogr_data/data/*.json` con su fuente por tabla. La GUI

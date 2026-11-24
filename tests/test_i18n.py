@@ -36,11 +36,11 @@ TEXT_CALLS: dict[str, tuple[int, ...]] = {
 SAME_WORDS = {
     "GSI", "RQD", "USCS", "OGR", "MPa", "kPa", "GPa", "deg", "psi", "psf", "ksf", "tsf", "Pa", "kN", "MN",
     "CSV", "PNG", "SVG", "PDF", "HTML", "JCond", "JCond89", "JCond76", "Jv", "Jr", "Ja", "RMR", "ORMAS",
-    "RSData", "RocData", "RocProp", "Hoek", "Brown", "Marinos", "Mohr", "Coulomb", "Barton", "Bandis",
+    "Hoek", "Brown", "Marinos", "Mohr", "Coulomb", "Barton", "Bandis",
     "Drucker", "Prager", "Cam", "Clay", "NorSand", "Mogi", "Deere", "Carter", "Diederichs", "Priest",
     "Hudson", "Palmstrom", "Choubey", "UFC", "ASTM", "NRCS", "FHWA", "CANMET", "MnDOT", "Excel", "sigma",
     "sigma1", "sigma3", "sig3max", "sigci", "sigcm", "sigt", "sigc", "phi", "tau", "JRC", "JCS", "Erm",
-    "Ei", "mb", "mi", "PRE", "ARMA", "Rocscience", "RSData's", "Data", "Copy", "Linear",
+    "Ei", "mb", "mi", "PRE", "ARMA", "Data", "Copy", "Linear",
     # the same in Spanish (registry labels): directions, Cam-Clay symbols, solver names, authors
     "Axial", "Lateral", "Vertical", "Kappa", "Lambda", "OCR", "Phi", "Simplex", "Levenberg", "Marquardt",
     "Carranza", "Torres", "Corkum",

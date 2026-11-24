@@ -53,7 +53,7 @@ sale en cuadros.
 
 El runner no filtra: corre todo. Un test suelto se prueba importando su
 archivo en un script; la evidencia de una tarea es siempre la suite entera.
-Coste medido el 2026-11-24 en el PC de desarrollo: 273 tests, entre 2 y 3 min
+Coste medido el 2026-11-24 en el PC de desarrollo: 274 tests, entre 2 y 3 min
 en serie. Si crece mucho, se dice en el changelog de la spec que lo causó.
 
 **Código de salida 127 con `Failed: 0`** (Git Bash; es 0xC0000409, un
@@ -191,8 +191,9 @@ se pueden **leer** en `../Referencias/` para entender qué hace una
 función, pero **no se citan**: las fórmulas se citan por su fuente
 científica original, y lo que solo documenta ese fabricante queda sin
 fuente hasta encontrar una citable. Donde haga falta, «el programa de
-referencia». Las menciones que quedan de antes de la regla las retira la
-spec 027.
+referencia». Lo comprueba `tests/test_spec_027.py` en todo archivo
+versionado; las únicas líneas exentas llevan `rule 9:` (la etiqueta del
+formato `.roc` y los patrones de esos tests).
 
 ---
 

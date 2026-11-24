@@ -109,7 +109,7 @@ def ghb_computed(criterion: str, params: Params, sig3max_mpa: float) -> dict[str
 
 
 def overlay_mc(criterion: str, params: Params, sig3max_mpa: float, shear_curve=None) -> samplers.InstantaneousMC | None:
-    """Equivalent MC (HB family, Hoek 2002) or best-fit MC (Power Curve, Barton-Bandis; RocData 2004 p. 10)."""
+    """Equivalent MC (HB family, Hoek 2002) or best-fit MC (Power Curve, Barton-Bandis; as in the earlier reference program)."""
 
     if criterion in HB_FAMILY:
         sigci, mb, s, a = hb_terms(criterion, params, sig3max_mpa)

@@ -2,12 +2,12 @@
 
 ## Qué se construye
 
-El "Use Lab Data" del viejo RocData: ajuste de criterios de resistencia a
+El "Use Lab Data" del programa de referencia antiguo: ajuste de criterios de resistencia a
 pares de datos de laboratorio, con los tres métodos documentados en su
 manual (Levenberg-Marquardt, Simplex, regresión lineal) y "Residuals"
 (suma de cuadrados de distancias verticales).
 
-Compatibilidad criterio/datos (tabla del manual de RocData 2004):
+Compatibilidad criterio/datos (tabla del manual del programa de referencia antiguo, que no se cita: regla 9):
 
 | Datos | GHB intacto (σci, mi) | GHB macizo (mb, s, a) | Mohr-Coulomb | Barton-Bandis | Power Curve |
 |---|---|---|---|---|---|
@@ -26,7 +26,7 @@ Métodos por ajuste:
 1. Datos sintéticos sin ruido: recuperación exacta (lineal) o < 0,5 %
   (LM) de los parámetros en cada ajuste disponible.
 2. Residuals ≈ 0 para datos sin ruido.
-3. Validación: σ3 ≥ σ1 en datos triaxiales → error (como RocData).
+3. Validación: σ3 ≥ σ1 en datos triaxiales → error (como el programa de referencia antiguo).
 4. La GUI pega datos desde Excel, ajusta y aplica los parámetros al
    criterio activo de la ventana principal.
 5. Tests sin Qt del núcleo; humo offscreen del diálogo.
@@ -37,7 +37,7 @@ Métodos por ajuste:
   documenta la formulación exacta en espacio principal; se aplaza).
 - GHB macizo: aquí se ajustan mb/s/a con σci y D fijos (análisis de datos
   de macizo), no σci/mi.
-- **Mejora registrada** (tercera pasada por RSData): el "Define by" del
+- **Mejora registrada** (tercera pasada por el programa de referencia): el "Define by" del
   GHB admite modo directo **mb, s, a** además de "GSI, mi, D"; cuando el
   registro de OGR-Data lo soporte, el "Apply" de este diálogo podrá
   rellenar el GHB sin el mapeo al HB clásico (hoy anotado como caveat).

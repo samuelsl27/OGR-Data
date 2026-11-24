@@ -11,9 +11,9 @@ en todos los parámetros (`10.500000 kPa`), cuatro en σ3max
 resultado de la calibración; el ajuste en MPa con la ventana en kPa.
 
 **Decimales** (decisión de la propietaria, 2026-11-24): según el
-parámetro, entre 4 y 6, mirando RSData; **lo que se copia lleva todos
-los decimales**. Lo que muestra RSData 1.009 en sus capturas
-(`../../../../Referencias/Ejemplos/RSData_analisis/capturas/`): sin ceros
+parámetro, entre 4 y 6, mirando el programa de referencia; **lo que se copia lleva todos
+los decimales**. Lo que muestra el programa de referencia en sus capturas
+(capturas del análisis privado en `../../../../Referencias/Ejemplos/`): sin ceros
 de relleno y hasta 6 cifras significativas — `100000` (UCS), `100`
 (GSI), `10` (mi), `0` (D) en la 39; `0.000233284` (cohesión) y
 `40.5662` (fricción) en la 74.
@@ -23,7 +23,7 @@ de relleno y hasta 6 cifras significativas — `100000` (UCS), `100`
 - **RF-1**: EL SISTEMA escribirá σ₁, σ₃, σ3max, σci, σt, σc, σcm, φ, τ y
   ° en etiquetas, ejes, resultados, diálogos e informe, en los dos idiomas.
 - **RF-2**: EL SISTEMA mostrará cada parámetro de entrada sin ceros de
-  relleno y con como mucho 6 cifras significativas, como RSData.
+  relleno y con como mucho 6 cifras significativas, como el programa de referencia.
 - **RF-3**: EL SISTEMA mostrará cada resultado con los decimales de su
   parámetro, entre 4 y 6, según una tabla única del plan
   [NECESITA ACLARACIÓN: confirmar la tabla con la propietaria].
@@ -56,8 +56,8 @@ de relleno y hasta 6 cifras significativas — `100000` (UCS), `100`
 | Parámetro | Pantalla | Motivo |
 |---|---|---|
 | mb, s, a, mi, D, GSI, ν | 4–6 cifras significativas | Adimensionales; s puede ser 1e-4 |
-| Tensiones (σci, σt, σc, σcm, c) | 6 cifras significativas | Como RSData |
-| Ángulos (φ, φb, φr, ψ) | 4 decimales | RSData `40.5662` |
+| Tensiones (σci, σt, σc, σcm, c) | 6 cifras significativas | Como el programa de referencia |
+| Ángulos (φ, φb, φr, ψ) | 4 decimales | Como el programa de referencia (`40.5662`) |
 | Módulos (Ei, Erm, E) | 6 cifras significativas | — |
 
 ## UX

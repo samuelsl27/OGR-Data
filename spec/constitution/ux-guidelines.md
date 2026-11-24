@@ -8,7 +8,7 @@ ingeniería: formularios con muchos parámetros numéricos, gráficas que se
 actualizan al instante, diálogos de datos y usuarios técnicos.
 
 Las reglas U1–U17 mandan; las fuentes explican el porqué. Si una regla
-choca con la paridad con el viejo RocData/RSData, se discute en la spec y
+choca con la paridad con el programa de referencia (antiguo y actual), se discute en la spec y
 gana lo que diga la propietaria.
 
 ## Fuentes

@@ -2,7 +2,7 @@
 
 ## Qué se construye
 
-El modelo de proyecto real de RSData (hoy OGR-Data guarda un material
+El modelo de proyecto real del programa de referencia (hoy OGR-Data guarda un material
 por archivo, spec 007): un proyecto `.ogrdata` con **varios materiales**,
 árbol de visibilidad (Add Material con plantillas roca/suelo, Duplicate,
 borrar, renombrar, color/símbolo), selección que alimenta la barra

@@ -1,6 +1,6 @@
 """Series data export for spreadsheets (spec 016).
 
-Honest equivalent of the RocData / RSData "Export to Excel": a CSV with
+Honest equivalent of the "Export to Excel" of the reference program: a CSV with
 one column pair per series, ready to open in Excel, without requiring
 Excel installed. Series may have different lengths; shorter series are
 padded with empty cells.

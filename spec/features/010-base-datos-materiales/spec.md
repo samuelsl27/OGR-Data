@@ -1,8 +1,8 @@
-# Spec 010 — Base de datos de propiedades de materiales (equivalente RocProp)
+# Spec 010 — Base de datos de propiedades de materiales (equivalente a la base de datos de referencia)
 
 ## Qué se construye
 
-El equivalente OGR de **RocProp** (analizado: búsqueda por palabras
+El equivalente OGR de la **base de datos de referencia** (analizado: búsqueda por palabras
 clave con comodines; registro con Rock Name, Unit Weight, Fabric, Notes,
 Location (región/país/localidad/lat/long/profundidad), Reference (tipo,
 título, autor, editorial, año, páginas, volumen, ISBN, edición) y datos
@@ -11,9 +11,9 @@ testigo, confinamiento, ángulo a foliación, σc, E50, ν, Information
 Quality 1–10), Tensile, Hoek-Brown, Velocity; navegación por páginas;
 "Copy to Clipboard").
 
-## Decisión clave: datos propios, no los de RocProp
+## Decisión clave: datos propios, no los de la base de datos de referencia
 
-La base de RocProp es contenido propietario de Rocscience: **no se
+La base de datos de referencia es contenido propietario del fabricante del programa de referencia: **no se
 copiará ni rastreará**. OGR-Data construye su propia base de datos
 versionada en JSON a partir de bibliografía oficial (Hoek ch.11 ya
 extraída en spec 003; candidatos a ampliar: tablas de Practical Rock
@@ -21,7 +21,7 @@ Engineering, fuentes USGS/USBR/NRCS). Cada registro lleva cita de fuente.
 
 ## Alcance v1
 
-- Esquema de registro RocProp-compatible (mismo modelo de datos).
+- Esquema de registro compatible con la base de datos de referencia (mismo modelo de datos).
 - Semillas: las tablas de Hoek ya digitalizadas (sigci por grado R0–R6,
   mi por roca) convertidas en registros con referencia.
 - GUI: diálogo de búsqueda (comodines `*`, frases entre comillas), lista
@@ -38,6 +38,6 @@ Engineering, fuentes USGS/USBR/NRCS). Cada registro lleva cita de fuente.
 
 ## Fuera de alcance
 
-- Importación de la base de RocProp (propietaria).
+- Importación de la base de datos de referencia (propietaria).
 - Coordenadas geográficas en mapa (la lat/long del esquema se guarda,
   no se visualiza).

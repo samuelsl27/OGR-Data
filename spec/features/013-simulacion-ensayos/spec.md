@@ -2,13 +2,13 @@
 
 ## Qué se construye
 
-El módulo de **Tests** de RSData (captura `20_*`): definir ensayos
+El módulo de **Tests** del programa de referencia (captura `20_*`): definir ensayos
 simulados sobre el material (Test Type: Uniaxial / Triaxial / Biaxial /
 Simple Shear / General; Seepage: Drained / Undrained; Loading Direction:
 Compression / Tension; Maximum Strain; Number of Steps; ciclos) y
 **Compute** integra el modelo constitutivo paso a paso, produciendo las
 curvas de la pestaña **Stress Path Graphs** (q-p', σ1-ε, εv-ε, etc. según
-los tutoriales de RSData: NorSand/Fraser River Sand, Modified Cam Clay).
+los tutoriales del programa de referencia: NorSand/Fraser River Sand, Modified Cam Clay).
 
 ## Faseado propuesto
 
@@ -19,14 +19,13 @@ los tutoriales de RSData: NorSand/Fraser River Sand, Modified Cam Clay).
   Hardening/Drucker-Prager como simulación constitutiva real, con sus
   reglas de endurecimiento documentadas en los manuales oficiales ya
   descargados; noDrainage real con presión de poros).
-- **13c — Cíclicos y animación** (cargas cíclicas, pestaña Animation de
-  RSData).
+- **13c — Cíclicos y animación** (cargas cíclicas, pestaña Animation del programa de referencia).
 
 ## Criterios de aceptación (fase 13a)
 
 - Ensayo triaxial CD simulado sobre MC: curva q-ε1 con meseta en q_f
   calculado analíticamente (coincidencia 1 %).
-- Comparación documentada contra los tutoriales RSData cuando el modelo
+- Comparación documentada contra los tutoriales del programa de referencia cuando el modelo
   esté en 13b.
 
 ## Riesgos

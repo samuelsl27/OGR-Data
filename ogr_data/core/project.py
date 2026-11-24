@@ -1,7 +1,7 @@
 """OGR Data project files (.ogrdata): specs 007 and 011.
 
-Format v2 (spec 011) holds a list of materials, as the RSData project
-model: each material carries its criterion, parameters (registry units,
+Format v2 (spec 011) holds a list of materials, as the project model of
+the reference program: each material carries its criterion, parameters (registry units,
 kPa and degrees), envelope range, application settings (spec 009) and its
 display properties (color, symbol, visibility). Project-level keys are the
 title, the display stress unit (spec 017) and the graph options (spec 016).
@@ -32,14 +32,14 @@ Params = Mapping[str, Union[float, bool, str]]
 # the one the window shows at start).
 DEFAULT_CRITERION = next(iter(CRITERIA))
 
-# Add Rock Template / Add Soil Template (RSData's Add Material drop-down).
-# RSData documents the templates only as "Material Model + Failure State
+# Add Rock Template / Add Soil Template (Add Material drop-down of the
+# reference program). The reference program documents the templates only as "Material Model + Failure State
 # Set" (rock) and "Material Model + Test, Stress Path" (soil); the criterion
 # each one starts with is an OGR Data choice: the rock-mass criterion of
 # reference (Generalized Hoek-Brown) and the soil one (Mohr-Coulomb), with
-# the registry defaults captured from RSData. Spec 012: the rock template
+# the registry defaults captured from the reference program. Spec 012: the rock template
 # also brings an (empty) failure state and the soil one a stress path
-# (and, spec 013, a test simulation: RSData's default Test 1).
+# (and, spec 013, a test simulation: the reference program's default Test 1).
 TEMPLATES: dict[str, tuple[str, str]] = {
     "material": ("Material", DEFAULT_CRITERION),
     "rock": ("Rock", "generalized_hoek_brown"),

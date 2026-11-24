@@ -166,7 +166,7 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         self._update_legend()
 
     def zoom_extents(self) -> None:
-        """Scale back to the natural envelope limits (RocData)."""
+        """Scale back to the natural envelope limits (as in the earlier reference program)."""
 
         self.options.x_range = None
         self.options.y_range = None

@@ -1,10 +1,10 @@
-# Spec 002 — Los diez criterios de fallo de RSData
+# Spec 002 — Los diez criterios de fallo del programa de referencia
 
 ## Qué se construye
 
-Registro de los **diez criterios** observados en RSData con sus parámetros y
-valores por defecto exactos (del análisis en
-`../../../Referencias/Ejemplos/RSData_analisis/01_modelos_material.md`), y
+Registro de los **diez criterios** observados en el programa de referencia con sus parámetros y
+valores por defecto exactos (del documento `01_modelos_material.md` del análisis privado del programa de
+referencia en `../../../Referencias/Ejemplos/`), y
 cálculo de envolventes:
 
 | Criterio | Espacio de la envolvente |
@@ -25,26 +25,25 @@ dinámico de parámetros, gráficas que se adaptan al espacio del criterio.
 
 ## Decisiones documentadas
 
-- **Drucker-Prager**: superficie Fs = √J2 + (q_φ/3)·I1 − k_φ = 0 del manual
-  oficial RSData (descargado en `../../../Referencias/Bibliografia/Suelos/`).
+- **Drucker-Prager**: superficie Fs = √J2 + (q_φ/3)·I1 − k_φ = 0 (el manual del programa de referencia, que no se cita: regla 9; copia
+  privada en `../../../Referencias/Bibliografia/Suelos/`).
   En triaxial: q = √3·(k_φ − q_φ·p').
-- **Cam-Clay / MCC**: manuales oficiales RSData (línea de estado crítico,
-  superficies de fluencia F = q + Mp·ln(−p/pc), F = q² + M²p(p+pc)). La
+- **Cam-Clay / MCC**: línea de estado crítico y superficies de fluencia
+  F = q + Mp·ln(−p/pc), F = q² + M²p(p+pc) (el manual del programa de referencia, que no se cita: regla 9). La
   spec 002 dibuja solo la **CSL**; las superficies de fluencia completas
   requieren el estado de consolidación (pc) y quedan para una fase con
   simulación de ensayos.
 - **Softening-Hardening**: en fallo se reduce a Mohr-Coulomb; se usa
-  M = 6·sinφ/(3−sinφ) (compresión triaxial) según el manual oficial.
-- **Power Curve**: fórmula del manual de RocData 2004 (τ = a·(σ+d)^b). Los
-  campos c y Waviness del diálogo de RSData se conservan en el registro con
+  M = 6·sinφ/(3−sinφ) (compresión triaxial) según el manual del programa de referencia (que no se cita: regla 9).
+- **Power Curve**: fórmula τ = a·(σ+d)^b (el manual del programa de referencia, que no se cita: regla 9). Los
+  campos c y Waviness del diálogo del programa de referencia se conservan en el registro con
   valor por defecto 0 y sin efecto hasta verificar su semántica exacta.
-- **NorSand**: parámetros del diálogo de RSData; sin envolvente (Rocscience
+- **NorSand**: parámetros del diálogo del programa de referencia; sin envolvente (el fabricante del programa de referencia
   no publica manual teórico de NorSand en la página de manuales).
 
 ## Criterios de aceptación
 
-1. Los diez criterios existen con los valores por defecto capturados de
-   RSData (tests).
+1. Los diez criterios existen con los valores por defecto capturados del programa de referencia (tests).
 2. MC, DP, CC/MCC y SH dan envolventes lineales en espacio principal cuya
    construcción tangente reproduce la recta τ = c + σn·tanφ (MC) con
    exactitud de tolerancia.

@@ -8,4 +8,4 @@
 - GUI: botones Save / Load / Import .roc en la barra lateral; el import
   actúa como `apply_fit_parameters`: selecciona criterio, reconstruye el
   formulario y rellena.
-- Tests sobre los 11 ejemplos reales del manual de RocData.
+- Tests sobre los 11 ejemplos `.roc` reales que acompañan al programa de referencia antiguo.

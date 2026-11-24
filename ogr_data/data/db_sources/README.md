@@ -60,4 +60,4 @@ National Transportation Library, ROSA P, dot:36572).
   through the NGDC web application with licence acceptance; not automated.
 - DTIC AD0646610, USACE EM 1110-2-1906, FHWA NHI manuals: the servers
   refuse automated downloads (403); not forced.
-- RocProp (Rocscience): proprietary, never used.
+- The reference database: proprietary, never used.

@@ -1,6 +1,6 @@
 """Spec 014: calibration against failure states.
 
-Verification case from RSData 1.009 (RSData_analisis/07, section 4):
+Verification case from the reference program (private references, 07, section 4):
 triaxial (0; 40.3), (100; 409), (200; 778), (300; 1500) kPa.
 """
 
@@ -14,7 +14,7 @@ from ogr_data.core import calibration as cal
 from ogr_data.core import states as st
 from ogr_data.core.hoek_brown import HbInput, hoek_brown_constants
 
-RSDATA = [st.TestPoint(0, 40.3), st.TestPoint(100, 409), st.TestPoint(200, 778), st.TestPoint(300, 1500)]
+REFERENCE_POINTS = [st.TestPoint(0, 40.3), st.TestPoint(100, 409), st.TestPoint(200, 778), st.TestPoint(300, 1500)]
 
 
 def _settings(strength="mohr_coulomb", algorithm="levenberg_marquardt", **kw):
@@ -25,8 +25,8 @@ def _state_from(pairs_kpa, test_type="triaxial", name="S"):
     return st.FailureState(name=name, test_type=test_type, points=[st.TestPoint(x, y) for x, y in pairs_kpa])
 
 
-def test_rsdata_case_with_excluded_point() -> None:
-    state = st.FailureState(points=RSDATA[:3] + [st.TestPoint(300, 1500, True)])
+def test_reference_case_with_excluded_point() -> None:
+    state = st.FailureState(points=REFERENCE_POINTS[:3] + [st.TestPoint(300, 1500, True)])
     for algorithm in ("linear", "levenberg_marquardt", "simplex"):
         r = cal.calibrate([state], _settings(algorithm=algorithm))
         assert abs(r.parameters["peak_cohesion"] - 10.4788) < 1e-3, algorithm
@@ -35,15 +35,15 @@ def test_rsdata_case_with_excluded_point() -> None:
         assert r.parameters["residual_friction"] == r.parameters["peak_friction"]
 
 
-def test_rsdata_case_all_points_bounded() -> None:
-    state = st.FailureState(points=RSDATA)
+def test_reference_case_all_points_bounded() -> None:
+    state = st.FailureState(points=REFERENCE_POINTS)
     # unconstrained optimum has c = -6.97 kPa (non physical): bounded solution c = 0
     r = cal.calibrate([state], _settings())
     assert r.parameters["peak_cohesion"] < 1e-6
-    assert abs(r.fitted["friction_deg"] - 40.0902) < 1e-3  # RSData shows 40.5662 (not reproducible)
+    assert abs(r.fitted["friction_deg"] - 40.0902) < 1e-3  # the reference program shows 40.5662 (not reproducible)
     assert "bound" in r.method_note
-    # Linear Regression has no valid MC line here (negative intercept); RSData
-    # kept the starting model in that case
+    # Linear Regression has no valid MC line here (negative intercept); the
+    # reference program kept the starting model in that case
     try:
         cal.calibrate([state], _settings(algorithm="linear"))
     except ValueError as exc:
@@ -143,11 +143,11 @@ def test_calibration_dialog_creates_material() -> None:
         w._set_stress_unit("kPa")
         tests_menu = next(a.menu() for a in w.menuBar().actions() if a.text().replace("&", "") == "Tests")
         assert "Calibrate…" in [a.text().replace("&", "") for a in tests_menu.actions()]
-        w.set_failure_states([st.FailureState(points=RSDATA[:3] + [st.TestPoint(300, 1500, True)])])
+        w.set_failure_states([st.FailureState(points=REFERENCE_POINTS[:3] + [st.TestPoint(300, 1500, True)])])
         source_params = dict(w._current_material().parameters)
         dlg = CalibrationDialog(w, w._project, w._current, "kPa")
         try:
-            assert dlg.strength.currentData() == "generalized_hoek_brown"  # RSData default
+            assert dlg.strength.currentData() == "generalized_hoek_brown"  # default of the reference program
             assert dlg.name.text() == "Calibrated Material"
             assert dlg.states.count() == 1
             dlg.strength.setCurrentIndex(dlg.strength.findData("mohr_coulomb"))

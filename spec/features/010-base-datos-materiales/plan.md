@@ -1,11 +1,11 @@
-# Plan 010 — Base de datos de materiales (equivalente RocProp)
+# Plan 010 — Base de datos de materiales (equivalente a la base de datos de referencia)
 
-Modelo: RocProp (capturas 36 y 37): panel de búsqueda (palabras clave,
+Modelo: la base de datos de referencia (capturas 36 y 37): panel de búsqueda (palabras clave,
 `*`, "frases"), "Search Records for … Showing Results a - b of n" con 14
 resultados por página, vista de registro y botones Edit / Delete / Copy
 to Clipboard / Copy to New Record; menú Favorites; exportación a Excel.
 
-## Datos (150 registros internos, todos con fuente; nada de RocProp)
+## Datos (150 registros internos, todos con fuente; nada de la base de datos de referencia)
 
 1. **Tablas del programa** (49): 42 rocas de la Tabla 3 de Hoek (mi ±,
    con su MR de *Practical Rock Engineering 2023*, fig. 13) y los 7
@@ -16,7 +16,7 @@ to Clipboard / Copy to New Record; menú Favorites; exportación a Excel.
    E50, ν, Vp, porosidad (Tabla 1) y constantes de Hoek-Brown intactas y
    residuales con su rango de σ3 (Tabla 2); referencia al informe MRL
    original (Tabla 3). Es el origen de los registros canadienses que se
-   ven en RocProp, tomado de la publicación oficial.
+   ven en la base de datos de referencia, tomado de la publicación oficial.
 3. **MnDOT 2018** (24): Folta, Sharpe, Hu & Labuz, *Development of a Rock
    Strength Database*, Minnesota DOT MN/RC 2018-19 ("No restrictions"):
    21 sondeos del proyecto TH 53 (134 ensayos uniaxiales: medias + cada
@@ -41,7 +41,7 @@ informe) queda fuera de las medias y entra como excluida.
 
 ## Núcleo
 
-- `core/database.py`: esquema RocProp-compatible (+ densidad, porosidad,
+- `core/database.py`: esquema compatible con la base de datos de referencia (+ densidad, porosidad,
   constantes residuales, rango de confinamiento, nº de probetas,
   `specimens`); búsqueda AND con `*` y frases; paginación de 14;
   validación (fuente obligatoria); registros del usuario y **favoritos**

@@ -1,9 +1,9 @@
-"""Registry of the ten RSData strength criteria.
+"""Registry of the ten strength criteria of the reference program.
 
 Field values (defaults) were captured from the Define Material Models dialog
-of RSData on 2026-11-22; see the analysis in the suite references
-(RSData_analisis/01_modelos_material.md). Stress units are kPa and degrees,
-as shown in the RSData dialogs.
+of the reference program on 2026-11-22; see the analysis in the suite
+references (01_modelos_material.md). Stress units are kPa and degrees,
+as shown in the dialogs of the reference program.
 """
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ class Criterion:
     fields: tuple[Field, ...]
 
 
-# Cam-Clay / MCC combos of RSData (Modified Cam Clay tutorial, spec 013)
+# Cam-Clay / MCC combos of the reference program (Modified Cam Clay tutorial, spec 013)
 VOLUME_REFERENCES = ("Normal Compression Line (N)", "Critical State Line (Gamma)")
 CONSOLIDATION_STATES = ("OCR", "Preconsolidation Pressure (Po)")
 
@@ -120,7 +120,7 @@ CRITERIA: dict[str, Criterion] = {
             Field("mi", "mi", 10.0, pick="mi_values"),
             Field("d", "D", 0.0, pick="disturbance"),
             # spec 022: intact modulus and rock mass modulus method (ORMAS-like;
-            # RSData uses a hidden fixed Ei). Default Ei = ORMAS default.
+            # the reference program uses a hidden fixed Ei). Default Ei = ORMAS default.
             Field("ei", "Intact modulus Ei", 12000000.0, "kPa", pick="modulus_ratio"),
             Field("modulus_method", "Erm method", MODULUS_METHODS[0], kind="enum", options=MODULUS_METHODS),
             Field("set_residual_to_peak", "Set Residual to Peak", True, kind="bool"),
@@ -137,7 +137,7 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("critical_state_slope", "Critical State Slope", 1.3),
-            # spec 013: RSData combo (MCC tutorial): the value is N or Gamma
+            # spec 013: combo of the reference program (MCC tutorial): the value is N or Gamma
             Field("volume_reference", "Specific Volume Reference", VOLUME_REFERENCES[0], kind="enum", options=VOLUME_REFERENCES),
             Field("specific_volume_unit_pressure", "Specific Volume at Unit Pressure", 2.61),
             Field("kappa", "Kappa", 0.025),
@@ -154,7 +154,7 @@ CRITERIA: dict[str, Criterion] = {
         "principal",
         (
             Field("critical_state_slope", "Critical State Slope", 1.3),
-            # spec 013: RSData combo (MCC tutorial): the value is N or Gamma
+            # spec 013: combo of the reference program (MCC tutorial): the value is N or Gamma
             Field("volume_reference", "Specific Volume Reference", VOLUME_REFERENCES[0], kind="enum", options=VOLUME_REFERENCES),
             Field("specific_volume_unit_pressure", "Specific Volume at Unit Pressure", 2.61),
             Field("kappa", "Kappa", 0.025),
@@ -173,7 +173,7 @@ CRITERIA: dict[str, Criterion] = {
             Field("peak_tensile", "Peak Tensile Strength", 0.0, "kPa"),
             Field("peak_friction", "Peak Friction Angle", 35.0, "deg", pick="compacted_soil"),
             Field("peak_cohesion", "Peak Cohesion", 10.5, "kPa", pick="compacted_soil"),
-            # spec 013b: options named after the RS2 manual (§11; RSData combo values not captured)
+            # spec 013b: options named as in the reference program (combo values not captured)
             Field("cone_hardening_type", "Cone Hardening Type", "Hyperbolic", kind="enum", options=("Hyperbolic", "Tabular")),
             Field("hardening_property", "Hardening Property", 0.005),
             # Tabular cone hardening (manual §11.1): mobilized friction angle and
@@ -209,7 +209,7 @@ CRITERIA: dict[str, Criterion] = {
             Field("hy", "Hy - Change in Hardening Modulus", 0.0),
             Field("psi0", "Psi0 - Initial State Parameter", -0.025),
             Field("gamma", "Gamma - Altitude of CSL at 1 kPa", 1.2),
-            # RSData labels OCR "(kPa)" (tutorial capture); it is a ratio
+            # the reference program labels OCR "(kPa)" (tutorial capture); it is a ratio
             Field("initial_consolidation_condition", "Initial Consolidation Condition", "OCR", kind="enum", options=("OCR",), used=False),
             Field("ocr", "OCR", 1.0),
             Field("cap_softening", "Cap Softening", False, kind="bool", used=False),

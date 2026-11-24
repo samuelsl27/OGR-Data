@@ -1,6 +1,6 @@
 """Report generator (spec 015): self-contained HTML report of a project.
 
-Content model of the RSData 1.009 Report Generator (capture 41, analysis
+Content model of the Report Generator of the reference program (capture 41, analysis
 05_profundizacion.md): a document of sections whose visibility is chosen
 with check boxes — Cover Page, Table of Contents, Title, Project Summary,
 Project Settings, Samples, Defined Material Models, Defined Failure
@@ -43,7 +43,7 @@ from .numbers import format_number, symbols
 from .project import SYMBOLS, Material, Project
 from .states import FAILURE_TEST_TYPES, PATH_TEST_TYPES, FailureState, StressPath
 
-# (key, label) in document order. Labels as in RSData, plus Graph Views.
+# (key, label) in document order. Labels as in the reference program, plus Graph Views.
 SECTIONS: tuple[tuple[str, str], ...] = (
     ("cover", "Cover Page"),
     ("toc", "Table of Contents"),
@@ -253,8 +253,8 @@ def computed_rows(material: Material, unit: str, translate: Translate | None = N
 
     Generalized Hoek-Brown: mb, s, a, sigt, sigc, sigcm, equivalent MC and
     Erm. Hoek-Brown (a = 0.5): sigcm and equivalent MC (Hoek 2002).
-    Power Curve and Barton-Bandis: best-fit MC over the range (RocData
-    2004 p. 10). Other criteria have no derived results.
+    Power Curve and Barton-Bandis: best-fit MC over the range (as in the
+    earlier reference program). Other criteria have no derived results.
     """
 
     p = material.parameters

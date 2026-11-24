@@ -123,7 +123,7 @@ ES = {
     "Save project": "Guardar proyecto",
     "OGR Data project (*.ogrdata)": "Proyecto de OGR Data (*.ogrdata)",
     "Save failed": "Error al guardar",
-    "Import RocData file": "Importar archivo de RocData",
+    "Import .roc file": "Importar archivo .roc",
     "Import failed": "Error al importar",
     "Unsaved changes": "Cambios sin guardar",
     "The project has unsaved changes. Save them?": "El proyecto tiene cambios sin guardar. ¿Desea guardarlos?",

@@ -1,10 +1,10 @@
-"""Define Test Simulations dialog (spec 013), modelled on RSData's.
+"""Define Test Simulations dialog (spec 013), modelled on the reference program's.
 
-Fields as in RSData 1.009 (capture 20 and the NorSand / Modified Cam Clay
+Fields as in the reference program (capture 20 and the NorSand / Modified Cam Clay
 tutorials): Name, Symbol, Test Type, Seepage Condition, Loading Direction,
 Initial Effective Lateral Stress (display unit), Initial Effective K0,
 Maximum Strain, Number of Steps and Cyclic Loading Cycles. The General Test
-adds the strain direction (OGR design: RSData does not document its inputs).
+adds the strain direction (OGR design: the reference program does not document its inputs).
 """
 
 from __future__ import annotations
@@ -115,9 +115,9 @@ class TestSimulationsDialog(_ItemsDialog):
                 "vertical stress (lateral / K0) is kept constant when drained."
             ),
             "general": tr(
-                "General Test (OGR Data; RSData does not document its inputs): proportional strain path in the given "
-                "direction, Maximum Strain on its largest component. Undrained keeps the volume (normal components "
-                "made deviatoric); pore pressure = change of the mean effective stress."
+                "General Test (OGR Data; the reference program does not document its inputs): proportional strain path "
+                "in the given direction, Maximum Strain on its largest component. Undrained keeps the volume (normal "
+                "components made deviatoric); pore pressure = change of the mean effective stress."
             ),
         }
         self._note.setText(notes[test.test_type])

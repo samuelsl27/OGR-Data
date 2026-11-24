@@ -25,7 +25,7 @@ Suite entera: **245 tests, 0 fallos** (esta vez con código de salida 0).
 |---|---|---|
 | RF-1 | `test_eight_menus_none_with_one_entry` | verde |
 | RF-2 | `test_every_window_action_is_in_the_menu_bar` | verde |
-| RF-3 | `test_eight_menus_none_with_one_entry` (nombres de RSData en Tests y Report) | verde |
+| RF-3 | `test_eight_menus_none_with_one_entry` (nombres del programa de referencia en Tests y Report) | verde |
 | RF-4 | `test_shortcuts_and_accelerators_in_both_languages`, `test_accelerators_are_unique_per_menu`, `test_word_initials_come_first` | verde |
 | RF-5 | `test_save_writes_to_the_project_file_and_title_names_it` | verde |
 | RF-6 | `test_recent_projects` | verde |

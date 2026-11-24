@@ -1,10 +1,10 @@
 # Plan 012 — Estados de fallo y rutas de tensión
 
-Modelo: diálogos *Define Failure States* y *Define Stress Paths* de RSData
+Modelo: diálogos *Define Failure States* y *Define Stress Paths* del programa de referencia
 (capturas `31_*`, `32_*`): lista a la izquierda (añadir, borrar, duplicar,
 subir/bajar), editor a la derecha (nombre + color, ajustes del ensayo) y
 tablas con cortar/copiar/pegar/insertar/borrar filas/importar/exportar.
-Color por defecto de un estado o ruta nuevo en RSData: **#800000**
+Color por defecto de un estado o ruta nuevo en el programa de referencia: **#800000**
 (muestreado de ambas capturas).
 
 ## Núcleo (`core/states.py`, sin Qt)
@@ -15,13 +15,13 @@ Color por defecto de un estado o ruta nuevo en RSData: **#800000**
   Undrained), Loading Direction (triaxial: Lateral/Axial), Strain Type
   (uniaxial: Lateral/Volumetric), Initial Effective Lateral Stress
   (defecto 100 kPa) y K0 (defecto 1) y pasos `PathStep(EpsilonZZ,
-  tensión, deformación)` cuyas columnas siguen al diálogo de RSData
+  tensión, deformación)` cuyas columnas siguen al diálogo del programa de referencia
   (ver "Segunda iteración").
 - Viven **por material** (`Material.failure_states/stress_paths`), como
-  pide la spec; en RSData se definen globalmente y se "aplican" a
+  pide la spec; en el programa de referencia se definen globalmente y se "aplican" a
   materiales. Claves aditivas en el `.ogrdata` v2 (ficheros de la 011 sin
   ellas cargan con listas vacías). Duplicar un material los copia.
-- Plantillas (spec 011): *Rock* trae un estado vacío "State 1" (RSData:
+- Plantillas (spec 011): *Rock* trae un estado vacío "State 1" (el programa de referencia:
   "Material Model + Failure State Set"); *Soil* una ruta "Path 1"
   (Uniaxial, como la captura 32).
 - `parse_rows`: parser único de tablas pegadas de Excel o leídas de
@@ -29,14 +29,13 @@ Color por defecto de un estado o ruta nuevo en RSData: **#800000**
   salta cabeceras y notas; columna opcional Exclude). El diálogo de
   ajuste (spec 006) pasa a usarlo, como pide la spec.
   `write_rows_csv` / `read_rows_csv`: exportación/importación; los
-  CSV oficiales de ejemplo de RocData se leen tal cual.
+  CSV oficiales de ejemplo del programa de referencia antiguo se leen tal cual.
 
-## Dibujo (fuente: RocData 3.0 User's Guide, pp. 13 y 47-48)
+## Dibujo (como el programa de referencia antiguo; su manual no se cita: regla 9)
 
-"For triaxial test data, the lab or field data is plotted as points in
-principal stress space, and as Mohr circles in direct shear space. For
-direct shear data, test data is only plotted as points in direct shear
-space."
+Los datos triaxiales se dibujan como puntos en el espacio de tensiones
+principales y como círculos de Mohr en el de corte directo; los de corte
+directo, solo como puntos en el espacio de corte directo.
 
 - Triaxial: puntos (símbolo y color del estado) en σ1–σ3 y semicírculos
   de Mohr (centro (σ1+σ3)/2, radio (σ1−σ3)/2) en τ–σn.
@@ -61,7 +60,7 @@ space."
   visibilidad y color). Doble clic en un hijo abre su diálogo; menú
   contextual Editar/Borrar. En el material: *Define Failure States…* y
   *Define Stress Paths…*; menús de barra **Failure States** y **Stress
-  Paths** (como RSData).
+  Paths** (como el programa de referencia).
 - Diálogos (`gui/states_dialog.py`) sobre copias: OK aplica, Cancel
   descarta. Columnas de tensión en la unidad de visualización (17);
   pegar/importar leen en esa unidad; almacenamiento en kPa. Una celda no
@@ -71,25 +70,24 @@ space."
 
 ## Pendiente / fuera de esta spec (no inventar)
 
-- **Pestaña Stress Path Graphs** de RSData (Axial Stress–Axial Strain,
+- **Pestaña Stress Path Graphs** del programa de referencia (Axial Stress–Axial Strain,
   Volumetric Strain–Axial Strain, q–Deviatoric Strain, q–p): requiere
   las definiciones de deformación volumétrica y desviadora con fuente
   oficial, que no está en `Referencias/Bibliografia` (los manuales
-  teóricos de RSData descargados pierden las ecuaciones en texto y no
+  teóricos del programa de referencia descargados pierden las ecuaciones en texto y no
   las definen). Se aborda con la simulación (spec 013) o al incorporar
   la fuente. Las rutas no se dibujan en τ–σn por la misma razón (falta
   convención con fuente, p. ej. s–t).
-- Lista completa de Test Type del diálogo de estados de RSData: solo se
-  observó "Triaxial Test"; "Direct Shear Test" viene del Use Lab Data de
-  RocData. Strain Type: solo "Lateral" observado.
+- Lista completa de Test Type del diálogo de estados del programa de referencia: solo se
+  observó "Triaxial Test"; "Direct Shear Test" viene del Use Lab Data del programa de referencia antiguo. Strain Type: solo "Lateral" observado.
 - Defectos de Initial Effective Lateral Stress (0) y K0 (1,0): elección
-  OGR (los valores de RSData no se capturaron). K0 se guarda; no
+  OGR (los valores del programa de referencia no se capturaron). K0 se guarda; no
   interviene en el dibujo.
 
 ## Tests
 
 `tests/test_states.py`: parser (Excel, punto y coma con coma decimal,
-CSV, espacios, cabeceras), CSV oficial de RocData, round-trip CSV,
+CSV, espacios, cabeceras), CSV oficial del programa de referencia antiguo, round-trip CSV,
 geometría del círculo de Mohr, mapeo de rutas (uniaxial, triaxial,
 extensión, no dibujables), defectos y validación, plantillas y round-trip
 del proyecto con estados/rutas (y ficheros de la 011), y offscreen:
@@ -102,9 +100,9 @@ borrar desde el árbol, persistencia y reapertura.
 
 ## Segunda iteración (2026-11-23): fuentes encontradas y aplicadas
 
-Fuentes guardadas: ayuda online oficial de RSData
-(`Referencias/Ejemplos/RSData_analisis/ayuda_online/`, resumen en
-`06_ayuda_online.md`) y `Referencias/Bibliografia/Ensayos/` (índice en
+Fuentes guardadas: ayuda online oficial del programa de referencia
+(en el análisis privado del programa de referencia, `Referencias/Ejemplos/`;
+resumen en `06_ayuda_online.md`) y `Referencias/Bibliografia/Ensayos/` (índice en
 `00_INDICE.md`).
 
 - **Correcciones con la ayuda oficial**: la "Loading Direction" de las
@@ -115,10 +113,10 @@ Fuentes guardadas: ayuda online oficial de RSData
   (figura oficial); Triaxial/Axial → EpsilonZZ, SigmaZZ, EpsilonV
   (provisional). Los tipos de estado de fallo oficiales son Triaxial,
   Simple Shear y General; Direct Shear se mantiene como extensión
-  RocData (etiqueta "(RocData)"). Ficheros de la primera versión con
+  heredada del programa de referencia antiguo (con una etiqueta que lo indica). Ficheros de la primera versión con
   Compression/Extension cargan como Lateral.
-- **Pestaña Stress Path Graphs** (RSData: cuatro gráficas por defecto):
-  Axial Stress–Axial Strain, Volumetric Strain–Axial Strain (RSData
+- **Pestaña Stress Path Graphs** (el programa de referencia: cuatro gráficas por defecto):
+  Axial Stress–Axial Strain, Volumetric Strain–Axial Strain (el programa de referencia
   muestra Pore Water Pressure en no drenado; las tablas no traen presión
   de poro), q–Deviatoric Strain y q–p. Definiciones (Machaček 2023,
   "Triaxial test"): p' = (σa+2σr)/3, q = σa−σr, εv = εa+2εr,
@@ -131,14 +129,14 @@ Fuentes guardadas: ayuda online oficial de RSData
   Axial → varía SigmaZZ con σr = σ'h0; Lateral → varía SigmaXX con
   σa = σ'h0/K0 (K0 = σ'h/σ'v). Biaxial, Simple Shear y General no se
   dibujan. El diálogo lo indica.
-- Verificación en la interfaz: prompt para Claude Desktop en
-  `Data/Promps/2026_11_23_Prompt_Claude-Desktop_RSData-ORMAS.md`.
+- Verificación en la interfaz: prompt para Claude Desktop del 2026-11-23
+  (programa de referencia y ORMAS) en `Data/Promps/`.
 
 ## Tercera iteración (2026-11-23): sustituida en parte por la spec 021
 
-La verificación en la interfaz de RSData 1.009 (documento 07) corrigió
+La verificación en la interfaz del programa de referencia (documento 07) corrigió
 el modelo: sin pestañas Peak/Residual (una tabla por estado), tipos de
 estado Triaxial / Direct Shear / General, rutas sin "General", Loading
 Direction None/Axial/Lateral, columnas por combinación y semántica
 numérica. Implementado en la **spec 021**; ver allí las decisiones donde
-RSData se comporta de forma dudosa.
+El programa de referencia se comporta de forma dudosa.

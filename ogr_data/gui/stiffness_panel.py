@@ -1,6 +1,6 @@
 """Stiffness group of the sidebar (specs 013 and 013b).
 
-RSData shows a Stiffness tab per material model: Linear Isotropic (Poisson's
+The reference program shows a Stiffness tab per material model: Linear Isotropic (Poisson's
 Ratio, Young's Modulus) for most models, "CamClay Isotropic" (Elastic
 Parameter: Constant Poisson Ratio / Constant Shear Modulus) for Cam-Clay and
 Modified Cam-Clay, and the NorSand stiffness (Shear modulus at reference,

@@ -110,7 +110,7 @@ def test_simulation_run(ws, name: str, project_id: str | None = None, material: 
             "deviatoric_strain": _pick(r.eps_q, idx),
             "pore_pressure_kpa": _pick(r.pore_pressure, idx),
         },
-        "sign_convention": "compression positive (RSData)",
+        "sign_convention": "compression positive (as the reference program)",
     }
     if shear:
         out["curves"]["shear_strain"] = _pick(r.shear_strain, idx)

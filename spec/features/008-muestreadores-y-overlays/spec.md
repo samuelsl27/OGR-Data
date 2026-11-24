@@ -2,9 +2,8 @@
 
 ## Qué se construye
 
-Las herramientas de análisis gráfico del menú Analysis de RSData y del
-viejo RocData (manual 2004, secciones "Stress Sampler" e "Instantaneous
-Mohr-Coulomb Sampler"):
+Las herramientas de análisis gráfico del menú Analysis del programa de referencia y del programa de referencia antiguo (herramientas "Stress Sampler" e
+"Instantaneous Mohr-Coulomb Sampler"):
 
 1. **Stress Sampler**: clic (o arrastre) sobre cualquiera de las dos
    gráficas; muestra las coordenadas (σ3 o σn en el eje X) y los valores
@@ -27,5 +26,5 @@ Mohr-Coulomb Sampler"):
 
 ## Referencias
 
-- Manual RocData 2004 (pp. 33-34), capturas `05_profundizacion.md`.
+- El manual del programa de referencia antiguo (no se cita: regla 9) y las capturas de `05_profundizacion.md`.
 - ORMAS no tiene muestreadores (diferencial a favor de OGR-Data).

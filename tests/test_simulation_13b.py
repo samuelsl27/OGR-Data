@@ -1,8 +1,8 @@
 """Spec 013b: Drucker-Prager, Cam-Clay / MCC, Softening-Hardening, simple shear.
 
 Checks against closed forms, an independent fine-step integration of the
-MCC rate equations, and the RS2/RSData theory manuals' worked examples
-(Referencias/Bibliografia/Suelos/RSData_Theory_*.pdf).
+MCC rate equations, and the worked examples of the theory manuals of the
+reference program (Referencias/Bibliografia/Suelos).
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ DP = dict(defaults("drucker_prager"), peak_q=0.5, peak_k=3.0, residual_q=0.5, re
 
 
 def test_drucker_prager_manual_example_and_flow() -> None:
-    # RS2 manual Fig. 4.2: drained triaxial from p = 100 kPa, q_phi = 0.5, k = 3 kPa -> q_f ~ 129 kPa
+    # worked example of the reference program: drained triaxial from p = 100 kPa, q_phi = 0.5, k = 3 kPa -> q_f ~ 129 kPa
     r = _run("drucker_prager", DP, test_type="triaxial", max_strain=0.04)
     q_f = 53.0 / (1.0 / math.sqrt(3.0) - 0.5 / 3.0)  # q/sqrt(3) = k + q_phi (100 + q/3)
     assert abs(q_f - 129.0531) < 1e-3 and abs(r.q[-1] - q_f) < 1e-6
@@ -101,11 +101,11 @@ def test_mcc_normally_consolidated_against_reference_and_manual() -> None:
         q_m, q_r = np.interp(ea, r.axial_strain, r.q), np.interp(ea, ref[:, 0], ref[:, 2])
         ev_m, ev_r = np.interp(ea, r.axial_strain, r.eps_v), np.interp(ea, ref[:, 0], ref[:, 1])
         assert abs(q_m / q_r - 1.0) < 0.005 and abs(ev_m / ev_r - 1.0) < 0.005, (ea, q_m, q_r, ev_m, ev_r)
-    # RSData's default 100 steps: within 1 % of the reference at the end of the test
+    # the reference program's default 100 steps: within 1 % of the reference at the end of the test
     r100 = _run("modified_cam_clay", _mcc(), NU, test_type="triaxial", confining=200.0, max_strain=0.2)
     assert abs(r100.q[-1] / np.interp(0.2, ref[:, 0], ref[:, 2]) - 1.0) < 0.01
     # documented comparison with the manual (Fig. 8.5, read from the plot): q ~ 385-390 kPa and
-    # e_v ~ 0.051 (analytic) / 0.055 (RS2) at e_a = 0.2; OGR: q = 374.6 kPa (3 % lower), e_v = 0.062
+    # e_v ~ 0.051 (analytic) / 0.055 (reference program) at e_a = 0.2; OGR: q = 374.6 kPa (3 % lower), e_v = 0.062
     assert abs(r.q[-1] - 387.0) / 387.0 < 0.05 and 0.05 < r.eps_v[-1] < 0.065
     # hardening and compaction towards the critical state q = M p (drained: p = 200 + q/3 -> q_cs = 400)
     assert np.all(np.diff(r.q) > 0.0) and np.all(np.diff(r.eps_v) > 0.0) and r.q[-1] < 400.0

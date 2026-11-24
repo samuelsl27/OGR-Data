@@ -1,4 +1,4 @@
-"""Material Database dialog (spec 010), modelled on RocProp (captures 36-37).
+"""Material Database dialog (spec 010), modelled on the reference database (captures 36-37).
 
 Search panel (key words, * wildcards, "exact phrases") · paged results
 ("Showing Results a - b of n") · record view · New / Copy to New / Edit /

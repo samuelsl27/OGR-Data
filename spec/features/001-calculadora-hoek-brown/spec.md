@@ -9,12 +9,12 @@ los parámetros derivados de la masa de roca (sigt, sigc, sigcm); los
 definido por el usuario (Custom o General = σci/4); y el **módulo de
 deformación** Erm con los métodos de Hoek-Diederichs 2006 (generalizado y
 simplificado) y Hoek-Carranza-Torres-Corkum 2002. Interfaz Qt con barra
-lateral de entrada interactiva (estilo viejo RocData) y dos gráficas
+lateral de entrada interactiva (al estilo del programa de referencia antiguo) y dos gráficas
 matplotlib: σ1–σ3 y τ–σn.
 
 ## Por qué
 
-Es la funcionalidad central (equivale a ORMAS y al corazón de RocData) y la
+Es la funcionalidad central (equivale a ORMAS y al corazón del programa de referencia antiguo) y la
 base sobre la que se montan los demás criterios, los pick dialogs y el
 portapapeles.
 
@@ -43,5 +43,5 @@ portapapeles.
 - `../../Referencias/Ejemplos/ORMAS_analisis/00_resumen.md` (valores de
   validación).
 - `../../Referencias/Bibliografia/Rocas/Hoek_CarranzaTorres_Corkum_2002_Hoek-Brown_2002_edition.pdf`
-- `../../Referencias/Ejemplos/RSData_analisis/01_modelos_material.md`
-  (parámetros GHB de RSData: pestaña Strength, Define by GSI/mi…).
+- `01_modelos_material.md`, en el análisis privado del programa de referencia en `../../Referencias/Ejemplos/`
+  (parámetros GHB del programa de referencia: pestaña Strength, Define by GSI/mi…).

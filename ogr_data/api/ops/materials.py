@@ -204,7 +204,7 @@ def material_paste(ws, text: str, project_id: str | None = None) -> dict:
 
 @operation("material_import_roc", toolset="material", mutates=True)
 def material_import_roc(ws, path: str, project_id: str | None = None) -> dict:
-    """Import a RocData file (.roc) as a new material of the project."""
+    """Import a .roc file as a new material of the project."""
 
     p = ws.get(project_id).project
     f = ws.resolve(path)

@@ -36,12 +36,13 @@ ES: dict[str, str] = {
     "Initial Effective Lateral Stress:": "Tensión efectiva lateral inicial:",
     "Initial Effective K0:": "K0 efectivo inicial:",
     "Strain Type:": "Tipo de deformación:",
-    "Uniaxial: the radial stress is zero (RSData 1.009 plots p and q with a hidden 100 kPa).": (
-        "Compresión simple: la tensión radial es nula (RSData 1.009 dibuja p y q con 100 kPa ocultos)."
+    "Uniaxial: the radial stress is zero (the reference program plots p and q with a hidden 100 kPa).": (
+        "Compresión simple: la tensión radial es nula (el programa de referencia dibuja p y q con 100 kPa "
+        "ocultos)."
     ),
-    "Loading Direction Lateral: RSData 1.009 overwrites SigmaXX with the initial lateral stress and "
+    "Loading Direction Lateral: the reference program overwrites SigmaXX with the initial lateral stress and "
     "plots no axial stress; the path is kept but not drawn (spec 021).": (
-        "Dirección de carga lateral: RSData 1.009 sobrescribe SigmaXX con la tensión lateral inicial y no "
+        "Dirección de carga lateral: el programa de referencia sobrescribe SigmaXX con la tensión lateral inicial y no "
         "dibuja tensión axial; la trayectoria se conserva pero no se dibuja (spec 021)."
     ),
     "Kept but not drawn: the stress invariants of this configuration are not verified (spec 021).": (
@@ -65,10 +66,10 @@ ES: dict[str, str] = {
         "Corte simple: deformación tangencial impuesta (deformación máxima = gamma), sin deformaciones "
         "laterales; la tensión vertical inicial (lateral / K0) se mantiene constante en condiciones drenadas."
     ),
-    "General Test (OGR Data; RSData does not document its inputs): proportional strain path in the given "
-    "direction, Maximum Strain on its largest component. Undrained keeps the volume (normal components "
+    "General Test (OGR Data; the reference program does not document its inputs): proportional strain path "
+    "in the given direction, Maximum Strain on its largest component. Undrained keeps the volume (normal components "
     "made deviatoric); pore pressure = change of the mean effective stress.": (
-        "Ensayo general (OGR Data; RSData no documenta sus datos de entrada): trayectoria de deformación "
+        "Ensayo general (OGR Data; el programa de referencia no documenta sus datos de entrada): trayectoria de deformación "
         "proporcional en la dirección indicada, con la deformación máxima en su mayor componente. En "
         "condiciones no drenadas se conserva el volumen (componentes normales convertidas en desviadoras); "
         "presión intersticial = variación de la tensión efectiva media."

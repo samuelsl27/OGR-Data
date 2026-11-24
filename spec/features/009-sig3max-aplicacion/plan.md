@@ -13,7 +13,7 @@ la profundidad (túnel) o altura (talud) en m; γ·H queda en MPa. Marinos &
 Hoek 2000 §2.2 confirma el rango 0 < σ3 < σv con σv = profundidad × peso
 unitario (se cumple: túnel 0,664 < 1,3 = σv).
 
-## Validación contra ORMAS V2.0 (casos de `RSData_analisis/05_profundizacion.md`)
+## Validación contra ORMAS V2.0 (casos del documento `05_profundizacion.md` del análisis privado del programa de referencia)
 
 Material ORMAS por defecto: sigci=30 MPa, GSI=50, mi=10, D=0 → σcm=5,2300 MPa.
 

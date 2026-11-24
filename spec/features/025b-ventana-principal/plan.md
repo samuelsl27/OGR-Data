@@ -16,7 +16,7 @@ Sin código. Cada apartado dice qué RF cubre.
 | Selector de unidad: un `QComboBox` en la barra y otro en *Project Settings*, los dos llaman a `_set_stress_unit` | Uno solo: el diálogo no podría cambiarla | RF-6, RF-7 |
 | *Project Settings* (`gui/project_settings_dialog.py`): título y unidad; al aceptar, la ventana aplica el título con un paso de deshacer y la unidad como hoy | Mantener `_title_edit` como campo oculto: estado fantasma | RF-6 |
 | `_title_edit` desaparece; el título vive en `self._project.title` y se cambia con `set_project_title(texto)` (punto de deshacer) | Dejar el `QLineEdit` fuera de la vista: dos fuentes de verdad | RF-6 |
-| Barra lateral: `QGroupBox` por sección («Material», «Stress range», «Parameters», «Stiffness»); el nombre del material con etiqueta en un `QFormLayout` | Pestañas como RSData: esconden el rango de tensiones mientras se editan parámetros | RF-5 |
+| Barra lateral: `QGroupBox` por sección («Material», «Stress range», «Parameters», «Stiffness»); el nombre del material con etiqueta en un `QFormLayout` | Pestañas como el programa de referencia: esconden el rango de tensiones mientras se editan parámetros | RF-5 |
 | Clasificador y ajuste quedan como botones en la sección «Material» (herramientas de estimación del material) y además en el menú (025c los ordenará) | Quitarlos de la barra lateral ahora: 025c aún no ha dado su sitio en los menús | RF-5 |
 | Estado del panel y de la barra: `saveState()` en `QSettings` (clave `window_state`) al cerrar y `restoreState()` al abrir; el cambio de idioma lo pasa en `adopt()` | Guardar solo «visible sí/no»: se pierde flotante/ancho | RF-4 |
 | Los tests usan un `QSettings` aislado: el runner fija `QSettings.setPath` a una carpeta temporal y la ventana crea sus ajustes con el formato por defecto (`QSettings.defaultFormat()` + `IniFormat` en tests) | Seguir escribiendo en el registro del usuario: los tests ya le cambian tema y unidad (anomalía, ver abajo), y esta spec añadiría el estado de la ventana | RF-4 |
@@ -40,7 +40,7 @@ Ninguno: `.ogrdata` ya guarda `title` y `stress_unit`. Clave nueva de
 ## Validación numérica
 
 No hay fórmulas nuevas. RF-9 usa `overlay_mc`, ya validado (spec 008,
-Hoek 2002 / RocData 2004); el test compara el valor del panel con la
+Hoek 2002); el test compara el valor del panel con la
 llamada directa al núcleo.
 
 ## Estrategia de tests (`tests/test_ux_025b.py`, offscreen)

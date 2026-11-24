@@ -1,13 +1,13 @@
-"""Material properties database (spec 010), the OGR equivalent of RocProp.
+"""Material properties database (spec 010), the OGR equivalent of the reference database.
 
-Same record model as Rocscience's RocProp (captures 36-37 of the RSData
-analysis): rock name and prefix, unit weight, fabric, notes; location
+Same record model as the reference database (captures 36-37 of the
+analysis of the reference program): rock name and prefix, unit weight, fabric, notes; location
 (region, country, town/city/state, latitude, longitude, depth); reference
 (type, title, author, publisher, year, pages, volume, ISBN, edition); and
 test data blocks Compression, Tensile, Hoek-Brown and Velocity, each with
 an Information Quality (1-10).
 
-The RocProp data are proprietary and are NOT used. OGR's built-in records
+The data of the reference database are proprietary and are NOT used. OGR's built-in records
 come from the sourced tables of the program (Hoek's mi table, the MR table
 of Practical Rock Engineering 2023, the field estimates of UCS) and from
 open official test data: CANMET 1995 "Geotechnical Properties of Rock"
@@ -16,7 +16,7 @@ of a Rock Strength Database" (Minnesota DOT, individual specimens); see
 core/db_sources.py. User records live in a separate JSON file. Every record needs a
 reference: a record without source is not saved.
 
-Search (as RocProp): key words must all match (AND), case-insensitive;
+Search (as the reference database): key words must all match (AND), case-insensitive;
 a plain word matches whole words, "*" matches any characters inside a
 word (gran* -> granite, granodiorite), "double quotes" match an exact
 phrase.
@@ -33,7 +33,7 @@ from typing import Any, Iterable
 from . import tables
 
 FORMAT = "ogr-data-materials-db/1"
-PAGE_SIZE = 14  # RocProp shows 14 results per page
+PAGE_SIZE = 14  # the reference database shows 14 results per page
 
 TEST_BLOCKS = ("compression", "tensile", "hoek_brown", "velocity")
 TEST_LABELS = {"compression": "Compression", "tensile": "Tensile", "hoek_brown": "Hoek-Brown", "velocity": "Velocity"}
@@ -143,7 +143,7 @@ def available_tests(record: dict) -> list[str]:
 
 
 def title(record: dict) -> str:
-    """RocProp-style headline: "Granite, Canada, Blue Beach North, Newfoundland"."""
+    """Headline in the style of the reference database: "Granite, Canada, Blue Beach North, Newfoundland"."""
 
     loc = record.get("location", {})
     parts = [record.get("rock_name_prefix", "") + " " + record.get("rock_name", "")]
@@ -253,7 +253,7 @@ class MaterialDatabase:
         self._write()
 
     def toggle_favourite(self, record_id: int) -> bool:
-        """Add or remove a favourite (RocProp Favorites); returns the new state."""
+        """Add or remove a favourite (Favorites of the reference database); returns the new state."""
 
         if record_id in self.favourites:
             self.favourites.discard(record_id)
@@ -307,7 +307,7 @@ def _dig(record: dict, dotted: str):
 
 
 def export_csv(path: str | Path, records: Iterable[dict]) -> int:
-    """Search results as CSV for Excel (RocProp "Export to Excel")."""
+    """Search results as CSV for Excel ("Export to Excel" of the reference database)."""
 
     import csv
 
@@ -339,7 +339,7 @@ def to_material_parameters(record: dict) -> dict:
 
 
 def clipboard_text(record: dict) -> str:
-    """Tab-separated listing of a record (RocProp "Copy to Clipboard")."""
+    """Tab-separated listing of a record ("Copy to Clipboard" of the reference database)."""
 
     lines = [f"Record ID\t{record.get('record_id')}", f"Rock Name\t{record.get('rock_name', '')}"]
     for key, label in RECORD_FIELDS[1:]:
@@ -387,7 +387,7 @@ def builtin_records() -> list[dict]:
             hb["modulus_ratio"] = f'{ratio["mr_lo"]:g}' + ("" if ratio["mr_hi"] is None else f'-{ratio["mr_hi"]:g}')
             where += "; MR: Practical Rock Engineering (2023) Figure 13"
         record["tests"]["hoek_brown"] = hb
-        record["reference"].update({"type": "Book section", "title": ref_title, "author": "E. Hoek", "publisher": "Rocscience", "location_in_source": where})
+        record["reference"].update({"type": "Book section", "title": ref_title, "author": "E. Hoek", "location_in_source": where})
         out.append(record)
     grades = tables.rock_strength_grades()
     for g in grades["grades"]:
@@ -403,7 +403,7 @@ def builtin_records() -> list[dict]:
         }
         record["reference"].update({
             "type": "Book section", "title": "Practical Rock Engineering, chapter 11: Rock mass properties",
-            "author": "E. Hoek", "publisher": "Rocscience",
+            "author": "E. Hoek",
             "location_in_source": "Table 2: field estimates of uniaxial compressive strength (grades after Brown 1981)",
         })
         out.append(record)

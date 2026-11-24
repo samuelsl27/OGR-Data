@@ -4,7 +4,7 @@
 
 - `ogr_data/core/models.py`: `Field` (key, label, default, unit, kind),
   `Criterion` (key, label, category rock/soil, fields, envelope space) y el
-  registro `CRITERIA` con los diez criterios y sus por defecto de RSData.
+  registro `CRITERIA` con los diez criterios y sus por defecto del programa de referencia.
 - `ogr_data/core/criteria_envelopes.py`: envolventes genéricas a partir del
   registro. Criterio con espacio "principal": función σ1(σ3) (MPa);
   derivada por diferencias centradas para la construcción tangente
@@ -17,7 +17,7 @@
 
 ## Conversión de unidades
 
-Los campos se guardan en **kPa** (como en los diálogos de RSData); el núcleo
+Los campos se guardan en **kPa** (como en los diálogos del programa de referencia); el núcleo
 trabaja en **MPa** (convención de la spec 001). Conversión en la frontera de
 la capa de envolventes.
 

@@ -1,7 +1,7 @@
 """Specs 012 and 021: failure states and stress paths.
 
-Reference numbers come from the verification of RSData 1.009
-(Referencias/Ejemplos/RSData_analisis/07_estados_y_rutas_verificado.md).
+Reference numbers come from the verification of the reference program
+(private references, 07_estados_y_rutas_verificado.md).
 """
 
 from __future__ import annotations
@@ -14,8 +14,9 @@ import numpy as np
 
 from ogr_data.core import project
 from ogr_data.core import states as st
+from tests._references import roc_examples
 
-EXAMPLES = Path("C:/Desarrollo/OGR_Suite/Data/Referencias/Doc_Guia/Doc_Roc_Data3_0/Examples")
+EXAMPLES = roc_examples()  # found by search (spec 027)
 EA = [0.0, 0.01, 0.02]
 
 
@@ -55,12 +56,12 @@ def test_mohr_circle_geometry() -> None:
 
 
 def test_failure_state_types_and_columns() -> None:
-    # RSData 1.009 Test Type combo (capture 70) and columns
+    # Test Type combo of the reference program (capture 70) and columns
     assert list(st.FAILURE_TEST_TYPES.values()) == ["Triaxial Test", "Direct Shear Test", "General Test"]
     assert st.FailureState().columns == ("Sigma3", "Sigma1")
     assert st.FailureState(test_type="direct_shear").columns == ("SigmaN", "Tau")
     assert st.FailureState(test_type="general").columns == ("StressXX", "StressYY", "StressZZ", "TauXY", "TauYZ", "TauXZ")
-    assert st.FailureState(test_type="simple_shear").test_type == "triaxial"  # not an RSData state type
+    assert st.FailureState(test_type="simple_shear").test_type == "triaxial"  # not a state type of the reference program
 
 
 def test_exclude_and_principal_points() -> None:
@@ -78,8 +79,8 @@ def test_exclude_and_principal_points() -> None:
     assert np.allclose(sig3, [70.0, 50.0]) and np.allclose(sig1, [200.0, 300.0])
 
 
-def test_exclude_reproduces_rsdata_calibration() -> None:
-    # RSData: MC calibration (Levenberg-Marquardt, vertical, absolute) with the
+def test_exclude_reproduces_the_reference_calibration() -> None:
+    # reference program: MC calibration (Levenberg-Marquardt, vertical, absolute) with the
     # outlier (300; 1500) excluded gives c = 10.4788 kPa, phi = 34.9894 deg.
     from ogr_data.core import fitting
 
@@ -101,7 +102,7 @@ def test_legacy_residual_points_become_a_state() -> None:
 # ----------------------------------------------------------- stress paths
 
 
-def test_path_columns_match_rsdata() -> None:
+def test_path_columns_match_the_reference() -> None:
     def cols(**kw):
         return st.StressPath(**kw).columns()
 
@@ -123,7 +124,7 @@ def test_path_columns_match_rsdata() -> None:
 def test_defaults_and_legacy_values() -> None:
     path = st.StressPath()
     assert (path.loading, path.strain_type, path.lateral_stress, path.k0) == ("Lateral", "Lateral", 100.0, 1.0)
-    assert st.StressPath(strain_type="Volumatric").strain_type == "Volumetric"  # RSData spelling
+    assert st.StressPath(strain_type="Volumatric").strain_type == "Volumetric"  # spelling of the reference program
     assert st.StressPath.from_dict({"loading": "Compression"}).loading == "Lateral"
     assert st.StressPath.from_dict({"test_type": "general"}).test_type == "uniaxial"
     assert st.StressPath(test_type="bogus", seepage="x").seepage == "Drained"
@@ -134,7 +135,7 @@ def _tx(sigma_zz, lateral=100.0, k0=1.0, last=(0.0, 0.0, 0.0), seepage="Drained"
     return st.StressPath(test_type="triaxial", loading="Axial", seepage=seepage, lateral_stress=lateral, k0=k0, steps=steps)
 
 
-def test_triaxial_axial_matches_rsdata_numbers() -> None:
+def test_triaxial_axial_matches_the_reference_numbers() -> None:
     inv = _tx([100, 200, 300]).invariants()  # TX_Axial_K1
     assert np.allclose(inv.sigma_a, [100, 200, 300])
     assert np.allclose(inv.p, [100, 400 / 3, 500 / 3]) and np.allclose(inv.q, [0, 100, 200])
@@ -153,7 +154,7 @@ def test_triaxial_axial_matches_rsdata_numbers() -> None:
 def test_uniaxial_strains_and_shear_points() -> None:
     vol = st.StressPath(test_type="uniaxial", strain_type="Volumetric", steps=[[a, s, v] for a, s, v in zip(EA, [0, 100, 200], [0, 0.004, 0.008])])
     inv = vol.invariants()
-    assert np.allclose(inv.eps_q, [0, 0.01 - 0.004 / 3, 0.02 - 0.008 / 3])  # RSData: 0.00867, 0.01733
+    assert np.allclose(inv.eps_q, [0, 0.01 - 0.004 / 3, 0.02 - 0.008 / 3])  # reference program: 0.00867, 0.01733
     assert np.allclose(inv.sigma_r, 0)  # OGR: uniaxial radial stress is zero
     lat = st.StressPath(test_type="uniaxial", steps=[[0.03, 600.0, -0.01]])
     inv = lat.invariants()

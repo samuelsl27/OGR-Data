@@ -3,7 +3,7 @@
 Data kinds: "triaxial" (sigma3, sigma1) and "direct" (normal, shear), MPa.
 Methods: "linear" (closed form, where documented), "levenberg_marquardt"
 and "simplex". Residuals are the sum of squared vertical distances, as in
-the RocData manual.
+the earlier reference program.
 """
 
 from __future__ import annotations
@@ -173,8 +173,8 @@ def fit_hb_intact_triaxial(sig3, sig1, method: str = LINEAR) -> FitResult:
 def fit_ghb_mass_triaxial(sig3, sig1, sigci: float, disturbance: float, method: str = LEVENBERG_MARQUARDT) -> FitResult:
     """Fit mb, s, a of the generalized Hoek-Brown criterion to rock mass data.
 
-    sigci (MPa) and D are fixed inputs, as in the RocData 'Use Rock Mass
-    Data' analysis.
+    sigci (MPa) and D are fixed inputs, as in the 'Use Rock Mass Data'
+    analysis of the earlier reference program.
     """
 
     sig3, sig1 = _validate(sig3, sig1, 3)

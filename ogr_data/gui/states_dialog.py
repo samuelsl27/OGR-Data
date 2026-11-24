@@ -1,6 +1,6 @@
 """Define Failure States / Define Stress Paths dialogs (spec 012).
 
-Modelled on RSData's dialogs (captures 31_* and 32_*): list of objects on
+Modelled on the dialogs of the reference program (captures 31_* and 32_*): list of objects on
 the left (add, delete, duplicate, move up/down), editor on the right
 (name and color, test settings) and point tables with cut / copy / paste
 / insert row / delete rows / import / export. The dialogs edit copies;
@@ -46,7 +46,7 @@ from .number_spin import NumberSpinBox
 
 
 def _header_text(name: str) -> str:
-    """A column name on screen: RSData's symbol-like names stay, words are translated.
+    """A column name on screen: the reference program's symbol-like names stay, words are translated.
 
     The English name is kept for the CSV files (they do not change with the language).
     """
@@ -472,7 +472,7 @@ class _ItemsDialog(QDialog):
 
 
 class FailureStatesDialog(_ItemsDialog):
-    """One point table per state, columns per Test Type (RSData 1.009)."""
+    """One point table per state, columns per Test Type (as the reference program)."""
 
     noun = "State"
 
@@ -532,7 +532,7 @@ class FailureStatesDialog(_ItemsDialog):
 
 
 class StressPathsDialog(_ItemsDialog):
-    """Fields and columns per configuration, as verified in RSData 1.009."""
+    """Fields and columns per configuration, as verified in the reference program."""
 
     noun = "Path"
 
@@ -594,7 +594,7 @@ class StressPathsDialog(_ItemsDialog):
     def _config_changed(self) -> None:
         config = self._config()
         test_type = config.test_type
-        # RSData 1.009: seepage and loading direction for triaxial/biaxial;
+        # reference program: seepage and loading direction for triaxial/biaxial;
         # sigma'h0 and K0 also for simple shear; strain type for uniaxial.
         triaxial_like = test_type in ("triaxial", "biaxial")
         visible = {
@@ -607,7 +607,7 @@ class StressPathsDialog(_ItemsDialog):
         for widget, shown in visible.items():
             widget.setEnabled(shown)
             self._form.setRowVisible(widget, shown)
-        # stress columns in the display unit (RSData shows no units here)
+        # stress columns in the display unit (the reference program shows no units here)
         headers = [
             f"{name} ({self._unit})" if is_stress else name
             for name, is_stress in zip(config.columns(), config.stress_columns())
@@ -617,10 +617,12 @@ class StressPathsDialog(_ItemsDialog):
         if config.drawable:
             note = ""
             if test_type == "uniaxial":
-                note = tr("Uniaxial: the radial stress is zero (RSData 1.009 plots p and q with a hidden 100 kPa).")
+                note = tr(
+                    "Uniaxial: the radial stress is zero (the reference program plots p and q with a hidden 100 kPa)."
+                )
         elif triaxial_like and config.loading == "Lateral":
             note = tr(
-                "Loading Direction Lateral: RSData 1.009 overwrites SigmaXX with the initial lateral stress and "
+                "Loading Direction Lateral: the reference program overwrites SigmaXX with the initial lateral stress and "
                 "plots no axial stress; the path is kept but not drawn (spec 021)."
             )
         else:

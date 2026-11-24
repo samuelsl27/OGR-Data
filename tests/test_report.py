@@ -145,7 +145,7 @@ def test_two_material_report_is_valid_and_self_contained() -> None:
     for text in ("Granite", "Clayey sand", "Generalized Hoek Brown", "Mohr Coulomb", "Triaxial UCS", "Path 1",
                  "Global strength σcm", "120 MPa", "Metric, stress as MPa", "2026-11-23 10:30", "sigma1 = 50 MPa"):
         assert text in document, text
-    # excluded point listed as such; sections in RSData order (the soil template brings a test, spec 013)
+    # excluded point listed as such; sections in the order of the reference program (the soil template brings a test, spec 013)
     assert re.search(r"<td class=\"num\">10</td><td class=\"num\">210</td><td class=\"num\">Yes</td>", document)
     assert report.included_sections(proj, views) == [
         "project_summary", "project_settings", "views", "samples", "material_models", "failure_states",

@@ -2,7 +2,7 @@
 
 ## Qué se construye
 
-Completar los diálogos "Pick" que el viejo RocData tenía y OGR-Data aún
+Completar los diálogos "Pick" que el programa de referencia antiguo tenía y OGR-Data aún
 no, **solo con fuentes oficiales verificables** (regla de la casa: no
 inventar datos):
 

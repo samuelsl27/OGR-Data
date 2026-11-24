@@ -1,4 +1,4 @@
-"""Spec 010: material properties database (RocProp equivalent, own data)."""
+"""Spec 010: material properties database (equivalent of the reference database, own data)."""
 
 from __future__ import annotations
 

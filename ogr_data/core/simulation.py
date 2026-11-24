@@ -1,6 +1,6 @@
 """Test simulations (spec 013, phases 13a and 13b).
 
-RSData's Tests module (Define Test Simulations, capture 20): a simulated
+The Tests module of the reference program (Define Test Simulations, capture 20): a simulated
 laboratory test on a material — Test Type, Seepage Condition (Drained /
 Undrained), Loading Direction (Compression / Tension), Maximum Strain,
 Number of Steps and Cyclic Loading Cycles — integrated step by step with
@@ -11,11 +11,11 @@ as engineering components in the order (a, x, y, a-x, x-y, a-y), where a
 is the axial (vertical) direction. Internally stresses and strains are
 3x3 tensors (tensorial shear strains).
 
-Constitutive models (RSData / RS2 theory manuals in Referencias/
-Bibliografia: Mohr-Coulomb, Hoek-Brown and GHB, Drucker-Prager, Cam-Clay
+Constitutive models (as in the theory manuals of the reference program, in
+Referencias/Bibliografia: Mohr-Coulomb, Hoek-Brown and GHB, Drucker-Prager, Cam-Clay
 and Modified Cam-Clay, Softening-Hardening):
 
-- Linear isotropic elasticity from the Stiffness tab (RSData: Poisson's
+- Linear isotropic elasticity from the Stiffness tab (reference program: Poisson's
   Ratio 0.3, Young's Modulus 20000 kPa) for all models except Cam-Clay
   and Modified Cam-Clay, whose bulk modulus is K = v p / kappa (manual
   eq. 8.7) with the Poisson's ratio of the Stiffness tab.
@@ -26,14 +26,14 @@ and Modified Cam-Clay, Softening-Hardening):
   * Mohr-Coulomb / Hoek-Brown / GHB as the six faces f_ij = s_i - S(s_j)
     of the pyramid (edges and apex exact); potentials with the dilation
     angle (MC), the dilation parameter as mb of the potential (HB) or no
-    plastic volume change (GHB has no dilation field in RSData).
+    plastic volume change (GHB has no dilation field in the reference program).
   * Drucker-Prager (manual eqs. 4.1-4.2): sqrt(J2) = k + q_phi p with the
     potential sqrt(J2) - q_psi p (q_psi = Dilation Parameter).
   * Tension cut-off s_min >= -T, associated (manual eqs. 4.3, 6.x, 11.11)
     for MC, DP and Softening-Hardening with their Tensile Strength field.
-    A tensile strength of 0 is read literally: no tension (RS2 meaning).
+    A tensile strength of 0 is read literally: no tension (as in the reference program).
   * Peak/residual (Set Residual to Peak off): elastic-brittle-plastic, the
-    first plastic step drops to the residual surface (RS2 convention).
+    first plastic step drops to the residual surface (as in the reference program).
 - Softening-Hardening, deviatoric mechanism (manual §11.1): Mohr-Coulomb
   surface with mobilized friction tan(phi) = tan(phi_f) e_q^p / (e_q^p + A)
   (eq. 11.4, Cone Hardening "Hyperbolic"), mobilized cohesion keeping the
@@ -53,7 +53,7 @@ and Modified Cam-Clay, Softening-Hardening):
   exact integration of K = v p / kappa over the step; radial in the
   deviatoric plane (the surfaces do not depend on Lode's angle).
 - NorSand: see NorSandModel (FLAC3D formulation with Nova's coupling,
-  checked against RSData's Fraser River sand tutorial).
+  checked against the Fraser River sand tutorial of the reference program).
 
 Tests (mixed control; one imposed strain component per step):
 - Uniaxial: lateral stresses zero.
@@ -65,10 +65,10 @@ Tests (mixed control; one imposed strain component per step):
 - Simple Shear: imposed shear strain gamma_ax, no lateral strains, vertical
   effective stress = initial vertical (drained) or no vertical strain and
   u = s_c - s'_a (undrained); isotropic start.
-- General (OGR design, RSData does not document its inputs): proportional
+- General (OGR design, the reference program does not document its inputs): proportional
   strain path in a given direction; undrained keeps the volume.
 - Initial state: Initial Effective Lateral Stress and Initial Effective K0
-  (RSData test dialog): axial (vertical) = lateral / K0.
+  (test dialog of the reference program): axial (vertical) = lateral / K0.
 
 Loading Direction Tension imposes negative strains (extension / reverse
 shear). Cyclic loading (basic): 0 -> max -> 0 per cycle, Number of Steps
@@ -85,7 +85,7 @@ import numpy as np
 
 from .hoek_brown import HbInput, hoek_brown_constants
 
-# Define Test Simulations, Test Type combo of RSData (capture 20; help).
+# Define Test Simulations, Test Type combo of the reference program (capture 20; help).
 TEST_TYPES: dict[str, str] = {
     "uniaxial": "Uniaxial Test",
     "triaxial": "Triaxial Test",
@@ -94,7 +94,7 @@ TEST_TYPES: dict[str, str] = {
     "general": "General Test",
 }
 SIMULATED_TYPES = ("uniaxial", "triaxial", "biaxial", "simple_shear", "general")
-# General Test (OGR design, RSData does not document its inputs): proportional
+# General Test (OGR design, the reference program does not document its inputs): proportional
 # strain path with these components, Maximum Strain on the largest one.
 STRAIN_COMPONENTS = ("EpsilonZZ", "EpsilonXX", "EpsilonYY", "GammaZX", "GammaXY", "GammaZY")
 SEEPAGE = ("Drained", "Undrained")
@@ -110,14 +110,14 @@ SIMULATED_CRITERIA = (
     "softening_hardening",
 )
 
-DEFAULT_COLOR = "#800000"  # RSData default color of a new object
+DEFAULT_COLOR = "#800000"  # default color of a new object in the reference program
 
-# RSData Stiffness tab (capture 12; tutorials): Linear Isotropic for most
+# Stiffness tab of the reference program (capture 12; tutorials): Linear Isotropic for most
 # models, "CamClay Isotropic" (Elastic Parameter: Constant Poisson Ratio /
 # Constant Shear Modulus) for Cam-Clay and MCC, and the NorSand stiffness
 # (Shear modulus at reference, Reference pressure, Modulus exponent,
 # Poisson's ratio, Minimum Shear Modulus). Stresses in kPa. NorSand defaults:
-# G_ref and p_ref of the RSData Fraser River sand tutorial are 40000 / 395 kPa;
+# G_ref and p_ref of the Fraser River sand tutorial of the reference program are 40000 / 395 kPa;
 # OGR uses G_ref = 40000 kPa at p_ref = 100 kPa, m = 0.5 and nu = 0.2 (FLAC3D
 # default), G_min = 1 kPa (tutorial).
 STIFFNESS_TYPES = ("Linear Isotropic",)
@@ -171,7 +171,7 @@ class TestSimulation:
     steps: int = 100
     cyclic: bool = False
     cycles: int = 1
-    # RSData "Initial Effective Lateral Stress (kPa)" and "Initial Effective K0"
+    # reference program: "Initial Effective Lateral Stress (kPa)" and "Initial Effective K0"
     # (tutorials: NorSand Fraser River sand, Modified Cam Clay); the initial
     # axial (vertical) effective stress is lateral / K0. Key kept as "confining".
     confining: float = 100.0
@@ -419,7 +419,7 @@ class PairFace:
 
 
 class TensionCutoff:
-    """sigma_i >= -T (compression positive), associated (RS2 manuals)."""
+    """sigma_i >= -T (compression positive), associated (as in the reference program)."""
 
     deviatoric = False
 
@@ -680,7 +680,7 @@ class PerfectBrittleModel:
 
 
 class VerticalCap:
-    """Vertical cap p <= pc (RS2 manual eq. 11.8), associated."""
+    """Vertical cap p <= pc (as in the reference program), associated."""
 
     deviatoric = False
 
@@ -700,7 +700,7 @@ class VerticalCap:
 
 
 class EllipticalCap:
-    """Elliptical cap (RS2 manual eq. 11.9), associated, compression positive:
+    """Elliptical cap (as in the reference program), associated, compression positive:
     (q / M_f)^2 + (p + c / tan phi_f) (p - pc) <= 0 for p above the top of the
     ellipse, which touches the ultimate cone q = M_f (p + c / tan phi_f); left
     of the top the cap continues as q <= its maximum (never active before the
@@ -752,7 +752,7 @@ def _table(rows, columns: int, name: str) -> list:
 
 
 class SofteningHardeningModel:
-    """RS2 Softening-Hardening model (manual §11): cone, cap and tension cut-off.
+    """Softening-Hardening model of the reference program (manual §11): cone, cap and tension cut-off.
 
     Cone (§11.1): Mohr-Coulomb surface with the mobilized friction angle and
     cohesion as functions of the deviatoric plastic strain of the cone,
@@ -897,7 +897,7 @@ class SofteningHardeningModel:
 
 
 class CamClayModel:
-    """Cam-Clay / Modified Cam-Clay (RS2 manual §8), drained or undrained strain driven."""
+    """Cam-Clay / Modified Cam-Clay (as in the reference program), drained or undrained strain driven."""
 
     def __init__(self, params: Mapping, stiffness: Mapping, modified: bool) -> None:
         st = stiffness_from(stiffness)
@@ -906,13 +906,13 @@ class CamClayModel:
         self.kap = float(params["kappa"])
         self.modified = modified
         value = float(params["specific_volume_unit_pressure"])
-        # RSData combo "Specific Volume at Unit Pressure": the value is N (virgin
+        # combo of the reference program "Specific Volume at Unit Pressure": the value is N (virgin
         # line) or Gamma (CSL); manual eqs. 8.3-8.4 relate them.
         if str(params.get("volume_reference", "")).startswith("Critical State Line"):
             value += (self.lam - self.kap) * (math.log(2.0) if modified else 1.0)
         self.N = value
         self.ocr = float(params["ocr"])
-        # RSData "Initial State of Consolidation": OCR or Preconsolidation Pressure (Po)
+        # reference program: "Initial State of Consolidation": OCR or Preconsolidation Pressure (Po)
         self.po = float(params.get("preconsolidation_stress", 0.0))
         self.use_po = str(params.get("initial_consolidation", "OCR")).startswith("Preconsolidation")
         self.nu = float(st["poisson"])
@@ -958,7 +958,7 @@ class CamClayModel:
             pc_on = p0 + q0 * q0 / (self.M**2 * p0)
         else:
             pc_on = p0 * math.exp(q0 / (self.M * p0))
-        # Po below the current state: readjusted to it (RS2 manual §8.5)
+        # Po below the current state: readjusted to it (as in the reference program)
         pc = max(self.po, pc_on) if self.use_po else self.ocr * pc_on
         v0 = self.N - self.lam * math.log(pc) + self.kap * math.log(pc / p0)
         if v0 <= 1.0:
@@ -1033,9 +1033,10 @@ def _invariants(S: np.ndarray) -> tuple[float, np.ndarray, float, float]:
 class NorSandModel:
     """NorSand (Jefferies 1993; Jefferies and Shuttle 2002, 2005).
 
-    No public theory manual of the RSData implementation exists; the model
-    is assembled from published sources and checked against RSData's NorSand
-    tutorial (Fraser River sand, undrained triaxial, which RSData compares
+    No public theory manual of the reference program's implementation exists;
+    the model is assembled from published sources and checked against the
+    NorSand tutorial of the reference program (Fraser River sand, undrained
+    triaxial, which the reference program compares
     with Jefferies' NorSand spreadsheet):
     - Elasticity, CSL, state parameters, M_i, chi_i, Lode function g(theta)
       and the hardening rule as published for FLAC3D 9.2 (Itasca, NorSand
@@ -1056,7 +1057,7 @@ class NorSandModel:
       puts the initial stress on the yield surface.
     Integration: explicit substeps of at most 1e-4 strain, consistency with the
     full dF/dp_i (M_i depends on p_i through psi_i) and drift correction of p_i.
-    "Cap Softening" (RSData check box) is stored but not modelled: its
+    "Cap Softening" (check box of the reference program) is stored but not modelled: its
     formulation is not published (FLAC3D calls its softening term
     "still in debate" and not supported).
     """
@@ -1466,7 +1467,7 @@ def simulate(criterion: str, params: Mapping, stiffness: Mapping | None, test: T
     """Integrate a test simulation; raises SimulationError when not possible."""
 
     if not test.simulated:
-        raise SimulationError(f"{TEST_TYPES[test.test_type]}: RSData's inputs for it are not documented; not simulated")
+        raise SimulationError(f"{TEST_TYPES[test.test_type]}: the reference program does not document its inputs; not simulated")
     test.validate()
     model = build_model(criterion, params, stiffness)
     ctl = _controls(test)

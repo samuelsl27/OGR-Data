@@ -1,9 +1,10 @@
-"""Spec 013, completion: NorSand, RSData test fields (K0), Cam-Clay options,
+"""Spec 013, completion: NorSand, test fields of the reference program (K0), Cam-Clay options,
 Softening-Hardening caps and tables, General Test and the Animation tab.
 
-References: RSData NorSand (Fraser River sand) and Modified Cam Clay
-tutorials (rocscience.com, results read from their figures); FLAC3D 9.2
-NorSand documentation; RS2 Softening-Hardening theory manual.
+References: NorSand (Fraser River sand) and Modified Cam Clay tutorials of
+the reference program (results read from their figures); FLAC3D 9.2
+NorSand documentation; Softening-Hardening theory manual of the reference
+program.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ import numpy as np
 from ogr_data.core import simulation as sm
 from ogr_data.core.models import CRITERIA, defaults
 
-# RSData NorSand tutorial, Fraser River sand (material and test dialogs)
+# NorSand tutorial of the reference program, Fraser River sand (material and test dialogs)
 FRS = dict(defaults("norsand"), m_tc=1.47, h0=75.0, chi_tc=3.2, n=0.5, hy=400.0, psi0=-0.025, gamma=1.2, ocr=1.1, **{"lambda": 0.06})
 FRS_STIFF = {"g_ref": 40000.0, "p_ref": 395.0, "g_exp": 0.47, "ns_poisson": 0.15, "g_min": 1.0}
 
@@ -28,7 +29,7 @@ def _run(criterion, params, stiffness=None, **test):
 
 
 def test_norsand_fraser_river_tutorial() -> None:
-    """Undrained triaxial at 395 kPa (tutorial "UTC"; RSData vs Jefferies' spreadsheet).
+    """Undrained triaxial at 395 kPa (tutorial "UTC"; reference program vs Jefferies' spreadsheet).
 
     Read from the tutorial figure: phase transformation (minimum p') at
     p' ~ 280 kPa, q ~ 380 kPa; pore pressure peak ~ 250 kPa near e_a = 0.02;
@@ -60,7 +61,7 @@ def test_norsand_drained_dense_loose_and_lode() -> None:
     assert np.all(np.isfinite(ln.q)) and ln.peak_q > 0.0
 
 
-# ----------------------------------------------------- RSData test fields
+# ------------------------------------- test fields of the reference program
 
 
 def test_initial_effective_k0_and_general_test() -> None:
@@ -83,7 +84,7 @@ def test_initial_effective_k0_and_general_test() -> None:
 # ------------------------------------------------------- Cam-Clay options
 
 
-def test_cam_clay_rsdata_options_and_tutorial() -> None:
+def test_cam_clay_reference_options_and_tutorial() -> None:
     base = dict(defaults("modified_cam_clay"), critical_state_slope=1.2, specific_volume_unit_pressure=1.788, kappa=0.0077, **{"lambda": 0.066})
     # Modified Cam Clay tutorial, HOC (Po = 500 kPa, p0 = 100 kPa, 50 steps):
     # "rise up to near 300 kPa first, and then smoothly decline to around 200 kPa"
@@ -171,7 +172,7 @@ def test_window_stiffness_tables_and_animation() -> None:
         w._set_stress_unit("kPa")
         w._add_material("soil")
         panel = w._stiffness_box
-        # stiffness rows follow the model (RSData Stiffness tab)
+        # stiffness rows follow the model (Stiffness tab of the reference program)
         w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("norsand"))
         assert panel.title() == "Stiffness (NorSand)" and panel.form.isRowVisible(panel.spins["g_ref"])
         assert not panel.form.isRowVisible(panel._young_row)

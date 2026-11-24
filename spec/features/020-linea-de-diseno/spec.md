@@ -12,8 +12,8 @@ OGR-Slip2D), que hoy no se parece:
    12 px, groupbox con título `#40607a`/`#9ab6d6`.
 2. **Barra de menús** (la ventana no tenía): File (Save/Load/Import
    .roc/Exit), Edit (Copy material/Copy data), View (Theme: light/dark),
-   Help (About). Los botones laterales se mantienen (espíritu viejo
-   RocData) pero el programa gana la estructura de la suite.
+   Help (About). Los botones laterales se mantienen (espíritu del
+   programa de referencia antiguo) pero el programa gana la estructura de la suite.
 3. **Tema persistente** (QSettings) y conmutación en caliente: la hoja
    Qt y los canvas matplotlib se actualizan juntos.
 4. **Canvas matplotlib a juego**: fondo de figura según tema, ejes y

@@ -1,4 +1,4 @@
-"""Generic envelopes for the ten RSData criteria (spec 002).
+"""Generic envelopes for the ten criteria of the reference program (spec 002).
 
 Conventions: the registry stores kPa and degrees; this module works in MPa
 and degrees, and returns MPa arrays. Criteria with envelope space
@@ -63,8 +63,8 @@ def principal_curve(key: str, params: Params, sig3max_mpa: float, points: int = 
         return sig3, major_principal_stress(inp, mb, s, a, sig3)
 
     if key == "drucker_prager":
-        # Fs = sqrt(J2) + q_phi I1/3 - k = 0 with I1 tension positive (RS2
-        # manual eq. 4.1), i.e. q = sqrt(3) (k + q_phi p) with p compression
+        # Fs = sqrt(J2) + q_phi I1/3 - k = 0 with I1 tension positive (as in
+        # the reference program), i.e. q = sqrt(3) (k + q_phi p) with p compression
         # positive (manual Fig. 4.2: q_phi = 0.5, k = 3 kPa, p0 = 100 kPa ->
         # q_f = 129 kPa). Spec 013b fix: spec 002 had the q_phi sign reversed.
         t = math.sqrt(3.0) * _f(params, "peak_q")
@@ -83,13 +83,13 @@ def principal_curve(key: str, params: Params, sig3max_mpa: float, points: int = 
 
     if key == "softening_hardening":
         # Failure surface is Mohr-Coulomb; M for triaxial compression
-        # (RSData theory manual, Pietruszczak 2010): M = 6 sin(phi)/(3 - sin(phi))
+        # (Pietruszczak 2010): M = 6 sin(phi)/(3 - sin(phi))
         phi = math.radians(_f(params, "peak_friction"))
         m = 6.0 * math.sin(phi) / (3.0 - math.sin(phi))
         c = _f(params, "peak_cohesion") * KPA_TO_MPA
         slope = (1.0 + 2.0 * m / 3.0) / (1.0 - m / 3.0)
         # q = M (p + c/tan(phi)) in compression-positive convention
-        # (the RSData manual writes q + M(p - c/tan(phi)) = 0 with
+        # (the reference program writes q + M(p - c/tan(phi)) = 0 with
         # compression negative).
         intercept = (m * c / math.tan(phi)) / (1.0 - m / 3.0)
         return sig3, intercept + slope * sig3
@@ -121,7 +121,7 @@ def shear_curve(key: str, params: Params, sig3max_mpa: float, points: int = 200)
 
     if key == "barton_bandis":
         # tau = sigma_n tan(phi_r + JRC log10(JCS / sigma_n)), 0 < sigma_n <= JCS
-        # (angles in degrees; Barton-Bandis 1982 as used by RocData)
+        # (angles in degrees; Barton-Bandis 1982 as used by the earlier reference program)
         phi_r = _f(params, "phi_r")
         jrc = _f(params, "jrc")
         jcs = _f(params, "jcs") * KPA_TO_MPA

@@ -1,4 +1,4 @@
-"""Material Database (spec 010, RocProp style): search, read a record, use it."""
+"""Material Database (spec 010, in the style of the reference database): search, read a record, use it."""
 
 from __future__ import annotations
 

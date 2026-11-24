@@ -217,9 +217,9 @@ def build_server(ws) -> MCPServer:
         return run("material_paste", text=text, project_id=project_id)
 
     @tool("material_import_roc", _EDIT)
-    def material_import_roc(path: Annotated[str, Field(description="Path of a RocData .roc file.")],
+    def material_import_roc(path: Annotated[str, Field(description="Path of a .roc file.")],
                             project_id: ProjectId = None) -> dict[str, Any]:
-        """Import a RocData file as a new material."""
+        """Import a .roc file as a new material."""
         return run("material_import_roc", path=path, project_id=project_id)
 
     # ------------------------------------------------------------ test data and fitting

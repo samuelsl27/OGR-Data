@@ -1,24 +1,25 @@
 """Calibration of a strength model against failure states (spec 014).
 
-The RSData Calibration dialog (capture 33; options verified in RSData
-1.009, Referencias/Ejemplos/RSData_analisis/07_estados_y_rutas_verificado.md
+The Calibration dialog of the reference program (capture 33; options
+verified in the private references, 07_estados_y_rutas_verificado.md
 section 4) on top of the fitting of spec 006:
 
 - several failure states at once (their non-excluded points), triaxial
   and general states as (sigma3, sigma1), direct shear as (sigma_n, tau);
 - Strength type: Mohr Coulomb, Generalized Hoek Brown, Power Curve,
   Barton Bandis; Failure Data Type: Lab Data or Rock Mass Data (GHB only,
-  sigci and D fixed, as RocData's "Use Rock Mass Data");
+  sigci and D fixed, as the earlier reference program's "Use Rock Mass Data");
 - Algorithm: Linear Regression (closed forms of spec 006: MC and intact
-  HB), Levenberg-Marquardt, Simplex (Nelder-Mead, RocData); Error
-  Summation: Vertical (residuals in sigma1 or tau, as the RocData manual);
+  HB), Levenberg-Marquardt, Simplex (Nelder-Mead, as in the earlier
+  reference program); Error Summation: Vertical (residuals in sigma1 or
+  tau, as in the earlier reference program);
   Error Type: Absolute or Relative (residual / observed value);
 - the result is a NEW material; the source material is not changed.
 
 Physical bounds (c >= 0, 0 < phi < 90, positive strengths, 1 <= GSI <= 100,
 0 <= JRC <= 20): when an unbounded Levenberg-Marquardt solution violates
 them, the fit is redone with a bounded trust-region solver and the result
-says so. RSData behaves similarly (it returned c ~ 0 where the unbounded
+says so. The reference program behaves similarly (it returned c ~ 0 where the unbounded
 fit gives c < 0) but its exact value (phi = 40.5662 deg in the verification
 case) is not reproducible; the bounded optimum here is phi = 40.09 deg.
 """
@@ -217,7 +218,7 @@ def _hoek_brown_mass(x, y, s: CalibrationSettings) -> CalibrationResult:
     """Rock mass data: GSI and mi with sigci and D fixed (GHB 2002 model)."""
 
     if s.algorithm == fitting.LINEAR:
-        raise ValueError("Linear Regression is not available for rock mass data (RocData)")
+        raise ValueError("Linear Regression is not available for rock mass data (as in the earlier reference program)")
     sigci = s.sigci_kpa / 1000.0
     if sigci <= 0:
         raise ValueError("sigci must be positive")
@@ -235,7 +236,7 @@ def _hoek_brown_mass(x, y, s: CalibrationSettings) -> CalibrationResult:
 
 def _power_curve(x, y, s: CalibrationSettings) -> CalibrationResult:
     if s.algorithm == fitting.LINEAR:
-        raise ValueError("Linear Regression is only available for Mohr-Coulomb and intact Hoek-Brown (RocData)")
+        raise ValueError("Linear Regression is only available for Mohr-Coulomb and intact Hoek-Brown (as in the earlier reference program)")
     model = lambda xx, p: p[0] * np.maximum(xx + p[2], 0.0) ** p[1]
     p, residual, note = _solve(model, [0.8, 0.8, 0.01], ([1e-9, 1e-6, 0.0], [np.inf, 10.0, np.inf]), x, y, s.algorithm, s.error_type == "Relative")
     a, b, d = (float(v) for v in p)
@@ -246,7 +247,7 @@ def _power_curve(x, y, s: CalibrationSettings) -> CalibrationResult:
 
 def _barton_bandis(x, y, s: CalibrationSettings) -> CalibrationResult:
     if s.algorithm == fitting.LINEAR:
-        raise ValueError("Linear Regression is only available for Mohr-Coulomb and intact Hoek-Brown (RocData)")
+        raise ValueError("Linear Regression is only available for Mohr-Coulomb and intact Hoek-Brown (as in the earlier reference program)")
     if np.any(x <= 0):
         raise ValueError("Barton-Bandis requires positive normal stress")
     phi_b = math.radians(s.phi_b_deg)

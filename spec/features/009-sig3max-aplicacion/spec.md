@@ -6,9 +6,8 @@ El selector **Application: Custom | Tunnel | Slope** del Failure Range
 (spec 002 lo dejó pendiente a propósito). Con túnel o talud se piden
 **peso unitario (MN/m3)** y **profundidad/altura (m)** y el σ3max se
 estima solo, como ORMAS (verificado: túnel γ=0,026·H=50 → σ3max=0,6642
-MPa con refit c=0,3669 φ=49,98°; talud → c=0,4608 φ=46,50°) y como
-RocData ("RocData estimates maximum σ3 values for tunneling and slope
-design applications based on the principles outlined in Ref. 1").
+MPa con refit c=0,3669 φ=49,98°; talud → c=0,4608 φ=46,50°) y como el programa de referencia antiguo, que estima el σ3max de túneles y
+taludes con los principios de la Ref. 1.
 
 ## Trabajo de especificación incluido
 
@@ -19,9 +18,9 @@ contra los dos casos ORMAS** anotados arriba antes de implementar.
 Si la fórmula del paper no reproduce ORMAS, la spec documentará ambas
 variantes y se preguntará al propietario cuál adoptar (no inventar).
 
-**Opciones confirmadas en RSData** (tercera pasada, captura `40_*`):
+**Opciones confirmadas en el programa de referencia** (tercera pasada, captura `40_*`):
 Application = **Custom | General | Tunnels | Slopes** ("General" = σci/4
-del viejo RocData; Custom pide σ3max manual; Tunnels/Slopes piden peso
+del programa de referencia antiguo; Custom pide σ3max manual; Tunnels/Slopes piden peso
 unitario y profundidad/altura).
 
 ## Criterios de aceptación

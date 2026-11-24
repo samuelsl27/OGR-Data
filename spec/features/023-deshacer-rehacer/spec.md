@@ -90,8 +90,8 @@ y «Exit» descartan el trabajo en silencio.
   por JSON), `ogr_api/ops/history.py`, y `ogr_core/project/commands.py`
   (patrón Command). OGR-Data no depende de ogr-core: se adapta el patrón,
   no se importa.
-- RSData 1.009 tiene Edit > Undo · Redo y un grupo Undo/Redo en la barra
-  de herramientas (`Referencias/Ejemplos/RSData_analisis/
-  03_interfaz_y_menus.md`); `05_profundizacion.md` lo dejó sin spec
-  («Edit: Undo/Redo | — | —»). Qué acciones deshace RSData no está
+- El programa de referencia tiene Edit > Undo · Redo y un grupo Undo/Redo en la barra
+  de herramientas (`03_interfaz_y_menus.md` del análisis privado del programa de referencia en
+  `Referencias/Ejemplos/`); `05_profundizacion.md` lo dejó sin spec
+  («Edit: Undo/Redo | — | —»). Qué acciones deshace el programa de referencia no está
   documentado: comprobarlo con el programa al hacer el plan.

@@ -14,7 +14,7 @@
 
 ## 13b
 
-- [x] Leer los manuales RS2/RSData (DP, CC/MCC, SH, MC, HB) desde las páginas renderizadas
+- [x] Leer los manuales del programa de elementos finitos de referencia y del programa de referencia (DP, CC/MCC, SH, MC, HB) desde las páginas renderizadas
 - [x] Motor en tensores con retorno espectral; superficies genéricas y conjunto activo robusto
 - [x] Corte a tracción (pico/residual) en MC, DP y Softening-Hardening
 - [x] Drucker-Prager (frágil, no asociado); corregir el signo de qφ en su envolvente (spec 002)
@@ -23,7 +23,7 @@
 - [x] Simple Shear (drenado / no drenado)
 - [x] Verificación: soluciones cerradas, integración de referencia MCC, ejemplos de los manuales (comparación documentada)
 - [x] Plan, roadmap; suite en verde; commit
-- [x] NorSand (FLAC3D + Nova, contrastado con el tutorial de RSData)
+- [x] NorSand (FLAC3D + Nova, contrastado con el tutorial del programa de referencia)
 - [x] General Test (trayectoria proporcional, diseño propio documentado)
 - [x] Softening-Hardening: casquete vertical / elíptico y endurecimiento tabular (cono y casquete)
 - [x] Campos reales del diálogo de ensayos: Initial Effective Lateral Stress / K0
@@ -34,5 +34,5 @@
 
 - [x] Panel Animation: material - ensayo, boceto de la probeta, deslizador, Play / Pause
 - [x] Punto actual en las cuatro gráficas y superficie de fluencia del paso en q-p
-- [x] Carga cíclica: casilla Cyclic Loading Cycles (RSData no tiene modelos cíclicos aparte)
+- [x] Carga cíclica: casilla Cyclic Loading Cycles (el programa de referencia no tiene modelos cíclicos aparte)
 - [x] Tests; suite en verde; commit

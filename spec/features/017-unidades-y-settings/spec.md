@@ -2,8 +2,8 @@
 
 ## Qué se construye
 
-El **Project Settings** de RSData (captura `30_*`): selector de unidades
-("Metric, stress as kPa" observado; el viejo RocData documenta métricas
+El **Project Settings** del programa de referencia (captura `30_*`): selector de unidades
+("Metric, stress as kPa" observado; el programa de referencia antiguo documenta métricas
 MPa/kPa/tsm e imperiales ksf/ksi/psf/psi/tsf) aplicado a todo el
 programa, y la configuración de título del proyecto.
 

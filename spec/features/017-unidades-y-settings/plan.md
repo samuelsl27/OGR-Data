@@ -27,4 +27,4 @@
   internos inalterados).
 - Fuera de alcance (spec): imperiales y t/m² (fase 2); el diálogo de
   ajuste a ensayos sigue en MPa (los datos de laboratorio se pegan en
-  MPa, como en RocData); Convergence Settings (spec 013).
+  MPa, como en el programa de referencia antiguo); Convergence Settings (spec 013).

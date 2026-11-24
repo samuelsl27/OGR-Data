@@ -10,7 +10,7 @@ cumplir alguno, se para y se pregunta a la propietaria.
    el `spec.md` (y se enseña el diff) antes de tocar el código.
 3. **Números con referencia externa.** Toda fórmula se valida contra una
    fuente publicada, una solución cerrada o un programa de referencia
-   (ORMAS, manuales de RSData/RS2), nunca contra lo que el código imprime
+   (ORMAS, el programa de referencia o el de elementos finitos de referencia), nunca contra lo que el código imprime
    hoy. Una fórmula plausible pero incorrecta es el peor resultado.
 4. **Cálculo separado de la interfaz.** `ogr_data.core` no conoce Qt,
    unidades de usuario ni idiomas; `ogr_data.api` no importa PySide6 ni

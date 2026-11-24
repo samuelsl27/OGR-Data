@@ -1,11 +1,11 @@
-# Spec 007 — Proyectos e importación RocData
+# Spec 007 — Proyectos e importación de archivos `.roc`
 
 ## Qué se construye
 
 1. **Persistencia propia**: archivos `.ogrdata` (JSON versionado
    `ogr-data-project/1`) con nombre, criterio, parámetros (kPa) y sig3max.
    Botones Save / Load en la ventana principal.
-2. **Importación del viejo RocData**: parser del formato de texto `.roc`
+2. **Importación de archivos `.roc`** (del programa de referencia antiguo): parser del formato de texto `.roc`
    (versión 3.013 observada), documentado por los 11 ejemplos oficiales de
    `Referencias/Doc_Guia/Doc_Roc_Data3_0/Examples`:
    - `failure criterion`: 0 = Hoek-Brown (GHB), 1 = Mohr-Coulomb,
@@ -27,7 +27,7 @@
 
 ## Fuera de alcance
 
-- Multi-materiales por proyecto (el modelo de proyecto de RSData con árbol
+- Multi-materiales por proyecto (el modelo de proyecto del programa de referencia con árbol
   de materiales es una fase posterior; hoy un archivo = un material).
 - Re-importar los puntos de ensayo al diálogo de ajuste (los datos se
   parsean y quedan accesibles programáticamente).

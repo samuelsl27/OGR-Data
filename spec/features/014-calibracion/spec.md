@@ -2,13 +2,13 @@
 
 ## Qué se construye
 
-El diálogo **Calibration** de RSData (captura `33_*`) sobre las specs 006,
+El diálogo **Calibration** del programa de referencia (captura `33_*`) sobre las specs 006,
 011 y 012:
 
 - Elegir el **Material Model** de origen y definir el modelo calibrado
   (nombre de Material y de Material Model, Strength type).
 - **Curve Fit Analysis**: Algorithm, Error Summation, Error Type
-  (combos a replicar con sus opciones exactas — extraerlas de RSData en
+  (combos a replicar con sus opciones exactas — extraerlas del programa de referencia en
   la fase de plan), Prediction Interval (%).
 - Selección de **Failure States** contra los que calibrar y **Failure
   Data Type** (Lab Data / Rock Mass Data); para macizo, σci y D fijos.
@@ -27,9 +27,9 @@ global. Es la evolución natural: se apoya en el núcleo de ajuste.
   entre los de ambos estados, error global reportado.
 - El material original no se modifica; el calibrado aparece en el árbol.
 
-## Opciones verificadas en RSData 1.009 (2026-11-23)
+## Opciones verificadas en el programa de referencia (2026-11-23)
 
-`RSData_analisis/07_estados_y_rutas_verificado.md` §4:
+el documento `07_estados_y_rutas_verificado.md` del análisis privado del programa de referencia §4:
 
 - Strength type: Mohr Coulomb · Generalized Hoek Brown (defecto) ·
   Power Curve · Barton Bandis.
@@ -49,7 +49,7 @@ global. Es la evolución natural: se apoya en el núcleo de ajuste.
 
 ## Estado (2026-11-23)
 
-Desarrollada: ver plan.md (contraste numérico con RSData y decisiones).
+Desarrollada: ver plan.md (contraste numérico con el programa de referencia y decisiones).
 
 ## Pendiente (fase de plan)
 

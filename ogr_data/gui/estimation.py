@@ -1,7 +1,8 @@
 """Estimation of properties without tests (spec 022).
 
-One-click selectors next to the GHB fields, as ORMAS (and the old RocData)
-offer them; RSData hides them behind double-click buttons.
+One-click selectors next to the GHB fields, as ORMAS (and the earlier
+reference program) offer them; the reference program hides them behind
+double-click buttons.
 
 - GsiDialog: the Hoek & Marinos (2000) chart selector of spec 003; the
   digitized charts, redrawn and clickable (general 2000, flysch 2000 and
@@ -287,7 +288,7 @@ class GsiDialog(QDialog):
         self._joint_stack.addWidget(page_q)
         joint_layout.addWidget(self._joint_stack)
         layout.addWidget(joint_box)
-        note = QLabel(data["rsdata_note"])
+        note = QLabel(data["reference_note"])
         note.setWordWrap(True)
         note.setStyleSheet("font-size: 8pt;")
         layout.addWidget(note)

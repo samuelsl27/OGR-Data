@@ -8,8 +8,9 @@ from pathlib import Path
 
 from ogr_data.core import project
 from ogr_data.core.models import defaults
+from tests._references import roc_examples
 
-EXAMPLES = Path("C:/Desarrollo/OGR_Suite/Data/Referencias/Doc_Guia/Doc_Roc_Data3_0/Examples")
+EXAMPLES = roc_examples()  # found by search (spec 027)
 
 
 # ------------------------------------------------------------------ core

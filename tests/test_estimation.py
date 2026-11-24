@@ -10,10 +10,10 @@ from ogr_data.core import gsi, tables
 
 
 def test_gsi_equations_of_hoek_carter_diederichs_2013() -> None:
-    # eq. 1: the RSData calculator case RQD = 30, JCond89 = 10 -> 30
+    # eq. 1: the calculator case of the reference program RQD = 30, JCond89 = 10 -> 30
     assert gsi.gsi_from_jcond89(10.0, 30.0) == 30.0
     assert gsi.gsi_from_jcond89(30.0, 100.0) == 95.0
-    # eq. 2 as published (2 JCond76): 35 (RSData shows 34, from 1.95 and truncation)
+    # eq. 2 as published (2 JCond76): 35 (the reference program shows 34, from 1.95 and truncation)
     assert gsi.gsi_from_jcond76(10.0, 30.0) == 35.0
     # eq. 3 as published: 52 (Jr/Ja)/(1 + Jr/Ja) + RQD/2
     assert math.isclose(gsi.gsi_from_jr_ja(2.0, 1.0, 30.0), 52.0 * 2.0 / 3.0 + 15.0)

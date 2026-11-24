@@ -1,7 +1,7 @@
 """Graphical samplers and plot overlays (spec 008).
 
 Stress sampler, instantaneous Mohr-Coulomb sampler, best-fit MC overlay
-and Mogi line, as documented in the RocData 2004 Users Guide:
+and Mogi line, as in the earlier reference program:
 stress sampler (p. 33), instantaneous Mohr-Coulomb sampler (pp. 33-34,
 tangential line with instantaneous c and phi), equivalent / best-fit MC
 envelope (p. 10) and Mogi's line sig1/sig3 = 3.4 (p. 37).
@@ -126,7 +126,7 @@ def mc_tangent_shear(inst: InstantaneousMC, x_range: np.ndarray) -> tuple[np.nda
 def best_fit_mc(normal: np.ndarray, shear: np.ndarray) -> InstantaneousMC:
     """Least-squares best-fit MC line tau = c + sigma_n tan(phi).
 
-    RocData 2004 p. 10: the best-fit Mohr-Coulomb envelope is determined
+    As in the earlier reference program, the best-fit Mohr-Coulomb envelope is determined
     over the displayed stress range (vertical residuals, same convention
     as the fitting module).
     """
@@ -140,7 +140,7 @@ def best_fit_mc(normal: np.ndarray, shear: np.ndarray) -> InstantaneousMC:
 
 
 def mogi_line(x_max: float, points: int = 100) -> tuple[np.ndarray, np.ndarray]:
-    """Mogi's line sigma1 = MOGI_RATIO * sigma3 (RocData 2004 p. 37)."""
+    """Mogi's line sigma1 = MOGI_RATIO * sigma3 (as in the earlier reference program)."""
 
     sig3 = np.linspace(0.0, x_max, points)
     return sig3, MOGI_RATIO * sig3

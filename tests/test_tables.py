@@ -84,7 +84,7 @@ def test_picker_dialogs_offscreen():
     dlg.reject()
 
 
-def test_sigci_pick_values_match_rsdata_and_ormas() -> None:
+def test_sigci_pick_values_match_the_reference_and_ormas() -> None:
     from ogr_data.core import tables
 
     data = tables.rock_strength_grades()

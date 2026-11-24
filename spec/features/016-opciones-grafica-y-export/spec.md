@@ -2,8 +2,7 @@
 
 ## Qué se construye
 
-El **Graph Editor** (captura `35_*`) y el menú contextual de gráfica de
-RSData (captura `34_*`), sobre nuestros canvas matplotlib:
+El **Graph Editor** (captura `35_*`) y el menú contextual de gráfica del programa de referencia (captura `34_*`), sobre nuestros canvas matplotlib:
 
 - **Title and Axis**: título visible/editable, posición de etiquetas de
   ejes (Inside/Outside), rango de ejes manual o automático, eje cuadrado.
@@ -12,10 +11,9 @@ RSData (captura `34_*`), sobre nuestros canvas matplotlib:
   (envolvente, MC equivalente, puntos de estado, rutas de tensión).
 - **Contextual**: Copy Graph as Image (ya), **Save Graph as Image**
   (PNG/JPG/BMP), **Export Graph to Excel** (CSV con los puntos de las
-  series abierto en Excel, equivalente honesto del "Export to Excel" de
-  RocData/RSData sin depender de Excel instalado).
+  series abierto en Excel, equivalente honesto del "Export to Excel" del programa de referencia (antiguo y actual) sin depender de Excel instalado).
 - Zoom extents (escala a los límites naturales de la envolvente, como el
-  "Zoom Extents" de RocData).
+  "Zoom Extents" del programa de referencia antiguo).
 
 ## Criterios de aceptación
 

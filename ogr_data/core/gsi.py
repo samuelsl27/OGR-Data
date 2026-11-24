@@ -14,7 +14,7 @@ aperture, roughness, infilling, weathering; 0-6 each, sum 0-30).
 
 The quantified chart (Figure 5) plots A = 1.5 JCond89 (45 -> 0) against
 B = RQD/2 (0 -> 40); GSI is A + B, so a point on the chart gives the GSI
-directly (chart_gsi). Results are not truncated (RSData 1.009 appears to
+directly (chart_gsi). Results are not truncated (the reference program appears to
 truncate the displayed value).
 """
 

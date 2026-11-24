@@ -1,6 +1,6 @@
 # Spec 027 — Retirar las referencias al fabricante del programa de referencia
 
-> Estado: **aprobada** (2026-11-24, «sí, las apruebo»).
+> Estado: **hecha** (2026-11-24; validación en `plan-tasks.md`).
 
 ## Contexto y objetivo
 

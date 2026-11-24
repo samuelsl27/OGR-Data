@@ -1,6 +1,7 @@
-"""Animation of a simulated test (spec 013c), after RSData's Animation tab.
+"""Animation of a simulated test (spec 013c), after the Animation tab of the
+reference program.
 
-RSData 1.009 (help "Animation", "Stress Path Graphs"; NorSand tutorial
+Reference program (help "Animation", "Stress Path Graphs"; NorSand tutorial
 capture): a Material - Test selector, a sketch of the specimen being loaded
 (arrow on top, dashed initial outline), a step slider and Play / Pause; the
 Stress Path Graphs mark the current point of the test and the q-p graph

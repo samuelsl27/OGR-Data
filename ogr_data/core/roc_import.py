@@ -1,7 +1,7 @@
-"""Importer for RocData 3.x .roc files (spec 007).
+"""Importer for .roc files (spec 007).
 
 Format reverse-engineered from the 11 official example files shipped with
-the RocData 3.0 user's guide (see the suite references). Plain text,
+the user's guide of the format (see the suite references). Plain text,
 `key: value` lines grouped in sections; criterion codes:
 0 = Hoek-Brown (GHB), 1 = Mohr-Coulomb, 2 = Barton-Bandis, 3 = Power Curve.
 Units code 0 = MPa (the only one observed); parameters are converted to
@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
-class RocDataPoints:
+class RocPoints:
     test: int
     points: tuple[tuple[float, float], ...]
 
@@ -27,8 +27,8 @@ class RocProject:
     criterion: str
     parameters: dict[str, float]
     sig3max_mpa: float | None
-    lab_data: RocDataPoints = field(default_factory=lambda: RocDataPoints(0, ()))
-    mass_data: RocDataPoints = field(default_factory=lambda: RocDataPoints(0, ()))
+    lab_data: RocPoints = field(default_factory=lambda: RocPoints(0, ()))
+    mass_data: RocPoints = field(default_factory=lambda: RocPoints(0, ()))
 
 
 _CRITERIA = {
@@ -38,7 +38,7 @@ _CRITERIA = {
     3: "power_curve",
 }
 
-# RocData parameter -> registry field, with scale applied after unit factor.
+# .roc parameter -> registry field, with scale applied after unit factor.
 _PARAM_MAP = {
     "generalized_hoek_brown": [
         ("sigci", "sigci", 1000.0),
@@ -64,6 +64,9 @@ _PARAM_MAP = {
 }
 
 _SIG3MAX_KEYS = ("sig3max", "signmax")
+
+# first line of every .roc file
+FORMAT_TAG = "RocData:"  # rule 9: file-format tag
 
 
 def _sections(lines: list[str]) -> dict[str, list[str]]:
@@ -91,7 +94,7 @@ def _key_value(lines: list[str]) -> dict[str, str]:
     return out
 
 
-def _parse_points(lines: list[str]) -> RocDataPoints:
+def _parse_points(lines: list[str]) -> RocPoints:
     values = _key_value(lines)
     test = int(float(values.get("test", "0")))
     num = int(float(values.get("num", "0")))
@@ -102,26 +105,26 @@ def _parse_points(lines: list[str]) -> RocDataPoints:
             points.append((float(parts[1]), float(parts[2])))
     if num and len(points) != num:
         raise ValueError(f"data block declares {num} points but {len(points)} were found")
-    return RocDataPoints(test, tuple(points))
+    return RocPoints(test, tuple(points))
 
 
 def parse_roc(path: str | Path) -> RocProject:
-    """Parse a RocData .roc file into a RocProject (registry units, kPa)."""
+    """Parse a .roc file into a RocProject (registry units, kPa)."""
 
     text = Path(path).read_text(encoding="utf-8", errors="replace")
     lines = text.replace("\r", "").split("\n")
-    if not lines or lines[0].strip() != "RocData:":
-        raise ValueError(f"{path} is not a RocData file (missing 'RocData:' header)")
+    if not lines or lines[0].strip() != FORMAT_TAG:
+        raise ValueError(f"{path} is not a .roc file (missing the .roc header)")
     sections = _sections(lines)
     settings = _key_value(sections.get("project settings", []))
 
     units = int(float(settings.get("units", "0")))
     if units != 0:
-        raise ValueError(f"unsupported RocData units code {units} (only 0 = MPa is implemented)")
+        raise ValueError(f"unsupported .roc units code {units} (only 0 = MPa is implemented)")
     criterion_code = int(float(settings.get("failure criterion", "0")))
     criterion = _CRITERIA.get(criterion_code)
     if criterion is None:
-        raise ValueError(f"unknown RocData failure criterion code {criterion_code}")
+        raise ValueError(f"unknown .roc failure criterion code {criterion_code}")
 
     section_key = {
         "generalized_hoek_brown": "hoek-brown settings",

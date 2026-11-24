@@ -2,13 +2,13 @@
 
 ## Qué se construye
 
-El **Report Generator** de RSData (Analysis: Report Generator / Add View
+El **Report Generator** del programa de referencia (Analysis: Report Generator / Add View
 To Report / Manage Report View): componer un informe con las vistas de
 las gráficas actuales y generarlo.
 
 ## Alcance v1
 
-Modelo de contenido observado en RSData (captura `41_*`): el informe es
+Modelo de contenido observado en el programa de referencia (captura `41_*`): el informe es
 un documento por secciones con visibilidad configurable — Cover Page,
 Table of Contents, Title, Project Summary, Project Settings, Samples,
 Defined Material Models, Defined Failure States, Defined Test

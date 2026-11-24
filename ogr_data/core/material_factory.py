@@ -2,7 +2,7 @@
 
 What the window's "create material" buttons build — from a USCS group
 (spec 018), a database record (spec 010), a calibration (spec 014) or a
-RocData file (spec 007) — as plain functions, so that the window and the
+.roc file (spec 007) — as plain functions, so that the window and the
 operations layer create exactly the same object.
 """
 
@@ -58,7 +58,7 @@ def from_calibration(name: str, result, sig3max_mpa: float = DEFAULT_SIG3MAX_MPA
 
 
 def from_roc(roc) -> Material:
-    """Material of an imported RocData (.roc) file."""
+    """Material of an imported .roc file."""
 
     return Material(name=roc.title or "Imported", criterion=roc.criterion, parameters=dict(roc.parameters),
                     sig3max_mpa=roc.sig3max_mpa if roc.sig3max_mpa is not None else DEFAULT_SIG3MAX_MPA)

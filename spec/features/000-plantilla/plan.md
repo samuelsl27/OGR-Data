@@ -25,7 +25,7 @@ ejemplo y compatibilidad con ficheros antiguos.
 ## Validación numérica
 
 Contra qué referencia externa se comprueba cada fórmula (publicación,
-solución cerrada, ORMAS/RSData) y con qué tolerancia.
+solución cerrada, ORMAS, el programa de referencia) y con qué tolerancia.
 
 ## Estrategia de tests
 

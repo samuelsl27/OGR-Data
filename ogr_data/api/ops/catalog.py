@@ -47,7 +47,7 @@ def catalog(ws, kind: str = "criteria") -> dict:
             for c in CRITERIA.values()]}
     if kind == "templates":
         return {"templates": {k: {"name": n, "criterion": c} for k, (n, c) in TEMPLATES.items()},
-                "note": "rock adds an empty failure state; soil adds a test simulation and a stress path (RSData templates)."}
+                "note": "rock adds an empty failure state; soil adds a test simulation and a stress path (templates of the reference program)."}
     if kind == "application_modes":
         return {"modes": list(APPLICATION_MODES),
                 "note": "tunnel / slope compute sigma3max from sigcm, unit weight and depth (Hoek 2002 / Marinos-Hoek); "

@@ -1,4 +1,4 @@
-"""Calibration dialog (spec 014), modelled on RSData's (capture 33).
+"""Calibration dialog (spec 014), modelled on the reference program's (capture 33).
 
 Material Model (source) · New Model Settings (material name, strength
 type) · Curve Fit Analysis (algorithm, error summation, error type) ·
@@ -59,7 +59,7 @@ class CalibrationDialog(QDialog):
         self.strength = QComboBox()
         for key, label in cal.STRENGTH_TYPES.items():
             self.strength.addItem(tr(label), key)  # i18n: registry
-        self.strength.setCurrentIndex(self.strength.findData("generalized_hoek_brown"))  # RSData default
+        self.strength.setCurrentIndex(self.strength.findData("generalized_hoek_brown"))  # default of the reference program
         new_form.addRow("Material:", self.name)  # i18n: ignore
         new_form.addRow(tr("Strength type:"), self.strength)
         layout.addWidget(new_box)
@@ -71,7 +71,7 @@ class CalibrationDialog(QDialog):
             self.algorithm.addItem(tr(label), key)  # i18n: registry
         self.algorithm.setCurrentIndex(self.algorithm.findData(fitting.LEVENBERG_MARQUARDT))
         self.summation = QComboBox()
-        self.summation.addItem("Vertical")  # i18n: ignore -- the only summation documented (RocData manual)
+        self.summation.addItem("Vertical")  # i18n: ignore -- the only summation documented (earlier reference program)
         self.error_type = QComboBox()
         for value in cal.ERROR_TYPES:
             self.error_type.addItem(tr(value), value)  # i18n: registry

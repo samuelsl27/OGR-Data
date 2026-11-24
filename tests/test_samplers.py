@@ -120,7 +120,7 @@ def test_mogi_line_ratio_and_brittle_ductile() -> None:
     x, y = samplers.mogi_line(7.5)
     assert np.allclose(y, 3.4 * x)
     # High GSI: brittle, envelope above Mogi's line over the whole range
-    # (RocData 2004 p. 37).
+    # (as in the earlier reference program).
     _, _, _, _, sig3_hi, sig1_hi = _ghb_curve(gsi=80.0)
     assert np.all(sig1_hi[1:] > 3.4 * sig3_hi[1:])
     # Low GSI: ductile, the envelope crosses Mogi's line from above (near

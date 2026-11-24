@@ -1,4 +1,4 @@
-"""Graph editor dialog (spec 016): the RSData-style display options.
+"""Graph editor dialog (spec 016): the display options of the reference program.
 
 Edits the two envelope canvases: title and axis (title, label position,
 manual or automatic ranges, square axis), graph display (grid) and

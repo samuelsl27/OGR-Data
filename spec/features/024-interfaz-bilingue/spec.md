@@ -2,7 +2,7 @@
 
 ## Qué se construye
 
-La interfaz de OGR-Data está solo en inglés (los nombres de RSData).
+La interfaz de OGR-Data está solo en inglés (los nombres del programa de referencia).
 Buena parte de quienes la usarán trabajan en español,
 y la suite ya tiene el precedente de OGR-Slip2D (`ogr_gui/i18n`, ~1200
 textos traducidos) y, en este programa, las cartas GSI bilingües de la
@@ -53,7 +53,7 @@ código en inglés**.
    (spec 022: macizo rocoso, discontinuidad, meteorizado/alterado,
    «espejos de falla»…) y con el de OGR-Slip2D cuando el término es común
    (cohesión, ángulo de rozamiento, peso específico, tensión efectiva).
-   Donde el nombre de RSData es la referencia del usuario (criterios,
+   Donde el nombre del programa de referencia es la referencia del usuario (criterios,
    «Failure State», «Stress Path»), el texto español lleva el nombre
    inglés en el tooltip.
 6. **Mecanismo** (a fijar en el plan, con Slip2D como punto de partida):
@@ -66,7 +66,7 @@ código en inglés**.
 ## Criterios de aceptación
 
 - En español no queda ningún texto visible en inglés salvo la lista
-  permitida (nombres propios, unidades, símbolos, nombres de RSData entre
+  permitida (nombres propios, unidades, símbolos, nombres del programa de referencia entre
   paréntesis o en tooltips, contenido bibliográfico). Un test offscreen
   abre la ventana y cada diálogo, recorre sus widgets y comprueba que todo
   texto está traducido o en la lista permitida.

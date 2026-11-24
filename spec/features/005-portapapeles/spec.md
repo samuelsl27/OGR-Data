@@ -4,8 +4,9 @@
 
 El mecanismo de transferencia de materiales de OGR-Data a OGR-Slip2D y
 OGR-FEM2D, con un **contrato abierto y documentado** (el hallazgo del
-análisis fue que el formato Rocscience es un objeto .NET privado e
-irreproducible — ver `Referencias/Ejemplos/RSData_analisis/04_integracion.md`):
+análisis fue que el formato del fabricante del programa de referencia es un objeto .NET privado e
+irreproducible — ver `04_integracion.md` en el análisis privado del programa de referencia, en
+`Referencias/Ejemplos/`):
 
 1. **Formato primario**: texto Unicode con prefijo `OGR-DATA-MATERIAL:` +
    JSON:
@@ -20,7 +21,7 @@ irreproducible — ver `Referencias/Ejemplos/RSData_analisis/04_integracion.md`)
    al pegar en su lista de materiales; si no está, ignoran el texto.
 2. **Copia tabulada** (botón "Copy data"): resumen `nombre\tvalor` de
    parámetros y resultados calculados, para pegar en Excel (como el
-   "Copy Data" del viejo RocData).
+   "Copy Data" del programa de referencia antiguo).
 3. **Copia de imagen**: la gráfica activa al portapapeles como imagen
    (QPixmap nativo de Qt).
 

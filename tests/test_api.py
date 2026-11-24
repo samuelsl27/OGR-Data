@@ -14,6 +14,7 @@ from ogr_data.api import Conflict, InvalidArgument, NotFound, OgrApiError, Works
 from ogr_data.core import clipboard, gsi_charts
 from ogr_data.core import material_results as mr
 from ogr_data.core import project as projects
+from tests._references import roc_examples
 
 ROOT = Path(__file__).resolve().parent.parent
 ORMAS = {"sigci": 30000.0, "gsi": 50.0, "mi": 10.0, "d": 0.0, "ei": 12000000.0}  # ORMAS default material
@@ -156,8 +157,8 @@ def test_clipboard_roundtrip_and_roc() -> None:
     assert "criterion\tGeneralized" in call(ws, "material_copy", format="tabular")["text"]
     _raises(InvalidArgument, call, ws, "material_paste", text="hello")
     _raises(NotFound, call, ws, "material_import_roc", path="nothing.roc")
-    roc = Path("C:/Desarrollo/OGR_Suite/Data/Referencias/Doc_Guia/Doc_Roc_Data3_0/Examples/Granite Triaxial Data.roc")
-    if roc.is_file():  # the RocData 3.0 examples of the suite references (as test_project)
+    roc = roc_examples() / "Granite Triaxial Data.roc"
+    if roc.is_file():  # the .roc examples of the suite references (as test_project)
         imported = call(ws, "material_import_roc", path=str(roc))
         assert imported["criterion"] == "generalized_hoek_brown" and imported["selected"]
 
@@ -208,7 +209,7 @@ def test_stress_paths_and_simulation() -> None:
 
 def test_estimation_without_tests() -> None:
     ws = _ws()
-    # RSData calculator cases (spec 022): RQD 30
+    # calculator cases of the reference program (spec 022): RQD 30
     assert call(ws, "gsi_quantified", rqd=30.0, jcond89=10.0)["gsi"] == 30.0
     assert call(ws, "gsi_quantified", rqd=30.0, jcond76=10.0)["gsi"] == 35.0
     assert abs(call(ws, "gsi_quantified", rqd=30.0, jr=2.0, ja=1.0)["gsi"] - (52.0 * 2 / 3 + 15.0)) < 1e-12

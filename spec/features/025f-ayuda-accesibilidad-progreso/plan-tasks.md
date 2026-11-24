@@ -11,7 +11,7 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
 | La ayuda vive en datos (`ogr_data/data/parameter_help.json`) con su lista de fuentes, y el núcleo la lee (`core/parameter_help.py`); la interfaz solo la muestra | Textos en el código de la ventana: no se pueden revisar ni citar | RF-1 |
 | Cada entrada: definición EN/ES con palabras propias, rango **solo** si una fuente lo da, fuentes y localizador (página, tabla, ecuación); lo que no tiene fuente va a `pending` con lo que falta | Rellenar con «valores habituales» sin fuente: lo prohíbe AGENTS.md | RF-1 |
 | Investigación en cuatro grupos (MC/DP/rigidez, Hoek-Brown, Cam-Clay/Softening-Hardening, NorSand/Power Curve/Barton-Bandis) sobre la biblioteca de la suite y fuentes públicas descargadas a `../Referencias/Bibliografia` | — | RF-1 |
-| Fuente original científica cuando se pudo leer; los manuales de Rocscience solo para conceptos propios del programa, citados como tales | Citar el manual para todo: no es la fuente del concepto | RF-1 |
+| Fuente original científica cuando se pudo leer; los manuales del fabricante del programa de referencia solo para conceptos propios del programa, citados como tales | Citar el manual para todo: no es la fuente del concepto | RF-1 |
 | Tooltip = nombre, definición, unidad (la de pantalla), rango típico y fuentes cortas; en la etiqueta y en el campo, y en los campos del rango de tensiones | — | RF-1 |
 | *Status tips* de una frase para las 46 acciones de los menús, por su texto inglés (`gui/status_tips.py`, `es_tips.py`) | — | RF-2 |
 | Etiqueta → campo con `setBuddy` (el campo, no la fila con su «Elegir…»); nombre accesible a lo que no tiene texto | — | RF-3 |
@@ -49,8 +49,7 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
 
 ## Qué se encontró
 
-- **Siete anomalías del programa** al documentar (valores por defecto de
-  RSData fuera de rango, Power Curve que ignora c y la ondulación, opciones
+- **Siete anomalías del programa** al documentar (valores por defecto del programa de referencia fuera de rango, Power Curve que ignora c y la ondulación, opciones
   que faltan…): se reportan en `fuentes-pendientes.md` §5, sin tocarlas.
 - Al cerrar el programa, una ventana podía recibir `closeEvent` con su menú
   Editar ya destruido por Qt (`RuntimeError: QMenu already deleted` en

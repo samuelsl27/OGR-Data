@@ -11,7 +11,7 @@ from ogr_data.core import simulation as sm
 from ogr_data.core.hoek_brown import HbInput, hoek_brown_constants
 from ogr_data.core.models import defaults
 
-MC = defaults("mohr_coulomb")  # c = 10.5 kPa, phi = 35 deg, psi = 0 (RSData defaults)
+MC = defaults("mohr_coulomb")  # c = 10.5 kPa, phi = 35 deg, psi = 0 (defaults of the reference program)
 
 
 def _n(deg: float) -> float:
@@ -46,8 +46,8 @@ def test_triaxial_cd_mohr_coulomb_plateau() -> None:
 def test_mohr_coulomb_other_tests_against_closed_forms() -> None:
     n = _n(35.0)
     sc = 2.0 * 10.5 * math.sqrt(n)
-    # uniaxial compression and tension; tension cut-off sigma >= -T (RS2 manual eq. 0.7),
-    # T = 0 (RSData default) means no tension, a large T leaves the intrinsic -2c/sqrt(N)
+    # uniaxial compression and tension; tension cut-off sigma >= -T (as in the reference program),
+    # T = 0 (default of the reference program) means no tension, a large T leaves the intrinsic -2c/sqrt(N)
     assert abs(_run(test_type="uniaxial").peak_q - sc) < 1e-6
     assert abs(_run(test_type="uniaxial", loading="Tension").axial_stress.min()) < 1e-9
     assert abs(_run(dict(MC, peak_tensile=5.0), test_type="uniaxial", loading="Tension").axial_stress.min() + 5.0) < 1e-9
@@ -94,7 +94,7 @@ def test_hoek_brown_and_generalized() -> None:
         r = _run(ghb, "generalized_hoek_brown", stiff, test_type=test_type, confining=confining, max_strain=0.01)
         q_f = 100000.0 * (mb * confining / 100000.0 + s) ** a
         assert abs(r.q[-1] - q_f) / q_f < 1e-6, (confining, r.q[-1], q_f)
-        # GHB flows without plastic volume change (no dilation field in RSData)
+        # GHB flows without plastic volume change (no dilation field in the reference program)
         assert abs(r.eps_v[-1] - r.eps_v[-5]) < 1e-12
     # classic Hoek-Brown (a = 0.5) with the dilation parameter as mb of the potential
     hb = dict(defaults("hoek_brown"), mb=5.0, s=0.01)

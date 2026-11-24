@@ -23,10 +23,10 @@ unidades, título, copiar y archivo, que pasan a una barra de herramientas.
 | | Opción | Captura | A favor | En contra |
 |---|---|---|---|---|
 | A | Actual: resultados al final de la barra lateral | [A](opciones/opcion_a.png) | Nada que cambiar | Resultados fuera de la vista (U1) |
-| **B** | **Panel acoplable a la derecha** | [B](opciones/opcion_b.png) | Entrada a la izquierda, gráficas en medio, salida a la derecha: se lee como el flujo de trabajo. Fijo mientras se desplazan los parámetros. Hueco debajo para el muestreador y la comparación entre materiales. Patrón de RSData (panel derecho plegable) y de las apps tipo CAD | Las gráficas pierden ~230 px de ancho (se recuperan cerrándolo o flotándolo) |
+| **B** | **Panel acoplable a la derecha** | [B](opciones/opcion_b.png) | Entrada a la izquierda, gráficas en medio, salida a la derecha: se lee como el flujo de trabajo. Fijo mientras se desplazan los parámetros. Hueco debajo para el muestreador y la comparación entre materiales. Patrón del programa de referencia (panel derecho plegable) y de las apps tipo CAD | Las gráficas pierden ~230 px de ancho (se recuperan cerrándolo o flotándolo) |
 | C | Franja bajo las gráficas | [C](opciones/opcion_c.png) | Gráficas a todo lo ancho; todos los valores en dos filas | Las gráficas pierden ~100 px de alto; la franja no admite más contenido; lejos de los parámetros |
 | D | Arriba de la barra lateral | [D](opciones/opcion_d.png) | Cerca de los parámetros; sin perder sitio para las gráficas | Empuja los parámetros aún más abajo: se cambia GSI sin ver los resultados otra vez |
-| E | Espejo: parámetros a la derecha, resultados a la izquierda | [E](opciones/opcion_e.png) | Propiedades a la derecha como un inspector | Rompe el hábito de RocData/RSData (materiales a la izquierda) y separa el árbol de sus parámetros |
+| E | Espejo: parámetros a la derecha, resultados a la izquierda | [E](opciones/opcion_e.png) | Propiedades a la derecha como un inspector | Rompe el hábito del programa de referencia (antiguo y actual) (materiales a la izquierda) y separa el árbol de sus parámetros |
 
 **Recomendación: B.** Es la única que mantiene a la vista, a la vez,
 los parámetros que se tocan, las gráficas y los resultados (U1, U2), y
@@ -78,7 +78,7 @@ Geotécnico que ajusta parámetros y copia el material a Slip2D/FEM2D.
 - Textos nuevos con `tr()` y español; cambio de idioma (spec 024)
   conserva la posición del panel.
 - El título del proyecto y la unidad de tensión se editan en
-  File > Project Settings…, como en RSData *Project Settings*; la unidad
+  File > Project Settings…, como en el programa de referencia *Project Settings*; la unidad
   también en la barra de herramientas. El título sigue deshaciéndose
   (spec 023).
 

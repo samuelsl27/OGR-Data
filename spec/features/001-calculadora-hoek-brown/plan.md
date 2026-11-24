@@ -6,7 +6,7 @@
   sigcm). Validación numérica contra ORMAS V2.0 (ver spec.md).
 - **MC equivalente**: ajuste por mínimos cuadrados de σ1 = k·σ3 + n sobre N
   puntos en [0, σ3max]; φ = asin((k−1)/(k+1)), c = n/(2√k). Equivalente al
-  "best-fit MC envelope over a stress range" de RocData. Se verifica contra
+  "best-fit MC envelope over a stress range" del programa de referencia antiguo. Se verifica contra
   ORMAS; si ORMAS usa la forma cerrada de la Ref. 1 §4, se adopta esa para
   coincidencia exacta.
 - **Envolvente τ–σn**: construcción tangente a los círculos de Mohr por
@@ -38,7 +38,7 @@ tests/
 - Diferencias de redondeo con ORMAS → tolerancias explícitas en tests y
   nota en la spec.
 - matplotlib lento al arrastre → recalcular envolvente con 200 puntos
-  (igual que RSData, Failure Range por defecto).
+  (igual que el programa de referencia, Failure Range por defecto).
 
 ## Correcciones (2026-11-23)
 

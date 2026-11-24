@@ -4,16 +4,16 @@ OGR-Data es el programa de la suite OpenGeoRock para **obtener, ajustar y
 transferir las propiedades geomecánicas de los materiales** (suelos y masas
 de roca) que usan OGR-Slip2D y OGR-FEM2D.
 
-Hereda el espíritu del antiguo RocData de Rocscience (2004): una herramienta
+Hereda el espíritu del programa de referencia antiguo (2004): una herramienta
 simple e interactiva donde cambiar un parámetro actualiza al instante las
 envolventes de resistencia, con estimación de parámetros desde tablas
 bibliográficas y ajuste de datos de ensayo. Añade lo que el usuario valora
-del RSData actual (modelos avanzados, clasificación de suelos) sin su
+del programa de referencia actual (modelos avanzados, clasificación de suelos) sin su
 complejidad de interfaz.
 
 ## Objetivos
 
-1. **Calculadora de resistencia**: los diez criterios observados en RSData —
+1. **Calculadora de resistencia**: los diez criterios observados en el programa de referencia —
    Mohr-Coulomb, Hoek-Brown, Drucker-Prager, Generalized Hoek-Brown,
    Cam-Clay, Modified Cam-Clay, Softening-Hardening, NorSand, Power Curve y
    Barton-Bandis — con parámetros MC equivalentes sobre un rango de tensión
@@ -31,7 +31,7 @@ complejidad de interfaz.
 
 ## No objetivos (de momento)
 
-- Integración con el formato privado de portapapeles de Rocscience.
+- Integración con el formato privado de portapapeles del fabricante del programa de referencia.
 
 Los otros dos no objetivos del arranque —simulación de ensayos y estados
 de fallo, rutas y calibración— pasaron a objetivos con las specs 012,

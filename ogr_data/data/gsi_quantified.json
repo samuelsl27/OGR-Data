@@ -1,5 +1,5 @@
 {
-  "source": "Hoek, E., Carter, T.G. & Diederichs, M.S. (2013). Quantification of the Geological Strength Index chart. 47th US Rock Mechanics / Geomechanics Symposium, ARMA 13-672. Eqs. 1-6, Figure 5 and Tables 1-3 (Appendix 1). PDF: Referencias/Bibliografia/General/2013-Quantification-of-the-GSI-Chart.pdf (rocscience.com).",
+  "source": "Hoek, E., Carter, T.G. & Diederichs, M.S. (2013). Quantification of the Geological Strength Index chart. 47th US Rock Mechanics / Geomechanics Symposium, ARMA 13-672. Eqs. 1-6, Figure 5 and Tables 1-3 (Appendix 1). PDF: Referencias/Bibliografia/General/2013-Quantification-of-the-GSI-Chart.pdf.",
   "equations": {
     "jcond89": "GSI = 1.5 JCond89 + RQD/2 (eq. 1)",
     "jcond76": "JCond89 = 1.3 JCond76; GSI = 2 JCond76 + RQD/2 (eq. 2, as published)",
@@ -7,7 +7,7 @@
     "rqd_lambda": "RQD = 100 e^(-0.1 lambda) (0.1 lambda + 1), lambda = discontinuities per metre (eq. 4, Priest & Hudson 1976; the minus sign is lost in the PDF rendering)",
     "rqd_jv": "RQD = 115 - 3.3 Jv (eq. 5, Palmstrom 1982) or RQD = 110 - 2.5 Jv (eq. 6, Palmstrom 2005)"
   },
-  "rsdata_note": "RSData 1.009 GSI Calculator differs on the alternatives: JCond76 via 1.5 x 1.3 = 1.95 (not the published 2) and Jr/Ja via GSI = 5.5 ln(Jr/Ja) + 21 + RQD/2, a form not in this paper (Referencias/Ejemplos/RSData_analisis/08_estimacion_sin_ensayos.md). OGR follows the paper.",
+  "reference_note": "The GSI Calculator of the reference program differs on the alternatives: JCond76 via 1.5 x 1.3 = 1.95 (not the published 2) and Jr/Ja via GSI = 5.5 ln(Jr/Ja) + 21 + RQD/2, a form not in this paper (private references, 08_estimacion_sin_ensayos.md). OGR follows the paper.",
   "chart": {
     "x": "1.5 JCond89, from 45 (left) to 0 (right)",
     "y": "RQD/2, from 0 to 40 (upper and lower rows of the 2000 chart removed, items 3-4 of the paper)",

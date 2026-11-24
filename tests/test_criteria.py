@@ -1,4 +1,4 @@
-"""Spec 002: the ten RSData criteria — registry defaults and envelopes."""
+"""Spec 002: the ten criteria of the reference program — registry defaults and envelopes."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def test_ten_criteria_present():
     assert all(c.fields for c in CRITERIA.values())
 
 
-def test_defaults_match_rsdata_capture():
+def test_defaults_match_the_reference_capture():
     d = defaults("mohr_coulomb")
     assert d["peak_cohesion"] == 10.5 and d["peak_friction"] == 35.0
     d = defaults("hoek_brown")
@@ -77,7 +77,7 @@ def test_drucker_prager_positive_and_linear():
     assert np.all(np.diff(sig1) > 0.0)
     k = np.polyfit(sig3, sig1, 1)
     assert abs(k[1] - (math.sqrt(3.0) * 35.0 / 1000.0) / (1.0 - math.sqrt(3.0) * 0.005 / 3.0)) < 1e-9
-    # RS2 manual Fig. 4.2 (q_phi = 0.5, k = 3 kPa): drained triaxial from 100 kPa fails at q = 129 kPa
+    # worked example of the reference program (q_phi = 0.5, k = 3 kPa): drained triaxial from 100 kPa fails at q = 129 kPa
     manual = dict(params, peak_q=0.5, peak_k=3.0)
     sig3, sig1 = ce.principal_curve("drucker_prager", manual, 0.2)
     sig1_at_100 = float(np.interp(0.1, sig3, sig1))  # MPa

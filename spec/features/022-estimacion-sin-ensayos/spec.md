@@ -2,32 +2,32 @@
 
 ## Qué se construye
 
-El valor del viejo RocData: obtener las propiedades de un material **sin
-ensayos**, con tablas y cartas de campo. RSData las conserva escondidas
+El valor del programa de referencia antiguo: obtener las propiedades de un material **sin
+ensayos**, con tablas y cartas de campo. El programa de referencia las conserva escondidas
 (botón de cada fila, que solo responde a **doble clic**); ORMAS las
 tiene a la vista (botones "+"). OGR-Data las pone en primer plano, con
 **un solo clic**, junto a σci, GSI, mi, D y Ei del criterio GHB (y los
-equivalentes de HB clásico). Análisis: `Referencias/Ejemplos/
-RSData_analisis/08_estimacion_sin_ensayos.md` y `ORMAS_analisis/`.
+equivalentes de HB clásico). Análisis: `08_estimacion_sin_ensayos.md` del análisis privado del programa de
+referencia en `Referencias/Ejemplos/`, y `ORMAS_analisis/`.
 
 1. **σci**: tabla de 7 clases de Hoek (ya en la spec 003). Valores que
-   escribe cada clase = los de RSData y ORMAS (verificados): 250, 175,
+   escribe cada clase = los del programa de referencia y ORMAS (verificados): 250, 175,
    75, 35, 15, 3, 0,6 MPa (hecho en esta revisión).
 2. **GSI**:
    - Cartas: *Basic Observational 2000* (Hoek y Marinos), *Heterogeneous
      / flysch 2000* (Marinos y Hoek, en Bibliografia) y, con fuente, la
-     *General Quantitative 2013* y la *Heterogeneous 2013* de RSData.
+     *General Quantitative 2013* y la *Heterogeneous 2013* del programa de referencia.
    - **Clic sobre la carta → GSI** interpolando entre isolíneas
      digitalizadas (método de ORMAS: segmentos de igual GSI de 5 en 5,
      interpolación lineal por distancia; N/A fuera de zona). Hoy la 003
      solo ofrece estructura × superficie con rango indicativo.
-   - **Calculadora** (RSData): RQD + JCond89 (GSI = 1,5·JCond89 + RQD/2),
+   - **Calculadora** (el programa de referencia): RQD + JCond89 (GSI = 1,5·JCond89 + RQD/2),
      JCond76 (JCond89 = 1,3·JCond76) o Jr/Ja (GSI = 5,5·ln(Jr/Ja) + 21 +
-     RQD/2). Mostrar el valor sin truncar (RSData parece truncar).
+     RQD/2). Mostrar el valor sin truncar (el programa de referencia parece truncar).
 3. **mi**: la tabla de la 003 (Hoek, Tabla 3) con **filtros** Rock Type /
-   Texture como RSData. Las nueve discrepancias ORMAS/RSData del
+   Texture como el programa de referencia. Las nueve discrepancias entre ORMAS y el programa de referencia del
    documento 08 quedan resueltas: nuestra tabla (transcrita de Hoek)
-   coincide con RSData; ORMAS tiene erratas (p. ej. Diorite/Diabase
+   coincide con el programa de referencia; ORMAS tiene erratas (p. ej. Diorite/Diabase
    cruzadas).
 4. **D**: tabla de Hoek 2002 (Tabla 1) / Practical Rock Engineering 2023
    (fig. 9): túnel y talud, con descripción y valor (0; 0; 0,5; 0,8;
@@ -36,7 +36,7 @@ RSData_analisis/08_estimacion_sin_ensayos.md` y `ORMAS_analisis/`.
    12 000 MPa fijo en el núcleo) con selector **MR** (Ei = MR·σci; tabla
    MR de Deere 1968 en Practical Rock Engineering 2023, fig. 13) y
    **selector de método** de Erm (generalizado / simplificado H&D 2006 /
-   Hoek 2002), como ORMAS. No reproducir el Ei fijo oculto de RSData
+   Hoek 2002), como ORMAS. No reproducir el Ei fijo oculto del programa de referencia
    (20 000 MPa, deducido en el documento 08).
 
 ## Fuentes
@@ -49,7 +49,7 @@ RSData_analisis/08_estimacion_sin_ensayos.md` y `ORMAS_analisis/`.
   (carta cuantitativa y calculadora; ver plan). Carta heterogénea 2013:
   pendiente (ver plan).
 - Derechos: las cartas GSI y las fotos de D son material con derechos
-  (Hoek, Marinos, Rocscience): **redibujarlas** (vectorial, con las
+  (Hoek, Marinos, el fabricante del programa de referencia): **redibujarlas** (vectorial, con las
   isolíneas digitalizadas) o pedir permiso; no copiar imágenes.
 
 ## Criterios de aceptación

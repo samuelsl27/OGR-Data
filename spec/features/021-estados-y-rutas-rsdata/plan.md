@@ -1,4 +1,4 @@
-# Plan 021 — Estados y rutas fieles a RSData
+# Plan 021 — Estados y rutas fieles al programa de referencia
 
 - `core/states.py`
   - `FailureState`: `points` (TestPoint x, y, exclude) para Triaxial y

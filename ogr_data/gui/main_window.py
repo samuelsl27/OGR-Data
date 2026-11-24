@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
         self._form_layout = QFormLayout(self._form_box)
         self._widgets: dict[str, object] = {}
 
-        # spec 013: Stiffness (RSData tab; rows per material model)
+        # spec 013: Stiffness (tab of the reference program; rows per material model)
         from .stiffness_panel import StiffnessPanel
 
         self._stiffness_box = StiffnessPanel(self._kpa_scale(), self._stress_unit, self.use_erm_as_young)
@@ -272,7 +272,7 @@ class MainWindow(QMainWindow):
         plots.addWidget(self._principal)
         plots.addWidget(self._shear)
 
-        # spec 012: Stress Path Graphs tab (RSData's four default graphs; the
+        # spec 012: Stress Path Graphs tab (the reference program's four default graphs; the
         # second shows volumetric strain: path tables hold no pore pressure).
         # Axis labels go in English (_t): the canvas translates them on screen
         # and keeps the English for the CSV headers.
@@ -313,7 +313,7 @@ class MainWindow(QMainWindow):
             canvas.menu_handler = self._on_path_canvas_menu
             canvas.set_display(self._scale(), self._stress_unit)
             path_grid.addWidget(canvas, index // 2, index % 2)
-        # spec 013c: Animation (RSData's Animation tab)
+        # spec 013c: Animation (Animation tab of the reference program)
         from .animation_panel import AnimationPanel
 
         self._animation = AnimationPanel(self)
@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
         self._rebuild_symbol_menu()
         self._delete_material_act = materials_menu.addAction(tr("Delete Material"), lambda: self._delete_material())
         materials_menu.addSeparator()
-        materials_menu.addAction(tr("Material Database…"), self._open_database)  # spec 010 (RSData: Open RocProp)
+        materials_menu.addAction(tr("Material Database…"), self._open_database)  # spec 010 (reference program: open the reference database)
         materials_menu.addAction(tr("Soil classifier (USCS)…"), self._open_classifier)
         materials_menu.addAction(tr("Fit lab data…"), self._open_fit_dialog)
 
@@ -480,7 +480,7 @@ class MainWindow(QMainWindow):
         self._overlay_mc_act.toggled.connect(self.refresh)
         self._overlay_mogi_act.toggled.connect(self.refresh)
 
-        # spec 015 (RSData names)
+        # spec 015 (names of the reference program)
         report_menu = bar.addMenu(tr("Report"))
         report_menu.addAction(tr("Report Generator…"), self._open_report_generator)
         report_menu.addAction(tr("Add View To Report"), self.add_view_to_report)
@@ -752,7 +752,7 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------- spec 011: materials
 
     def _build_material_panel(self) -> QWidget:
-        """Materials tree (RSData's Visibility panel) with its buttons."""
+        """Materials tree (Visibility panel of the reference program) with its buttons."""
 
         box = QGroupBox(tr("Materials"))
         layout = QVBoxLayout(box)
@@ -1209,10 +1209,10 @@ class MainWindow(QMainWindow):
     def _draw_test_data(self) -> None:
         """Failure-state points, Mohr circles and stress paths of visible materials.
 
-        As RSData 1.009 (capture 71) and the RocData 3.0 guide (pp. 13, 47-48):
+        As the reference program (capture 71) and the earlier reference program:
         triaxial and general states as filled points in sigma1-sigma3 and Mohr
         circles in tau-sigma; direct shear states as points in tau-sigma.
-        Excluded points are not drawn (RSData removes them from the plots).
+        Excluded points are not drawn (the reference program removes them from the plots).
         """
 
         principal, shear = [], []
@@ -1577,7 +1577,7 @@ class MainWindow(QMainWindow):
         canvases["pq"].show_animation((result.p[i] / kpa, result.q[i] / kpa), surface)
 
     def use_erm_as_young(self) -> None:
-        """Young's modulus = Erm of the Generalized Hoek-Brown material (as RSData fills it)."""
+        """Young's modulus = Erm of the Generalized Hoek-Brown material (as the reference program fills it)."""
 
         computed = self._ghb_computed()
         if not computed:
@@ -1607,7 +1607,7 @@ class MainWindow(QMainWindow):
         return self._sim_cache[key]
 
     def compute(self, report_problems: bool = True) -> list[str]:
-        """Compute (RSData menu): re-run every test simulation; returns the problems."""
+        """Compute (menu of the reference program): re-run every test simulation; returns the problems."""
 
         from PySide6.QtWidgets import QApplication, QProgressDialog
 
@@ -1895,7 +1895,7 @@ class MainWindow(QMainWindow):
 
         from ..core import roc_import
 
-        path, _ = QFileDialog.getOpenFileName(self, tr("Import RocData file"), "", "RocData (*.roc)")  # i18n: ignore (filter)
+        path, _ = QFileDialog.getOpenFileName(self, tr("Import .roc file"), "", ".roc (*.roc)")  # i18n: ignore (filter)
         if not path:
             return
         try:
@@ -2344,7 +2344,7 @@ class MainWindow(QMainWindow):
         return mr.hb_terms(key, params, sig3max)
 
     def _overlay_mc_params(self, key: str, params: dict, sig3max: float, normal, shear) -> samplers.InstantaneousMC | None:
-        """Equivalent / best-fit MC overlay for curved criteria (RocData 2004 p. 10)."""
+        """Equivalent / best-fit MC overlay for curved criteria (as in the earlier reference program)."""
 
         if not self._overlay_mc_act.isChecked():
             return None

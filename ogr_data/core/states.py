@@ -1,14 +1,14 @@
 """Failure states and stress paths of a material (specs 012 and 021).
 
-Layouts verified in RSData 1.009 (Referencias/Ejemplos/RSData_analisis/
+Layouts verified in the reference program (private references,
 07_estados_y_rutas_verificado.md, captures 44-74, Excel exports):
 
-- FailureState: name, color, symbol, test type and ONE point table (RSData
-  has no Peak/Residual tabs). Triaxial: Sigma3, Sigma1, Exclude. Direct
+- FailureState: name, color, symbol, test type and ONE point table (the
+  reference program has no Peak/Residual tabs). Triaxial: Sigma3, Sigma1, Exclude. Direct
   Shear: SigmaN, Tau, Exclude. General: StressXX, StressYY, StressZZ,
   TauXY, TauYZ, TauXZ (no Exclude). Exclude removes the point from the
-  calibration and from the plots (verified numerically). Drawing (RSData
-  capture 71 and RocData 3.0 guide pp. 13, 47-48): triaxial and general
+  calibration and from the plots (verified numerically). Drawing (reference
+  program, capture 71, and the earlier reference program): triaxial and general
   states as points in sigma1-sigma3 and Mohr circles in tau-sigma; direct
   shear as points in tau-sigma.
 - StressPath: test type Uniaxial / Triaxial / Biaxial / Simple Shear; the
@@ -33,12 +33,12 @@ from typing import Iterable, Mapping
 
 import numpy as np
 
-# RSData default color of a new state / path (captures 31, 32; official help).
+# default color of a new state / path in the reference program (captures 31, 32; official help).
 DEFAULT_COLOR = "#800000"
 # further states/paths of the same material
 PALETTE = ("#1f618d", "#117a65", "#b9770e", "#6c3483", "#a04000", "#2e4053")
 
-# Define Failure States, Test Type combo of RSData 1.009 (capture 70).
+# Define Failure States, Test Type combo of the reference program (capture 70).
 FAILURE_TEST_TYPES: dict[str, str] = {
     "triaxial": "Triaxial Test",
     "direct_shear": "Direct Shear Test",
@@ -46,7 +46,7 @@ FAILURE_TEST_TYPES: dict[str, str] = {
 }
 GENERAL_COLUMNS = ("StressXX", "StressYY", "StressZZ", "TauXY", "TauYZ", "TauXZ")
 
-# Define Stress Paths, Test Type combo of RSData 1.009 (capture 59; the
+# Define Stress Paths, Test Type combo of the reference program (capture 59; the
 # online help also lists "General", absent from the program).
 PATH_TEST_TYPES: dict[str, str] = {
     "uniaxial": "Uniaxial Test",
@@ -56,7 +56,7 @@ PATH_TEST_TYPES: dict[str, str] = {
 }
 SEEPAGE_CONDITIONS = ("Drained", "Undrained")
 LOADING_DIRECTIONS = ("None", "Axial", "Lateral")
-# RSData shows "Volumatric" (typo of the program); OGR spells it right.
+# the reference program shows "Volumatric" (typo of the program); OGR spells it right.
 STRAIN_TYPES = ("None", "Volumetric", "Lateral")
 
 
@@ -161,7 +161,7 @@ class FailureState:
 def failure_states_from_dicts(items: Iterable[Mapping]) -> list[FailureState]:
     """Load failure states; first-012 files with residual points are split.
 
-    RSData has one table per state, so a legacy state with "residual"
+    The reference program has one table per state, so a legacy state with "residual"
     points becomes two states: "<name>" and "<name> (residual)".
     """
 
@@ -181,9 +181,9 @@ def failure_states_from_dicts(items: Iterable[Mapping]) -> list[FailureState]:
 class PathInvariants:
     """Per-step effective stresses (kPa) and strains of a drawable path.
 
-    p' = (sa + 2 sr)/3 and q = |sa - sr| (RSData plots q unsigned, verified);
-    ev = ea + 2 er, eq = 2 (ea - er)/3 = ea - ev/3 (Machacek 2023; RSData
-    verified); s, t: centre and radius of the Mohr circle, the stress point
+    p' = (sa + 2 sr)/3 and q = |sa - sr| (the reference program plots q unsigned, verified);
+    ev = ea + 2 er, eq = 2 (ea - er)/3 = ea - ev/3 (Machacek 2023; reference
+    program verified); s, t: centre and radius of the Mohr circle, the stress point
     on the tau-sigma plane (UTM "Stress Paths and Strength Tests", p. 2).
     """
 
@@ -231,10 +231,10 @@ class StressPath:
     color: str = DEFAULT_COLOR
     test_type: str = "uniaxial"
     seepage: str = "Drained"
-    loading: str = "Lateral"  # triaxial / biaxial: Loading Direction (RSData default Lateral)
-    lateral_stress: float = 100.0  # initial effective lateral stress, kPa (RSData default)
-    k0: float = 1.0  # initial effective K0 (RSData default; no observable effect)
-    strain_type: str = "Lateral"  # uniaxial: Strain Type (RSData default Lateral)
+    loading: str = "Lateral"  # triaxial / biaxial: Loading Direction (default Lateral, as the reference program)
+    lateral_stress: float = 100.0  # initial effective lateral stress, kPa (default of the reference program)
+    k0: float = 1.0  # initial effective K0 (default of the reference program; no observable effect)
+    strain_type: str = "Lateral"  # uniaxial: Strain Type (default Lateral, as the reference program)
     steps: list[list[float]] = field(default_factory=list)  # rows, columns per columns()
     visible: bool = True
 
@@ -243,13 +243,13 @@ class StressPath:
         self.seepage = _choice(self.seepage, SEEPAGE_CONDITIONS, "Drained")
         # first-012 files stored Compression/Extension
         self.loading = _choice(self.loading, LOADING_DIRECTIONS, "Lateral")
-        if self.strain_type == "Volumatric":  # RSData spelling
+        if self.strain_type == "Volumatric":  # spelling of the reference program
             self.strain_type = "Volumetric"
         self.strain_type = _choice(self.strain_type, STRAIN_TYPES, "Lateral")
         self.steps = [[float(v) for v in row] for row in self.steps]
 
     def columns(self) -> tuple[str, ...]:
-        """Table columns of RSData 1.009 for this configuration (verified)."""
+        """Table columns of the reference program for this configuration (verified)."""
 
         if self.test_type == "uniaxial":
             return ("EpsilonZZ", "SigmaZZ", "EpsilonXX" if self.strain_type == "Lateral" else "EpsilonV")
@@ -267,10 +267,10 @@ class StressPath:
 
     @property
     def drawable(self) -> bool:
-        """Configurations whose meaning is verified in RSData (spec 021).
+        """Configurations whose meaning is verified in the reference program (spec 021).
 
         Uniaxial and triaxial with Loading Direction = Axial. Not drawn:
-        Lateral (RSData overwrites SigmaXX with sigma'h0 and plots the axial
+        Lateral (the reference program overwrites SigmaXX with sigma'h0 and plots the axial
         stress as 0), None (no stress column), biaxial (plane-strain
         invariants not verified) and simple shear (no normal stresses).
         """
@@ -284,7 +284,7 @@ class StressPath:
     def invariants(self) -> PathInvariants | None:
         """Effective axial/radial stresses and strains per step, or None.
 
-        Uniaxial: radial stress zero (OGR; RSData 1.009 plots p and q with a
+        Uniaxial: radial stress zero (OGR; the reference program plots p and q with a
         hidden radial stress of 100 kPa, a program quirk not reproduced);
         radial strain EpsilonXX or (EpsilonV - EpsilonZZ)/2. Triaxial, Axial
         loading: radial stress = initial effective lateral stress; drained ->

@@ -1,11 +1,10 @@
 # Plan 011 — Proyectos multi-material
 
-Modelo: panel *Visibility* de RSData (captura `03_*`: árbol de materiales
+Modelo: panel *Visibility* del programa de referencia (captura `03_*`: árbol de materiales
 con ojo y papelera, botones *Add Material* con desplegable *Add Rock
 Template / Add Soil Template* y *Duplicate Material*; panel *Properties*
 con el nombre) y menú contextual sobre un material
-(`RSData_analisis/03_interfaz_y_menus.md`). Se mantiene la sencillez del
-viejo RocData: la barra lateral sigue siendo el formulario, ahora del
+(el documento `03_interfaz_y_menus.md` del análisis privado del programa de referencia). Se mantiene la sencillez del programa de referencia antiguo: la barra lateral sigue siendo el formulario, ahora del
 material seleccionado.
 
 ## Núcleo (`core/project.py`, sin Qt)
@@ -13,7 +12,7 @@ material seleccionado.
 - `Material`: nombre, criterio, parámetros (kPa/grados del registro),
   `sig3max_mpa`, `Application` (modo custom/tunnel/slope + peso unitario
   + profundidad de la spec 009, que pasan a ser **por material** como el
-  *Failure Range* de RSData), color, símbolo, visible. Los parámetros que
+  *Failure Range* del programa de referencia), color, símbolo, visible. Los parámetros que
   falten se completan con los defectos del criterio.
 - `Project`: lista de materiales (≥1), índice seleccionado, título,
   unidad de visualización y opciones de gráfica. Operaciones: `add`
@@ -28,13 +27,13 @@ material seleccionado.
   material en ambos espacios (principal + tangente de Mohr; solo
   cortante; o ninguna), para dibujar los demás materiales.
 
-## Plantillas (decisión OGR, no dato de RSData)
+## Plantillas (decisión OGR, no dato del programa de referencia)
 
-RSData documenta las plantillas solo como "Material Model + Failure State
+El programa de referencia documenta las plantillas solo como "Material Model + Failure State
 Set" (roca) y "Material Model + Test, Stress Path" (suelo); no consta qué
 criterio usa cada una. OGR Data elige: **Rock → Generalized Hoek-Brown**,
 **Soil → Mohr-Coulomb**, ambos con los defectos del registro (capturados
-de RSData). *Add Material* a secas = criterio por defecto del programa
+del programa de referencia). *Add Material* a secas = criterio por defecto del programa
 (el primero del registro, Mohr-Coulomb). La parte de estados de fallo y
 rutas de las plantillas llega con la spec 012.
 

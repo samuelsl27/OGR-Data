@@ -1,6 +1,6 @@
 # Plan 016 — Opciones de gráfica y exportación
 
-Modelo: Graph Editor de RSData (captura `35_*`: lista de gráficas,
+Modelo: Graph Editor del programa de referencia (captura `35_*`: lista de gráficas,
 pestañas Title and Axis / Graph Display / Series Display, vista previa)
 y menú contextual de gráfica (`34_*`). matplotlib cubre el render; esta
 spec es la capa de UI y persistencia.
@@ -13,7 +13,7 @@ spec es la capa de UI y persistencia.
 - `core/export.py` (sin Qt): `write_series_csv(path, columns, unit)` —
   columnas "etiqueta (unidad)" por serie, filas recortadas/rellenadas
   con vacíos (formato listo para Excel, equivalente honesto del
-  "Export to Excel" de RocData/RSData).
+  "Export to Excel" del programa de referencia (antiguo y actual)).
 - `gui/plots.py`: cada canvas lleva `PlotOptions`; `apply_options()`
   aplica título/rejilla/aspecto/límites/estilos; el color por defecto
   sigue al tema salvo override del usuario; `zoom_extents()` vuelve a
@@ -31,7 +31,7 @@ spec es la capa de UI y persistencia.
   rejilla, límites, estilos de series), zoom extents, guardar imagen,
   editor (aplicar/cancelar) y persistencia en proyecto.
 
-## Ampliaciones detectadas (análisis RSData 2026-11-23)
+## Ampliaciones detectadas (análisis del programa de referencia, 2026-11-23)
 
 - Graph Editor → **Axis Type**: en las Stress Path Graphs cada eje puede
   mostrar cualquiera de 27 variables (componentes de deformación y
