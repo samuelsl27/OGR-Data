@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import io
 import math
+import os
 
 import numpy as np
 from PySide6.QtCore import Qt
@@ -55,6 +56,7 @@ from ..core.graph_options import PlotOptions
 from ..core.hoek_brown import HbInput, ModulusMethod, compute
 from ..core.models import CRITERIA, Criterion, defaults
 from . import i18n
+from . import accelerators
 from .i18n import tr
 from .plots import EnvelopeCanvas, PathCanvas
 from .results_panel import ResultsPanel
@@ -67,6 +69,9 @@ def _t(text: str) -> str:
 
     return text
 
+
+#: Recent Projects kept in the settings (spec 025c).
+RECENT_PROJECTS = 8
 
 #: Windows opened by a language switch (spec 024): referenced here so that
 #: Python keeps them alive once the window that created them has closed.
@@ -98,6 +103,8 @@ class MainWindow(QMainWindow):
         # selected material; _loading blocks write-back while a material
         # is being loaded into the form.
         self._project = projects.Project.new()
+        self._file_path: str | None = None  # spec 025c: Save writes here
+        self._delete_confirm = True  # Supr asks before deleting a material (tests turn it off)
         self._current = 0
         self._loading = True
         self._tree_updating = False
@@ -281,6 +288,7 @@ class MainWindow(QMainWindow):
         self.statusBar()
         self._build_results_dock()
         self._build_toolbar()
+        self._assign_accelerators()
 
         self._rebuild_form()
         self._overlay_mc_act.setChecked(True)
@@ -298,25 +306,42 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------------- menus
 
     def _create_menus(self) -> None:
+        """Eight menus (spec 025c), each action under its RSData name.
+
+        RSData spreads Failure States, Tests, Stress Paths, Calibrate and
+        Compute over five one-entry menus; here they are one Tests menu in
+        the order they are used (define, compute, calibrate). The actions
+        the toolbar shares are attributes (spec 025b): one QAction, one
+        enabled state.
+        """
+
         bar = QMenuBar(self)
         self.setMenuBar(bar)
+        keys = QKeySequence.StandardKey
 
-        # spec 025b: the actions the toolbar shares are attributes, so the
-        # toolbar and the menu hold the same QAction (one enabled state)
         file_menu = bar.addMenu(tr("File"))
         self._new_act = file_menu.addAction(tr("New Project"), self._new_project)
-        self._save_act = file_menu.addAction(tr("Save…"), self._save_project)
-        self._open_act = file_menu.addAction(tr("Load…"), self._load_project)
-        file_menu.addAction(tr("Import .roc…"), self._import_roc)
+        self._new_act.setShortcut(QKeySequence(keys.New))
+        self._open_act = file_menu.addAction(tr("Open…"), self._load_project)
+        self._open_act.setShortcut(QKeySequence(keys.Open))
+        self._recent_menu = file_menu.addMenu(tr("Recent Projects"))
+        self._recent_menu.aboutToShow.connect(self._rebuild_recent_menu)
         file_menu.addSeparator()
+        self._save_act = file_menu.addAction(tr("Save"), self._save_project)
+        self._save_act.setShortcut(QKeySequence(keys.Save))
+        self._save_as_act = file_menu.addAction(tr("Save As…"), self._save_project_as)
+        self._save_as_act.setShortcut(QKeySequence("Ctrl+Shift+S"))
+        file_menu.addSeparator()
+        file_menu.addAction(tr("Import .roc…"), self._import_roc)
         self._project_settings_act = file_menu.addAction(tr("Project Settings…"), self._open_project_settings)
         file_menu.addSeparator()
         file_menu.addAction(tr("Exit"), self.close)
 
         edit_menu = bar.addMenu(tr("Edit"))
+        self._edit_menu = edit_menu
         # spec 023
         self._undo_act = QAction(tr("Undo"), self)
-        self._undo_act.setShortcut(QKeySequence(QKeySequence.StandardKey.Undo))
+        self._undo_act.setShortcut(QKeySequence(keys.Undo))
         self._undo_act.triggered.connect(self.undo)
         self._redo_act = QAction(tr("Redo"), self)
         self._redo_act.setShortcuts([QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z")])
@@ -327,6 +352,40 @@ class MainWindow(QMainWindow):
         self._copy_material_act = edit_menu.addAction(tr("Copy material"), self._copy_material)
         self._copy_data_act = edit_menu.addAction(tr("Copy data"), self._copy_data)
         self._copy_plot_act = edit_menu.addAction(tr("Copy plot"), self._copy_plot_image)
+        edit_menu.addSeparator()
+        # spec 025c RF-7: Supr only while the tree has the focus (the tree
+        # adds the action), so the fields keep it for their text
+        self._delete_act = edit_menu.addAction(tr("Delete"), lambda: self._delete_selected())
+        self._delete_act.setShortcut(QKeySequence(keys.Delete))
+        self._delete_act.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
+
+        view_menu = bar.addMenu(tr("View"))
+        theme_menu = view_menu.addMenu(tr("Theme"))
+        theme_names = {"light": tr("Light"), "dark": tr("Dark")}
+        for name in THEMES:
+            theme_menu.addAction(theme_names.get(name, name.capitalize()), lambda _=False, n=name: self._set_theme(n))
+        # spec 024: interface language (the window reopens in it, keeping everything)
+        language_menu = view_menu.addMenu(tr("Language"))
+        language_group = QActionGroup(self)
+        for code, native in i18n.LANGUAGES.items():
+            act = language_menu.addAction(native, lambda _=False, c=code: self.set_language(c))
+            act.setCheckable(True)
+            act.setChecked(code == i18n.current_language())
+            language_group.addAction(act)
+        # spec 017 / 025c: display stress unit
+        self._unit_menu = view_menu.addMenu(tr("Stress unit"))
+        unit_group = QActionGroup(self)
+        self._unit_actions: dict[str, QAction] = {}
+        for unit_name in units.STRESS_FACTORS:
+            act = self._unit_menu.addAction(unit_name, lambda _=False, u=unit_name: self._set_stress_unit(u))
+            act.setCheckable(True)
+            act.setChecked(unit_name == self._stress_unit)
+            unit_group.addAction(act)
+            self._unit_actions[unit_name] = act
+        view_menu.addSeparator()
+        view_menu.addAction(tr("Graph Editor…"), self._open_graph_editor)
+        # spec 025b: View > Results panel / Toolbar (added once they exist)
+        self._view_menu = view_menu
 
         materials_menu = bar.addMenu(tr("Materials"))
         materials_menu.addAction(tr("Add Material"), lambda: self._add_material("material"))
@@ -335,20 +394,27 @@ class MainWindow(QMainWindow):
         materials_menu.addSeparator()
         materials_menu.addAction(tr("Duplicate Material"), self._duplicate_material)
         materials_menu.addAction(tr("Rename Material"), self._rename_material)
-        materials_menu.addAction(tr("Delete Material"), self._delete_material)
+        materials_menu.addAction("Color…", self._choose_material_color)  # i18n: ignore (same in Spanish)
+        materials_menu.addAction(tr("Automatic color"), lambda: self._set_material_color(""))
+        self._symbol_menu = materials_menu.addMenu(tr("Symbol"))
+        self._symbol_menu.aboutToShow.connect(self._rebuild_symbol_menu)
+        self._rebuild_symbol_menu()
+        self._delete_material_act = materials_menu.addAction(tr("Delete Material"), lambda: self._delete_material())
+        materials_menu.addSeparator()
+        materials_menu.addAction(tr("Material Database…"), self._open_database)  # spec 010 (RSData: Open RocProp)
+        materials_menu.addAction(tr("Soil classifier (USCS)…"), self._open_classifier)
+        materials_menu.addAction(tr("Fit lab data…"), self._open_fit_dialog)
 
-        # spec 012
-        states_menu = bar.addMenu(tr("Failure States"))
-        states_menu.addAction(tr("Define Failure States…"), lambda: self._define_failure_states())
-        tests_menu = bar.addMenu(tr("Tests"))  # spec 013
+        # specs 012, 013, 014: RSData's five one-entry menus, in the order of use
+        tests_menu = bar.addMenu(tr("Tests"))
+        tests_menu.addAction(tr("Define Failure States…"), lambda: self._define_failure_states())
+        tests_menu.addAction(tr("Define Stress Paths…"), lambda: self._define_stress_paths())
         tests_menu.addAction(tr("Define Test Simulations…"), lambda: self._define_test_simulations())
-        paths_menu = bar.addMenu(tr("Stress Paths"))
-        paths_menu.addAction(tr("Define Stress Paths…"), lambda: self._define_stress_paths())
-        # spec 014
-        calibrate_menu = bar.addMenu(tr("Calibrate"))
-        calibrate_menu.addAction(tr("Calibrate…"), self._open_calibration)
-        compute_menu = bar.addMenu(tr("Compute"))  # spec 013
-        self._compute_act = compute_menu.addAction(tr("Compute"), self.compute)
+        tests_menu.addSeparator()
+        self._compute_act = tests_menu.addAction(tr("Compute"), self.compute)
+        self._compute_act.setShortcut(QKeySequence("F5"))
+        tests_menu.addSeparator()
+        tests_menu.addAction(tr("Calibrate…"), self._open_calibration)
 
         analysis_menu = bar.addMenu(tr("Analysis"))
         self._stress_sampler_act = QAction(tr("Stress Sampler"), self, checkable=True)
@@ -364,38 +430,131 @@ class MainWindow(QMainWindow):
         self._overlay_mogi_act = QAction(tr("Overlay Mogi Line"), self, checkable=True)
         analysis_menu.addAction(self._overlay_mc_act)
         analysis_menu.addAction(self._overlay_mogi_act)
-        analysis_menu.addSeparator()
-        analysis_menu.addAction(tr("Material Database…"), self._open_database)  # spec 010 (RSData: Open RocProp)
-        analysis_menu.addSeparator()
-        # spec 015 (RSData names)
-        analysis_menu.addAction(tr("Report Generator…"), self._open_report_generator)
-        analysis_menu.addAction(tr("Add View To Report"), self.add_view_to_report)
-        analysis_menu.addAction(tr("Manage Report View…"), self._manage_report_views)
         self._stress_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._mc_sampler_act.toggled.connect(self._sampler_mode_changed)
         self._overlay_mc_act.toggled.connect(self.refresh)
         self._overlay_mogi_act.toggled.connect(self.refresh)
 
-        view_menu = bar.addMenu(tr("View"))
-        theme_menu = view_menu.addMenu(tr("Theme"))
-        theme_names = {"light": tr("Light"), "dark": tr("Dark")}
-        for name in THEMES:
-            theme_menu.addAction(theme_names.get(name, name.capitalize()), lambda _=False, n=name: self._set_theme(n))
-        # spec 024: interface language (the window reopens in it, keeping everything)
-        language_menu = view_menu.addMenu(tr("Language"))
-        language_group = QActionGroup(self)
-        for code, native in i18n.LANGUAGES.items():
-            act = language_menu.addAction(native, lambda _=False, c=code: self.set_language(c))
-            act.setCheckable(True)
-            act.setChecked(code == i18n.current_language())
-            language_group.addAction(act)
-        view_menu.addSeparator()
-        view_menu.addAction(tr("Graph Editor…"), self._open_graph_editor)
-        # spec 025b: View > Results panel / Toolbar (filled once they exist)
-        self._view_menu = view_menu
+        # spec 015 (RSData names)
+        report_menu = bar.addMenu(tr("Report"))
+        report_menu.addAction(tr("Report Generator…"), self._open_report_generator)
+        report_menu.addAction(tr("Add View To Report"), self.add_view_to_report)
+        report_menu.addAction(tr("Manage Report View…"), self._manage_report_views)
 
         help_menu = bar.addMenu(tr("Help"))
+        self._shortcuts_act = help_menu.addAction(tr("Keyboard Shortcuts"), self._show_shortcuts)
+        self._shortcuts_act.setShortcut(QKeySequence("F1"))
+        help_menu.addSeparator()
         help_menu.addAction(tr("About OGR Data"), self._about)
+
+    def _rebuild_symbol_menu(self) -> None:
+        """Materials > Symbol, checked at the selected material's (as the tree's menu)."""
+
+        self._symbol_menu.clear()
+        current = self._current_material().symbol
+        for symbol, label in projects.SYMBOLS.items():
+            act = self._symbol_menu.addAction(tr(label), lambda _=False, s=symbol: self._set_material_symbol(s))  # i18n: registry
+            act.setCheckable(True)
+            act.setChecked(symbol == current)
+        accelerators.assign(self._symbol_menu)
+
+    def _assign_accelerators(self) -> None:
+        """Alt letters for every menu (spec 025c RF-4), once all entries exist."""
+
+        accelerators.assign(self.menuBar())
+
+    # ------------------------------------------------- spec 025c: files, recent projects, delete
+
+    def _ask_save_path(self) -> str:
+        from PySide6.QtWidgets import QFileDialog
+
+        path, _ = QFileDialog.getSaveFileName(self, tr("Save project"), self._file_path or "", tr("OGR Data project (*.ogrdata)"))
+        return path
+
+    def _save_project(self) -> bool:
+        """Save (Ctrl+S): to the project's file, or Save As when it has none (RF-5)."""
+
+        if self._file_path:
+            return self.save_project_to(self._file_path)
+        return self._save_project_as()
+
+    def _save_project_as(self) -> bool:
+        path = self._ask_save_path()
+        if not path:
+            return False
+        return self.save_project_to(path)
+
+    def recent_projects(self) -> list[str]:
+        raw = self._settings.value("recent_projects", [])
+        if isinstance(raw, str):  # QSettings gives a bare string for a one-item list
+            raw = [raw]
+        return [str(p) for p in (raw or [])]
+
+    def _remember_recent(self, path: str) -> None:
+        path = os.path.abspath(path)
+        recent = [p for p in self.recent_projects() if os.path.abspath(p) != path]
+        self._settings.setValue("recent_projects", [path, *recent][:RECENT_PROJECTS])
+
+    def _forget_recent(self, path: str) -> None:
+        path = os.path.abspath(path)
+        self._settings.setValue("recent_projects", [p for p in self.recent_projects() if os.path.abspath(p) != path])
+
+    def _rebuild_recent_menu(self) -> None:
+        self._recent_menu.clear()
+        recent = self.recent_projects()
+        if not recent:
+            empty = self._recent_menu.addAction(tr("(none)"))
+            empty.setEnabled(False)
+            return
+        for index, path in enumerate(recent, start=1):
+            act = self._recent_menu.addAction(f"&{index} {path}", lambda _=False, p=path: self._open_recent(p))
+            act.setStatusTip(path)
+
+    def _open_recent(self, path: str) -> None:
+        if self._confirm_discard():
+            self.open_project_file(path)
+
+    def open_project_file(self, path: str) -> bool:
+        """Open a project file; a vanished one leaves Recent Projects, said in the status bar (RF-6)."""
+
+        if not os.path.exists(path):
+            self._forget_recent(path)
+            self.statusBar().showMessage(
+                tr("{0} no longer exists: removed from Recent Projects.").format(os.path.basename(path)), 8000
+            )
+            return False
+        try:
+            loaded = projects.load_project(path)
+        except (ValueError, OSError) as exc:
+            QMessageBox.warning(self, tr("Open failed"), str(exc))
+            return False
+        self.open_project(loaded)
+        self._file_path = os.path.abspath(path)
+        self._remember_recent(path)
+        self._update_window_title()
+        return True
+
+    def _delete_selected(self, confirm: bool | None = None) -> None:
+        """Edit > Delete / Supr in the tree: the selected material, state, path or simulation."""
+
+        if confirm is None:
+            confirm = self._delete_confirm
+        item = self._tree.currentItem()
+        if item is None:
+            return
+        if item.parent() is None:
+            self._delete_material(confirm)
+        else:
+            kind, index = item.data(0, Qt.ItemDataRole.UserRole)
+            self._delete_child(kind, index)
+
+    def _show_shortcuts(self) -> None:
+        """F1: the keyboard shortcuts, read from the menus (non-modal, RF-9)."""
+
+        from .shortcuts_dialog import ShortcutsDialog
+
+        self._shortcuts_dialog = ShortcutsDialog(self.menuBar(), self)
+        self._shortcuts_dialog.show()
 
     # ------------------------------------------------- spec 025b: results panel and toolbar
 
@@ -527,6 +686,7 @@ class MainWindow(QMainWindow):
         self._tree.currentItemChanged.connect(self._tree_current_changed)
         self._tree.itemChanged.connect(self._tree_item_changed)
         self._tree.itemDoubleClicked.connect(self._tree_double_clicked)
+        self._tree.addAction(self._delete_act)  # spec 025c RF-7: Supr here only
         layout.addWidget(self._tree)
 
         buttons = QHBoxLayout()
@@ -1151,9 +1311,13 @@ class MainWindow(QMainWindow):
         return units.from_display(self._sig3max.value(), self._stress_unit)
 
     def _update_window_title(self) -> None:
+        """Document first, as Windows does (spec 025c RF-8): «slope.ogrdata[*] (title) - OGR Data»."""
+
+        name = os.path.basename(self._file_path) if getattr(self, "_file_path", None) else tr("Untitled")
         title = self._project.title.strip()
         # [*]: Qt shows "*" there while the project has unsaved changes (spec 023)
-        self.setWindowTitle(f"OGR Data - {title}[*]" if title else "OGR Data[*]")
+        label = f"{name}[*] ({title})" if title else f"{name}[*]"
+        self.setWindowTitle(f"{label} - OGR Data")
 
     def _set_plot_labels(self) -> None:
         u = self._stress_unit
@@ -1183,6 +1347,12 @@ class MainWindow(QMainWindow):
     def _rescale_to(self, unit: str) -> None:
         old_scale = self._scale()
         self._stress_unit = unit
+        if unit in getattr(self, "_unit_actions", {}):
+            self._unit_actions[unit].setChecked(True)
+        if hasattr(self, "_unit_combo") and self._unit_combo.currentText() != unit:
+            self._unit_combo.blockSignals(True)
+            self._unit_combo.setCurrentText(unit)
+            self._unit_combo.blockSignals(False)
         self._settings.setValue("stress_unit", unit)
         ratio = self._scale() / old_scale
         for field in self._criterion().fields:
@@ -1518,14 +1688,6 @@ class MainWindow(QMainWindow):
         }
         return self._project
 
-    def _save_project(self) -> bool:
-        from PySide6.QtWidgets import QFileDialog
-
-        path, _ = QFileDialog.getSaveFileName(self, tr("Save project"), "", tr("OGR Data project (*.ogrdata)"))
-        if not path:
-            return False
-        return self.save_project_to(path)
-
     def save_project_to(self, path: str) -> bool:
         """Write the project; marks the saved point of the undo history (spec 023)."""
 
@@ -1537,9 +1699,13 @@ class MainWindow(QMainWindow):
         except (ValueError, OSError) as exc:
             QMessageBox.warning(self, tr("Save failed"), str(exc))
             return False
+        self._file_path = os.path.abspath(path)
+        self._remember_recent(path)
         if self._history is not None:
             self._history.mark_saved()
             self._update_history_ui()
+        self._update_window_title()
+        self.statusBar().showMessage(tr("Saved {0}").format(path), 5000)
         return True
 
     def _load_project(self) -> None:
@@ -1547,15 +1713,9 @@ class MainWindow(QMainWindow):
 
         if not self._confirm_discard():
             return
-        path, _ = QFileDialog.getOpenFileName(self, tr("Load project"), "", tr("OGR Data project (*.ogrdata)"))
-        if not path:
-            return
-        try:
-            loaded = projects.load_project(path)
-        except (ValueError, OSError) as exc:
-            QMessageBox.warning(self, tr("Load failed"), str(exc))
-            return
-        self.open_project(loaded)
+        path, _ = QFileDialog.getOpenFileName(self, tr("Open project"), "", tr("OGR Data project (*.ogrdata)"))
+        if path:
+            self.open_project_file(path)
 
     def open_project(self, loaded: projects.Project) -> None:
         """Replace the window's project (spec 011; v1 files arrive migrated).
@@ -1589,6 +1749,8 @@ class MainWindow(QMainWindow):
         fresh = projects.Project.new()
         fresh.stress_unit = self._stress_unit  # the display unit is a user setting
         self.open_project(fresh)
+        self._file_path = None
+        self._update_window_title()
 
     def _load_settings_into_window(self, data: dict) -> None:
         """Apply the display unit saved in the project (spec 017)."""
@@ -1690,6 +1852,7 @@ class MainWindow(QMainWindow):
         self._redo_act.setEnabled(h.can_redo)
         self._undo_act.setText(tr("Undo {0}").format(h.undo_text_in(tr)) if h.can_undo else tr("Undo"))
         self._redo_act.setText(tr("Redo {0}").format(h.redo_text_in(tr)) if h.can_redo else tr("Redo"))
+        accelerators.assign(self._edit_menu)  # the new texts get their Alt letter again (spec 025c)
         self._update_window_title()
         self.setWindowModified(h.modified)
 
@@ -1802,6 +1965,8 @@ class MainWindow(QMainWindow):
         self._absorb()
         self._graph_tabs.setCurrentIndex(old._graph_tabs.currentIndex())
         self.restoreState(old.saveState())  # spec 025b: panel and toolbar as they were
+        self._file_path = old._file_path  # spec 025c: Save keeps writing to the same file
+        self._update_window_title()
 
     # ------------------------------------------------------------------ form
 

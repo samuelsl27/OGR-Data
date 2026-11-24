@@ -152,7 +152,7 @@ def test_panel_and_toolbar_state_is_remembered() -> None:
     app, w = _window()
     w2 = w3 = None
     try:
-        view = [a.text() for a in w._view_menu.actions()]
+        view = [a.text().replace("&", "") for a in w._view_menu.actions()]
         assert "Results panel" in view and "Toolbar" in view
         w._results_dock.toggleViewAction().trigger()
         app.processEvents()
@@ -258,7 +258,7 @@ def test_project_settings_set_title_and_unit() -> None:
 
     app, w = _window()
     try:
-        files = [a.text() for a in w.menuBar().actions()[0].menu().actions()]
+        files = [a.text().replace("&", "") for a in w.menuBar().actions()[0].menu().actions()]
         assert "Project Settings…" in files
         dialog = ProjectSettingsDialog("", "kPa", w)
         dialog.title_edit.setText("  Portal  ")
@@ -266,7 +266,7 @@ def test_project_settings_set_title_and_unit() -> None:
         w.apply_project_settings(dialog.title(), dialog.stress_unit())
         dialog.deleteLater()
         assert w._project.title == "Portal" and w._stress_unit == "MPa"
-        assert w.windowTitle().replace("[*]", "") == "OGR Data - Portal"
+        assert w.windowTitle().replace("[*]", "") == "Untitled (Portal) - OGR Data"
         w.undo()
         assert w._project.title == ""
     finally:

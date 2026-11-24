@@ -1,6 +1,7 @@
 # Spec 025c — Menús y convenciones de Windows
 
-> Estado: **borrador** (2026-11-24), pendiente de aprobación.
+> Estado: **hecha** (2026-11-24; validación en `tasks.md`). Aprobada al pedir la propietaria «continúa». Las dos
+> dudas se resolvieron con la propuesta de la spec (ver abajo).
 
 ## Contexto y objetivo
 
@@ -85,7 +86,8 @@ la ventana no está en ella (regla 3 de AGENTS.md); suite en verde.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: ¿«Tests» como nombre del menú agrupado, o
-  «Lab Data» / «Datos de ensayo»?]
-- [NECESITA ACLARACIÓN: ¿Report como menú propio o dentro de File, como
-  en muchos programas de cálculo?]
+Resueltas con la propuesta de la propia spec, al pedir la propietaria
+seguir sin pararse (2026-11-24); se cambian si no le convencen:
+
+- El menú agrupado se llama **Tests** / **Ensayos** (nombre de RSData).
+- **Report** / **Informe** es un menú propio (sus tres entradas son de RSData).

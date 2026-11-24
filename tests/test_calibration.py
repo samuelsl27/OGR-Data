@@ -140,8 +140,8 @@ def test_calibration_dialog_creates_material() -> None:
     w = MainWindow()
     try:
         w._set_stress_unit("kPa")
-        titles = [a.text() for a in w.menuBar().actions()]
-        assert "Calibrate" in titles
+        tests_menu = next(a.menu() for a in w.menuBar().actions() if a.text().replace("&", "") == "Tests")
+        assert "Calibrate…" in [a.text().replace("&", "") for a in tests_menu.actions()]
         w.set_failure_states([st.FailureState(points=RSDATA[:3] + [st.TestPoint(300, 1500, True)])])
         source_params = dict(w._current_material().parameters)
         dlg = CalibrationDialog(w, w._project, w._current, "kPa")

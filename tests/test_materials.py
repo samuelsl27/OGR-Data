@@ -362,14 +362,14 @@ def test_window_project_save_open_and_import() -> None:
             assert w2._tree.topLevelItemCount() == 3 and w2._current == 1
             assert w2._name_edit.text() == "Rock"
             assert w2._widgets["gsi"].value() == 65.0
-            assert w2.windowTitle() == "OGR Data - Two materials[*]" and not w2.isWindowModified()  # just opened (spec 023)
+            assert w2.windowTitle() == "Untitled[*] (Two materials) - OGR Data" and not w2.isWindowModified()  # just opened (spec 023)
             _select(w2, 2)
             assert abs(w2._widgets["sigci"].value() - 369270.0) < 1.0
             # New Project: back to one default material, empty title
             w2._new_project(confirm=False)
             assert w2._tree.topLevelItemCount() == 1
             assert w2._criterion_combo.currentData() == project.DEFAULT_CRITERION
-            assert w2.windowTitle() == "OGR Data[*]"
+            assert w2.windowTitle() == "Untitled[*] - OGR Data"
         finally:
             w2.deleteLater()
     finally:

@@ -10,6 +10,7 @@ from ogr_data.core import history as hist
 from ogr_data.core import project as projects
 from ogr_data.core import states as st
 from ogr_data.core.models import defaults
+from ogr_data.gui.accelerators import plain
 
 # ------------------------------------------------------------------ core
 
@@ -123,12 +124,12 @@ def test_window_field_criterion_and_grouping() -> None:
         start = _cmp(w)
         w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("generalized_hoek_brown"))
         app.processEvents()
-        assert w._undo_act.text().startswith("Undo Change Criterion")
+        assert plain(w._undo_act.text()).startswith("Undo Change Criterion")
         after_criterion = _cmp(w)
         gsi = w._widgets["gsi"]
         for value in (51.0, 52.0, 53.0, 45.0):  # typing / arrow clicks in one field: one step
             gsi.setValue(value)
-        assert len(w._history.undo_steps) == 2 and w._undo_act.text() == "Undo Change GSI"
+        assert len(w._history.undo_steps) == 2 and plain(w._undo_act.text()) == "Undo Change GSI"
         gsi.editingFinished.emit()  # leaving the field closes the group
         gsi.setValue(40.0)
         assert len(w._history.undo_steps) == 3
@@ -152,21 +153,21 @@ def test_window_material_actions() -> None:
     app, w = _window()
     try:
         w._add_material("rock")
-        assert w._undo_act.text() == "Undo Add Material 'Rock'" and len(w._project.materials) == 2
+        assert plain(w._undo_act.text()) == "Undo Add Material 'Rock'" and len(w._project.materials) == 2
         w._duplicate_material()
         assert len(w._project.materials) == 3
         w._name_edit.setText("Granite")
         w._name_edit.editingFinished.emit()
-        assert w._undo_act.text().startswith("Undo Rename Material")
+        assert plain(w._undo_act.text()).startswith("Undo Rename Material")
         w._set_material_color("#123456")
-        assert w._undo_act.text() == "Undo Change Color"
+        assert plain(w._undo_act.text()) == "Undo Change Color"
         item = w._tree.topLevelItem(w._current)
         from PySide6.QtCore import Qt
 
         item.setCheckState(0, Qt.CheckState.Unchecked)
-        assert w._undo_act.text() == "Undo Hide Material"
+        assert plain(w._undo_act.text()) == "Undo Hide Material"
         w._delete_material(confirm=False)
-        assert w._undo_act.text().startswith("Undo Delete Material") and len(w._project.materials) == 2
+        assert plain(w._undo_act.text()).startswith("Undo Delete Material") and len(w._project.materials) == 2
         w.undo()
         assert len(w._project.materials) == 3 and w._project.materials[w._current].name == "Granite"
         assert w._tree.topLevelItemCount() == 3
@@ -187,7 +188,7 @@ def test_window_dialog_like_edits() -> None:
     app, w = _window()
     try:
         w.set_failure_states([st.FailureState(name="State 1", points=[st.TestPoint(0.0, 100.0)])])
-        assert w._undo_act.text() == "Undo Edit Failure States"
+        assert plain(w._undo_act.text()) == "Undo Edit Failure States"
         from ogr_data.core import fitting
 
         w.apply_fit_parameters(fitting.FitResult("mohr_coulomb", fitting.TRIAXIAL, fitting.LINEAR,
@@ -201,17 +202,17 @@ def test_window_dialog_like_edits() -> None:
         w.pick_value = lambda key: 55.0
         field = next(f for f in w._criterion().fields if f.key == "gsi")
         w._pick(field, w._widgets["gsi"])
-        assert w._undo_act.text() == "Undo Change GSI"
+        assert plain(w._undo_act.text()) == "Undo Change GSI"
         # sigma3max and the application
         w._sig3max.setValue(1000.0)
-        assert w._undo_act.text() == "Undo Change sig3max"
+        assert plain(w._undo_act.text()) == "Undo Change sig3max"
         w._application_combo.setCurrentIndex(w._application_combo.findData("tunnel"))
-        assert w._undo_act.text() == "Undo Change Application"
+        assert plain(w._undo_act.text()) == "Undo Change Application"
         w.undo()
         assert w._application_combo.currentData() == "custom" and w._sig3max.value() == 1000.0
         # project title: one step
         w.set_project_title("Portal")  # spec 025b: File > Project Settings
-        assert w._undo_act.text() == "Undo Change Project Title"
+        assert plain(w._undo_act.text()) == "Undo Change Project Title"
         w.undo()
         assert w._project.title == ""
         # the display unit is a preference: no step, values kept
@@ -232,7 +233,7 @@ def test_window_shortcuts() -> None:
     try:
         assert w._undo_act.shortcut() == QKeySequence(QKeySequence.StandardKey.Undo)
         assert {s.toString() for s in w._redo_act.shortcuts()} == {"Ctrl+Y", "Ctrl+Shift+Z"}
-        edit_menu = next(a.menu() for a in w.menuBar().actions() if a.text() == "Edit")
+        edit_menu = next(a.menu() for a in w.menuBar().actions() if plain(a.text()) == "Edit")
         assert edit_menu.actions()[:2] == [w._undo_act, w._redo_act]
     finally:
         w.deleteLater()
@@ -241,7 +242,7 @@ def test_window_shortcuts() -> None:
 def test_window_unsaved_changes() -> None:
     app, w = _window()
     try:
-        assert w.windowTitle().endswith("[*]") and not w.isWindowModified()
+        assert "[*]" in w.windowTitle() and not w.isWindowModified()
         w._widgets["peak_cohesion"].setValue(50.0)
         assert w.isWindowModified()
         with tempfile.TemporaryDirectory() as tmp:

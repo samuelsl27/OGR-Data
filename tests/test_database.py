@@ -183,7 +183,7 @@ def test_database_dialog_and_use_as_material() -> None:
                 assert [p.exclude for p in state.points] == [False, True]
             finally:
                 dlg.deleteLater()
-            assert "Material Database…" in [a.text() for m in w.menuBar().actions() if m.text() == "Analysis" for a in m.menu().actions()]
+            assert "Material Database…" in [a.text().replace("&", "") for m in w.menuBar().actions() if m.text().replace("&", "") == "Materials" for a in m.menu().actions()]
         finally:
             w.deleteLater()
 

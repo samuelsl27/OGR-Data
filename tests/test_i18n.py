@@ -13,6 +13,8 @@ import ast
 import re
 from pathlib import Path
 
+from ogr_data.gui.accelerators import plain
+
 ROOT = Path(__file__).resolve().parent.parent
 GUI = ROOT / "ogr_data" / "gui"
 SKIP_FILES = {"themes.py"}  # style sheets, no user text
@@ -259,7 +261,7 @@ def _visible_texts(root) -> list[str]:
                 for sub in menu.actions():
                     if sub.menu() is not None:
                         texts += [a.text() for a in sub.menu().actions()]
-    return [t for t in texts if t]
+    return [plain(t) for t in texts if t]
 
 
 def _english_left(texts: list[str], es: dict) -> list[str]:
@@ -317,7 +319,7 @@ def test_spanish_window_and_dialogs_show_no_english_text() -> None:
         problems = {k: v for k, v in problems.items() if v}
         assert not problems, problems
         # the menus are Spanish and the stored values stay English
-        assert [a.text() for a in w.menuBar().actions()][:2] == ["Archivo", "Editar"]
+        assert [plain(a.text()) for a in w.menuBar().actions()][:2] == ["Archivo", "Editar"]
         w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("generalized_hoek_brown"))
         assert w._params()["modulus_method"] == "Generalized Hoek & Diederichs (2006)"
         for win in windows.values():
@@ -351,12 +353,12 @@ def test_language_switch_keeps_the_project_and_history() -> None:
         app.processEvents()
         assert w2 is not w and i18n.current_language() == "es"
         assert hist.comparable(w2._state()) == before and w2._current == 1 and w2._project.title == "Switch"
-        assert len(w2._history.undo_steps) == steps and w2._undo_act.text().startswith("Deshacer ")
-        assert w2._overlay_mogi_act.isChecked() and w2.menuBar().actions()[0].text() == "Archivo"
+        assert len(w2._history.undo_steps) == steps and plain(w2._undo_act.text()).startswith("Deshacer ")
+        assert w2._overlay_mogi_act.isChecked() and plain(w2.menuBar().actions()[0].text()) == "Archivo"
         w2.undo()
         assert w2._project.title == ""
         w3 = w2.set_language("en")
-        assert w3.menuBar().actions()[0].text() == "File" and w3._undo_act.text().startswith("Undo")
+        assert plain(w3.menuBar().actions()[0].text()) == "File" and plain(w3._undo_act.text()).startswith("Undo")
         w3.deleteLater()
     finally:
         i18n.set_language("en")

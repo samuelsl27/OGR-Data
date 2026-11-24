@@ -42,8 +42,9 @@ def test_window_theme_switch_offscreen():
     app = QApplication.instance() or QApplication([])
     w = MainWindow()
     # menu bar with the suite structure
-    titles = [a.text() for a in w.menuBar().actions()]
-    assert titles == ["File", "Edit", "Materials", "Failure States", "Tests", "Stress Paths", "Calibrate", "Compute", "Analysis", "View", "Help"]
+    # the menu structure of spec 025c (spec 020 had eleven menus)
+    titles = [a.text().replace("&", "") for a in w.menuBar().actions()]
+    assert titles == ["File", "Edit", "View", "Materials", "Tests", "Analysis", "Report", "Help"]
     w._set_theme("dark")
     assert "#2b2b2b" in QApplication.instance().styleSheet()
     assert w._principal.line_color("envelope") == mpl_colors("dark")["envelope"]

@@ -228,7 +228,7 @@ def test_window_add_view_manage_and_generate() -> None:
     try:
         w._set_stress_unit("kPa")
         w.set_project_title("Report test")
-        names = [a.text() for m in w.menuBar().actions() if m.text() == "Analysis" for a in m.menu().actions()]
+        names = [a.text().replace("&", "") for m in w.menuBar().actions() if m.text().replace("&", "") == "Report" for a in m.menu().actions()]
         assert {"Report Generator…", "Add View To Report", "Manage Report View…"} <= set(names)
         first = w.add_view_to_report()
         assert first.title == "Material - Strength Graphs" and len(first.images) == 2
