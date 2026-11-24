@@ -343,19 +343,18 @@ def test_language_switch_keeps_the_project_and_history() -> None:
         w._set_stress_unit("kPa")
         w._add_material("rock")
         w._widgets["gsi"].setValue(42.0)
-        w._title_edit.setText("Switch")
-        w._title_edit.editingFinished.emit()
+        w.set_project_title("Switch")
         w._overlay_mogi_act.setChecked(True)
         before = hist.comparable(w._state())
         steps = len(w._history.undo_steps)
         w2 = w.set_language("es")
         app.processEvents()
         assert w2 is not w and i18n.current_language() == "es"
-        assert hist.comparable(w2._state()) == before and w2._current == 1 and w2._title_edit.text() == "Switch"
+        assert hist.comparable(w2._state()) == before and w2._current == 1 and w2._project.title == "Switch"
         assert len(w2._history.undo_steps) == steps and w2._undo_act.text().startswith("Deshacer ")
         assert w2._overlay_mogi_act.isChecked() and w2.menuBar().actions()[0].text() == "Archivo"
         w2.undo()
-        assert w2._title_edit.text() == ""
+        assert w2._project.title == ""
         w3 = w2.set_language("en")
         assert w3.menuBar().actions()[0].text() == "File" and w3._undo_act.text().startswith("Undo")
         w3.deleteLater()

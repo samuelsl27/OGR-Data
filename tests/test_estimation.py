@@ -173,7 +173,7 @@ def test_window_ei_method_and_pick_units() -> None:
         for label, method in zip(MODULUS_METHODS, ModulusMethod):
             w._widgets["modulus_method"].setCurrentIndex(w._widgets["modulus_method"].findText(label))
             erm_mpa = rock_mass_modulus(inp, method)
-            assert f"{erm_mpa * 1000.0:.2f} kPa" in w._outputs.text(), (label, w._outputs.text())
+            assert f"{erm_mpa * 1000.0:.2f} kPa" in w._results.results_text(), (label, w._results.results_text())
         # ORMAS values: 3686.23 / 9340.70 / 5477.23 MPa (checked in test_hoek_brown)
         # picks return kPa; the form shows the display unit (MPa here)
         w._set_stress_unit("MPa")

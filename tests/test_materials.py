@@ -339,7 +339,7 @@ def test_window_project_save_open_and_import() -> None:
 
     app, w = _window()
     try:
-        w._title_edit.setText("Two materials")
+        w.set_project_title("Two materials")
         w._add_material("rock")
         w._widgets["gsi"].setValue(65.0)
         roc = roc_import.parse_roc(EXAMPLES / "Granite Triaxial Data.roc")

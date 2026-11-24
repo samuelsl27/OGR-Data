@@ -227,7 +227,7 @@ def test_window_add_view_manage_and_generate() -> None:
     w = MainWindow()
     try:
         w._set_stress_unit("kPa")
-        w._title_edit.setText("Report test")
+        w.set_project_title("Report test")
         names = [a.text() for m in w.menuBar().actions() if m.text() == "Analysis" for a in m.menu().actions()]
         assert {"Report Generator…", "Add View To Report", "Manage Report View…"} <= set(names)
         first = w.add_view_to_report()

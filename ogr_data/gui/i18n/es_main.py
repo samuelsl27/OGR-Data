@@ -193,4 +193,16 @@ ES = {
     "dash-dot": "trazo y punto",
     "dotted": "punteada",
     "Language": "Idioma",
+    # ------------------------------------------------ spec 025b: window layout
+    "Stress range": "Rango de tensiones",
+    "Results": "Resultados",
+    "Results panel": "Panel de resultados",
+    "Sampler": "Muestreador",
+    "Toolbar": "Barra de herramientas",
+    "Project Settings…": "Configuración del proyecto…",
+    "No envelope for these parameters.": "No hay envolvente con estos parámetros.",
+    "This criterion has no derived parameters: its strength parameters are the inputs.": (
+        "Este criterio no tiene parámetros derivados: sus parámetros de resistencia son los datos de entrada."
+    ),
+    "Over the stress range up to sig3max = {0}.": "En el rango de tensiones hasta sig3max = {0}.",
 }

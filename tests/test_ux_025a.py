@@ -59,7 +59,7 @@ def test_dark_theme_paints_the_sidebar_dark() -> None:
         w.show()
         w._set_theme("dark")
         app.processEvents()
-        sidebar = w.findChild(QScrollArea).widget()
+        sidebar = w.findChild(QScrollArea, "sidebar").widget()
         assert sidebar.palette().color(QPalette.ColorRole.Window).name() == "#2b2b2b"
         # what is really painted: a pixel of the sidebar's margin
         pixel = sidebar.grab().toImage().pixelColor(2, 2)

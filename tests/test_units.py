@@ -87,7 +87,7 @@ def test_units_window_offscreen() -> None:
         assert w._principal.axes.xaxis.get_major_formatter()(7.5, 0) == "7.5"
         assert w._shear.axes.yaxis.get_major_formatter()(2.0, 0) == "2"
         assert "normal stress (MPa)" == w._shear.axes.get_xlabel()
-        assert "MPa" in w._outputs.text() and "kPa" not in w._outputs.text()
+        assert "MPa" in w._results.results_text() and "kPa" not in w._results.results_text()
 
         # round trip back to kPa is idempotent
         w._set_stress_unit("kPa")
@@ -98,7 +98,7 @@ def test_units_window_offscreen() -> None:
         assert w._principal.axes.xaxis.get_major_formatter()(7.5, 0) == "7500"
 
         # project title drives the window title
-        w._title_edit.setText("Portal tunnel")
+        w.set_project_title("Portal tunnel")
         assert w.windowTitle().replace("[*]", "") == "OGR Data - Portal tunnel"  # [*]: unsaved mark (spec 023)
 
         # save keeps the display unit and title; loading applies them

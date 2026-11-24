@@ -83,7 +83,7 @@ Siguientes (24-11-2026):
     interfaz contra la nueva [guía de UX](ux-guidelines.md), en seis
     specs ([índice](../features/025-revision-ux/README.md)): **025a**
     errores visibles (hecha), **025b** ventana principal con los
-    resultados en un panel a la derecha (aprobada, con plan), **025c**
+    resultados en un panel a la derecha (hecha), **025c**
     menús y convenciones, **025d** estados vacíos y confirmaciones,
     **025e** notación, decimales y unidades, **025f** ayuda,
     accesibilidad y progreso (borradores).

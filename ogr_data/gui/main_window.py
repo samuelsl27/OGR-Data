@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QColorDialog,
     QComboBox,
     QDialog,
+    QDockWidget,
     QDoubleSpinBox,
     QFormLayout,
     QGridLayout,
@@ -30,7 +31,9 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSplitter,
+    QStyle,
     QTabWidget,
+    QToolBar,
     QToolButton,
     QTreeWidget,
     QTreeWidgetItem,
@@ -54,6 +57,7 @@ from ..core.models import CRITERIA, Criterion, defaults
 from . import i18n
 from .i18n import tr
 from .plots import EnvelopeCanvas, PathCanvas
+from .results_panel import ResultsPanel
 from .settings import app_settings
 from .themes import THEMES, apply_theme
 
@@ -172,79 +176,53 @@ class MainWindow(QMainWindow):
         self._young = self._stiffness_box.spins["young"]
         self._use_erm = self._stiffness_box.use_erm
 
-        self._outputs = QLabel()
-        self._outputs.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self._outputs.setMinimumWidth(280)
-        self._outputs.setStyleSheet("font-family: Consolas, monospace;")
-
+        # spec 025b: the sidebar holds only the material, in titled sections
+        # (materials, material, stress range, parameters, stiffness); the
+        # results moved to a panel on the right, project and program
+        # settings to File > Project Settings and the toolbar.
         sidebar = QVBoxLayout()
         sidebar.addWidget(self._build_material_panel())
-        sidebar.addWidget(QLabel(tr("Failure criterion")))
-        sidebar.addWidget(self._criterion_combo)
-        self._classifier_button = QPushButton(tr("Soil classifier (USCS)…"))
-        self._classifier_button.clicked.connect(self._open_classifier)
-        sidebar.addWidget(self._classifier_button)
-        self._fit_button = QPushButton(tr("Fit lab data…"))
-        self._fit_button.clicked.connect(self._open_fit_dialog)
-        sidebar.addWidget(self._fit_button)
+        material_box = QGroupBox("Material")  # i18n: ignore (same in Spanish)
+        material_layout = QVBoxLayout(material_box)
+        material_form = QFormLayout()
+        material_form.setContentsMargins(0, 0, 0, 0)
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText(tr("Material name"))
         self._name_edit.setText(self._project.materials[0].name)
         self._name_edit.textChanged.connect(self._name_edited)
         self._name_edit.editingFinished.connect(self._name_edit_finished)
         self._name_edit.editingFinished.connect(self._close_history_group)
-        sidebar.addWidget(self._name_edit)
-        # spec 017: display stress unit and project title
-        unit_row = QHBoxLayout()
-        unit_row.addWidget(QLabel(tr("Stress unit")))
+        material_form.addRow(tr("Name"), self._name_edit)
+        material_form.addRow(tr("Failure criterion"), self._criterion_combo)
+        material_layout.addLayout(material_form)
+        self._classifier_button = QPushButton(tr("Soil classifier (USCS)…"))
+        self._classifier_button.clicked.connect(self._open_classifier)
+        material_layout.addWidget(self._classifier_button)
+        self._fit_button = QPushButton(tr("Fit lab data…"))
+        self._fit_button.clicked.connect(self._open_fit_dialog)
+        material_layout.addWidget(self._fit_button)
+        sidebar.addWidget(material_box)
+        range_box = QGroupBox(tr("Stress range"))
+        range_form = QFormLayout(range_box)
+        range_form.addRow(tr("Application (sigma3max range)"), self._application_combo)
+        self._sig3max_label = QLabel(tr("sig3max (envelope range)"))
+        range_form.addRow(self._sig3max_label, self._sig3max)
+        range_form.addRow(self._app_fields)
+        sidebar.addWidget(range_box)
+        sidebar.addWidget(self._form_box)
+        sidebar.addWidget(self._stiffness_box)
+        sidebar.addStretch(1)
+        # spec 017: display stress unit, now in the toolbar and Project Settings
         self._unit_combo = QComboBox()
         for unit_name in units.STRESS_FACTORS:
             self._unit_combo.addItem(unit_name)
         self._unit_combo.setCurrentText(self._stress_unit)
-        unit_row.addWidget(self._unit_combo)
-        sidebar.addLayout(unit_row)
-        self._title_edit = QLineEdit()
-        self._title_edit.setPlaceholderText(tr("Project title"))
-        self._title_edit.textChanged.connect(self._update_window_title)
-        self._title_edit.editingFinished.connect(self._title_edited)
-        sidebar.addWidget(self._title_edit)
-        copy_row = QHBoxLayout()
-        copy_material = QPushButton(tr("Copy material"))
-        copy_material.clicked.connect(self._copy_material)
-        copy_data = QPushButton(tr("Copy data"))
-        copy_data.clicked.connect(self._copy_data)
-        copy_image = QPushButton(tr("Copy plot"))
-        copy_image.clicked.connect(self._copy_plot_image)
-        copy_row.addWidget(copy_material)
-        copy_row.addWidget(copy_data)
-        copy_row.addWidget(copy_image)
-        sidebar.addLayout(copy_row)
-        file_row = QHBoxLayout()
-        save_button = QPushButton(tr("Save…"))
-        save_button.clicked.connect(self._save_project)
-        load_button = QPushButton(tr("Load…"))
-        load_button.clicked.connect(self._load_project)
-        import_button = QPushButton(tr("Import .roc…"))
-        import_button.clicked.connect(self._import_roc)
-        file_row.addWidget(save_button)
-        file_row.addWidget(load_button)
-        file_row.addWidget(import_button)
-        sidebar.addLayout(file_row)
-        sidebar.addWidget(QLabel(tr("Application (sigma3max range)")))
-        sidebar.addWidget(self._application_combo)
-        self._sig3max_label = QLabel(tr("sig3max (envelope range)"))
-        sidebar.addWidget(self._sig3max_label)
-        sidebar.addWidget(self._sig3max)
-        sidebar.addWidget(self._app_fields)
-        sidebar.addWidget(self._form_box)
-        sidebar.addWidget(self._stiffness_box)
-        sidebar.addWidget(QLabel(tr("Computed")))
-        sidebar.addWidget(self._outputs, stretch=1)
 
         sidebar_widget = QWidget()
         sidebar_widget.setLayout(sidebar)
         sidebar_widget.setMaximumWidth(360)
         scroll = QScrollArea()
+        scroll.setObjectName("sidebar")
         scroll.setWidget(sidebar_widget)
         scroll.setWidgetResizable(True)
         scroll.setMaximumWidth(380)
@@ -301,6 +279,8 @@ class MainWindow(QMainWindow):
         splitter.setSizes([380, 770])
         self.setCentralWidget(splitter)
         self.statusBar()
+        self._build_results_dock()
+        self._build_toolbar()
 
         self._rebuild_form()
         self._overlay_mc_act.setChecked(True)
@@ -310,6 +290,10 @@ class MainWindow(QMainWindow):
         self.refresh()
         self._history = hist.History(self._state())
         self._update_history_ui()
+        # spec 025b RF-4: results panel and toolbar as the user left them
+        state = self._settings.value("window_state")
+        if state:
+            self.restoreState(state)
 
     # ----------------------------------------------------------------- menus
 
@@ -317,11 +301,15 @@ class MainWindow(QMainWindow):
         bar = QMenuBar(self)
         self.setMenuBar(bar)
 
+        # spec 025b: the actions the toolbar shares are attributes, so the
+        # toolbar and the menu hold the same QAction (one enabled state)
         file_menu = bar.addMenu(tr("File"))
-        file_menu.addAction(tr("New Project"), self._new_project)
-        file_menu.addAction(tr("Save…"), self._save_project)
-        file_menu.addAction(tr("Load…"), self._load_project)
+        self._new_act = file_menu.addAction(tr("New Project"), self._new_project)
+        self._save_act = file_menu.addAction(tr("Save…"), self._save_project)
+        self._open_act = file_menu.addAction(tr("Load…"), self._load_project)
         file_menu.addAction(tr("Import .roc…"), self._import_roc)
+        file_menu.addSeparator()
+        self._project_settings_act = file_menu.addAction(tr("Project Settings…"), self._open_project_settings)
         file_menu.addSeparator()
         file_menu.addAction(tr("Exit"), self.close)
 
@@ -336,8 +324,9 @@ class MainWindow(QMainWindow):
         edit_menu.addAction(self._undo_act)
         edit_menu.addAction(self._redo_act)
         edit_menu.addSeparator()
-        edit_menu.addAction(tr("Copy material"), self._copy_material)
-        edit_menu.addAction(tr("Copy data"), self._copy_data)
+        self._copy_material_act = edit_menu.addAction(tr("Copy material"), self._copy_material)
+        self._copy_data_act = edit_menu.addAction(tr("Copy data"), self._copy_data)
+        self._copy_plot_act = edit_menu.addAction(tr("Copy plot"), self._copy_plot_image)
 
         materials_menu = bar.addMenu(tr("Materials"))
         materials_menu.addAction(tr("Add Material"), lambda: self._add_material("material"))
@@ -359,7 +348,7 @@ class MainWindow(QMainWindow):
         calibrate_menu = bar.addMenu(tr("Calibrate"))
         calibrate_menu.addAction(tr("Calibrate…"), self._open_calibration)
         compute_menu = bar.addMenu(tr("Compute"))  # spec 013
-        compute_menu.addAction(tr("Compute"), self.compute)
+        self._compute_act = compute_menu.addAction(tr("Compute"), self.compute)
 
         analysis_menu = bar.addMenu(tr("Analysis"))
         self._stress_sampler_act = QAction(tr("Stress Sampler"), self, checkable=True)
@@ -402,9 +391,120 @@ class MainWindow(QMainWindow):
             language_group.addAction(act)
         view_menu.addSeparator()
         view_menu.addAction(tr("Graph Editor…"), self._open_graph_editor)
+        # spec 025b: View > Results panel / Toolbar (filled once they exist)
+        self._view_menu = view_menu
 
         help_menu = bar.addMenu(tr("Help"))
         help_menu.addAction(tr("About OGR Data"), self._about)
+
+    # ------------------------------------------------- spec 025b: results panel and toolbar
+
+    def _build_results_dock(self) -> None:
+        """The results of the selected material, docked on the right (RF-1)."""
+
+        self._results = ResultsPanel(self._copy_material)
+        self._results_dock = QDockWidget(tr("Results"), self)
+        self._results_dock.setObjectName("results_dock")  # saveState / restoreState
+        self._results_dock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self._results_dock.setWidget(self._results)
+        self._results.setMinimumWidth(220)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self._results_dock)
+        toggle = self._results_dock.toggleViewAction()
+        toggle.setText(tr("Results panel"))
+        self._view_menu.addSeparator()
+        self._view_menu.addAction(toggle)
+
+    def _build_toolbar(self) -> None:
+        """The actions of every session, with the same QAction as the menus (RF-7)."""
+
+        bar = QToolBar(tr("Toolbar"), self)
+        bar.setObjectName("main_toolbar")  # saveState / restoreState
+        bar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        style = self.style()
+        icons = {
+            self._new_act: QStyle.StandardPixmap.SP_FileIcon,
+            self._open_act: QStyle.StandardPixmap.SP_DialogOpenButton,
+            self._save_act: QStyle.StandardPixmap.SP_DialogSaveButton,
+            self._undo_act: QStyle.StandardPixmap.SP_ArrowBack,
+            self._redo_act: QStyle.StandardPixmap.SP_ArrowForward,
+            self._copy_material_act: QStyle.StandardPixmap.SP_FileLinkIcon,
+            self._copy_data_act: QStyle.StandardPixmap.SP_FileDialogDetailedView,
+            self._copy_plot_act: QStyle.StandardPixmap.SP_DesktopIcon,
+            self._compute_act: QStyle.StandardPixmap.SP_MediaPlay,
+        }
+        groups = (
+            (self._new_act, self._open_act, self._save_act),
+            (self._undo_act, self._redo_act),
+            (self._copy_material_act, self._copy_data_act, self._copy_plot_act),
+            (self._compute_act,),
+        )
+        for index, group in enumerate(groups):
+            if index:
+                bar.addSeparator()
+            for action in group:
+                action.setIcon(style.standardIcon(icons[action]))
+                bar.addAction(action)
+        # Undo/Redo name the step they take back ("Undo Change GSI"): as text
+        # buttons they would resize the bar at every edit, so icon only
+        for action in (self._undo_act, self._redo_act):
+            bar.widgetForAction(action).setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
+        bar.addSeparator()
+        unit_label = QLabel(tr("Stress unit") + " ")
+        unit_label.setBuddy(self._unit_combo)
+        bar.addWidget(unit_label)
+        bar.addWidget(self._unit_combo)
+        self._toolbar = bar
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, bar)
+        toggle = bar.toggleViewAction()
+        toggle.setText(tr("Toolbar"))
+        self._view_menu.addAction(toggle)
+
+    def _results_heading(self) -> str:
+        material = self._current_material()
+        return f"{material.name} ({tr(CRITERIA[material.criterion].label)})"  # i18n: registry
+
+    def _show_derived_results(self) -> None:
+        """RF-9: the derived results of a criterion other than GHB, or why there are none.
+
+        The rows are the report's (``report.computed_rows``): classic
+        Hoek-Brown gives sigcm and the equivalent MC (Hoek 2002), Power Curve
+        and Barton-Bandis the best-fit MC over the range (RocData 2004);
+        one source for the panel and the report.
+        """
+
+        rows = report.computed_rows(self._current_material(), self._stress_unit, tr)
+        if not rows:
+            self._results.set_message(
+                self._results_heading(),
+                tr("This criterion has no derived parameters: its strength parameters are the inputs."),
+            )
+            return
+        note = tr("Over the stress range up to sig3max = {0}.").format(
+            i18n.localize(units.stress_text(self._sig3max_mpa(), self._stress_unit))
+        )
+        self._results.set_results(self._results_heading(), [(label, i18n.localize(value)) for label, value in rows], note)
+
+    # ------------------------------------------------- spec 025b: project settings
+
+    def _open_project_settings(self) -> None:
+        from .project_settings_dialog import ProjectSettingsDialog
+
+        dialog = ProjectSettingsDialog(self._project.title, self._stress_unit, self)
+        if dialog.exec():
+            self.apply_project_settings(dialog.title(), dialog.stress_unit())
+
+    def apply_project_settings(self, title: str, stress_unit: str) -> None:
+        if stress_unit != self._stress_unit:
+            self._unit_combo.setCurrentText(stress_unit)  # -> _set_stress_unit
+        self.set_project_title(title)
+
+    def set_project_title(self, title: str) -> None:
+        """The project title, as one undo step (spec 023)."""
+
+        self._project.title = title
+        self._update_window_title()
+        self._checkpoint()
+        self._close_history_group()
 
     # ------------------------------------------------- spec 011: materials
 
@@ -1051,13 +1151,9 @@ class MainWindow(QMainWindow):
         return units.from_display(self._sig3max.value(), self._stress_unit)
 
     def _update_window_title(self) -> None:
-        title = self._title_edit.text().strip()
+        title = self._project.title.strip()
         # [*]: Qt shows "*" there while the project has unsaved changes (spec 023)
         self.setWindowTitle(f"OGR Data - {title}[*]" if title else "OGR Data[*]")
-
-    def _title_edited(self) -> None:
-        self._checkpoint()
-        self._close_history_group()
 
     def _set_plot_labels(self) -> None:
         u = self._stress_unit
@@ -1415,7 +1511,6 @@ class MainWindow(QMainWindow):
 
         self._store_current()
         self._project.selected = self._current
-        self._project.title = self._title_edit.text()
         self._project.stress_unit = self._stress_unit
         self._project.graph_options = {
             "principal": self._principal.options.to_dict(),
@@ -1481,7 +1576,7 @@ class MainWindow(QMainWindow):
 
     def _show_project(self, project: projects.Project) -> None:
         self._project = project
-        self._title_edit.setText(project.title)
+        self._update_window_title()
         for name, canvas in (("principal", self._principal), ("shear", self._shear)):
             raw = project.graph_options.get(name)
             canvas.apply_options(PlotOptions.from_dict(raw) if raw else PlotOptions())
@@ -1562,7 +1657,6 @@ class MainWindow(QMainWindow):
         """The project as the undo history sees it (title and graph options of the window included)."""
 
         self._project.selected = self._current
-        self._project.title = self._title_edit.text()
         self._project.graph_options = {
             "principal": self._principal.options.to_dict(),
             "shear": self._shear.options.to_dict(),
@@ -1649,10 +1743,17 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event) -> None:  # noqa: N802 (Qt)
         if getattr(self, "_replaced", False) or self._confirm_discard():
             event.accept()
+            if not getattr(self, "_replaced", False):  # the new window saves its own
+                self.save_window_state()
             if self in _OPEN_WINDOWS:
                 _OPEN_WINDOWS.remove(self)
         else:
             event.ignore()
+
+    def save_window_state(self) -> None:
+        """Remember the results panel and the toolbar (spec 025b RF-4)."""
+
+        self._settings.setValue("window_state", self.saveState())
 
     # ------------------------------------------------------------ spec 024: language
 
@@ -1685,7 +1786,6 @@ class MainWindow(QMainWindow):
         old._store_current()
         old._project.selected = old._current
         project = old._project
-        project.title = old._title_edit.text()
         self.report_views = old.report_views
         self.report_visibility = old.report_visibility
         self._overlay_mc_act.setChecked(old._overlay_mc_act.isChecked())
@@ -1701,6 +1801,7 @@ class MainWindow(QMainWindow):
         self._history = old._history
         self._absorb()
         self._graph_tabs.setCurrentIndex(old._graph_tabs.currentIndex())
+        self.restoreState(old.saveState())  # spec 025b: panel and toolbar as they were
 
     # ------------------------------------------------------------------ form
 
@@ -1910,6 +2011,7 @@ class MainWindow(QMainWindow):
         if self._sampler_mode is None:
             self._clear_sampler_marks()
             self.statusBar().clearMessage()
+            self._results.set_sampler_text("")
 
     def _clear_sampler_marks(self) -> None:
         self._principal.clear_sample()
@@ -1964,7 +2066,7 @@ class MainWindow(QMainWindow):
                     f"sigma3 = {units.stress_text(inst.point_x, self._stress_unit)}   sigma1 = {units.stress_text(inst.point_y, self._stress_unit)}   "
                     f"sigma_n = {units.stress_text(n_t, self._stress_unit)}   tau = {units.stress_text(t_t, self._stress_unit)}"
                 )
-            self.statusBar().showMessage(i18n.localize(text))
+            self._show_sample_text(i18n.localize(text))
             return
 
         # shear-space click
@@ -1991,7 +2093,13 @@ class MainWindow(QMainWindow):
                 f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
                 f"sigma_n = {units.stress_text(inst.point_x, self._stress_unit)}   tau = {units.stress_text(inst.point_y, self._stress_unit)}"
             )
-        self.statusBar().showMessage(i18n.localize(text))
+        self._show_sample_text(i18n.localize(text))
+
+    def _show_sample_text(self, text: str) -> None:
+        """The sampler's reading, in the status bar and the results panel (spec 025b RF-8)."""
+
+        self.statusBar().showMessage(text)
+        self._results.set_sampler_text(text)
 
     # --------------------------------------------------------------- refresh
 
@@ -2025,12 +2133,13 @@ class MainWindow(QMainWindow):
         if crit.envelope == "none":
             self._principal.redraw([], [])
             self._shear.redraw([], [])
-            self._outputs.setText(tr("envelope not available for this criterion yet"))
+            self._results.set_message(self._results_heading(), tr("envelope not available for this criterion yet"))
             return
 
         if crit.envelope == "principal":
             curve = ce.principal_curve(key, params, sig3max)
             if curve is None:
+                self._results.set_message(self._results_heading(), tr("No envelope for these parameters."))
                 return
             sig3, sig1 = curve
             normal, shear = ce.tangent_shear(sig3, sig1)
@@ -2054,23 +2163,26 @@ class MainWindow(QMainWindow):
             if key == "generalized_hoek_brown":
                 inp = self._ghb_input(params, sig3max)
                 result = compute(inp, self._modulus_method(params))
-                self._outputs.setText(i18n.localize(
-                    f"mb   = {result.mb:.4f}\n"
-                    f"s    = {result.s:.4f}\n"
-                    f"a    = {result.a:.4f}\n"
-                    f"sigt = {units.stress_text(result.sigt, self._stress_unit)}\n"
-                    f"sigc = {units.stress_text(result.sigc, self._stress_unit)}\n"
-                    f"sigcm= {units.stress_text(result.sigcm, self._stress_unit)}\n"
-                    f"c    = {units.stress_text(result.mc.cohesion, self._stress_unit)}\n"
-                    f"phi  = {result.mc.friction_deg:.2f} deg\n"
-                    f"Erm  = {units.stress_text(result.erm, self._stress_unit, decimals=2)}"
-                ))
+                unit = self._stress_unit
+                rows = [
+                    ("mb", f"{result.mb:.4f}"),
+                    ("s", f"{result.s:.4f}"),
+                    ("a", f"{result.a:.4f}"),
+                    ("sigt", units.stress_text(result.sigt, unit)),
+                    ("sigc", units.stress_text(result.sigc, unit)),
+                    ("sigcm", units.stress_text(result.sigcm, unit)),
+                    ("c", units.stress_text(result.mc.cohesion, unit)),
+                    ("phi", f"{result.mc.friction_deg:.2f} deg"),
+                    ("Erm", units.stress_text(result.erm, unit, decimals=2)),
+                ]
+                self._results.set_results(self._results_heading(), [(k, i18n.localize(v)) for k, v in rows])
             else:
-                self._outputs.setText("")
+                self._show_derived_results()
         else:
             # shear-space criteria
             curve = ce.shear_curve(key, params, sig3max)
             if curve is None:
+                self._results.set_message(self._results_heading(), tr("No envelope for these parameters."))
                 return
             normal, shear = curve
             self._curves["shear"] = (normal, shear)
@@ -2085,7 +2197,7 @@ class MainWindow(QMainWindow):
             else:
                 self._principal.redraw([], [])
                 self._shear.redraw(normal, shear)
-            self._outputs.setText("")
+            self._show_derived_results()
 
         if self._overlay_mogi_act.isChecked() and self._curves["principal"] is not None:
             self._principal.show_mogi(*samplers.mogi_line(sig3max))

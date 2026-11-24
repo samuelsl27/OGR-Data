@@ -1,6 +1,6 @@
 # Spec 025b — Ventana principal: resultados a la vista
 
-> Estado: **aprobada** (2026-11-24): opción B, lecturas del muestreador
+> Estado: **hecha** (2026-11-24; validación en `tasks.md`). Aprobada el mismo día: opción B, lecturas del muestreador
 > en el panel y en la barra de estado, título en *Project Settings*.
 > RF-9 añadido después de aprobar (ver «Cambios tras la aprobación»).
 

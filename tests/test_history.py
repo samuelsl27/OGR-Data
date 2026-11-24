@@ -209,12 +209,11 @@ def test_window_dialog_like_edits() -> None:
         assert w._undo_act.text() == "Undo Change Application"
         w.undo()
         assert w._application_combo.currentData() == "custom" and w._sig3max.value() == 1000.0
-        # project title: one step when the field is left
-        w._title_edit.setText("Portal")
-        w._title_edit.editingFinished.emit()
+        # project title: one step
+        w.set_project_title("Portal")  # spec 025b: File > Project Settings
         assert w._undo_act.text() == "Undo Change Project Title"
         w.undo()
-        assert w._title_edit.text() == ""
+        assert w._project.title == ""
         # the display unit is a preference: no step, values kept
         steps = len(w._history.undo_steps)
         w._set_stress_unit("MPa")
