@@ -82,14 +82,11 @@ class SoilClassifierDialog(QDialog):
         self._highly_organic = QCheckBox(tr("Highly organic soil (peat-like)"))
         self._highly_organic.toggled.connect(self._update)
 
-        classify_button = QPushButton(tr("Classify"))
-        classify_button.clicked.connect(self._update)
 
         inputs = QWidget()
         left = QVBoxLayout(inputs)
         left.addLayout(form)
         left.addWidget(self._highly_organic)
-        left.addWidget(classify_button)
 
         self._symbol = QLineEdit()
         self._symbol.setReadOnly(True)
@@ -99,7 +96,9 @@ class SoilClassifierDialog(QDialog):
 
         results = QWidget()
         right = QVBoxLayout(results)
-        right.addWidget(QLabel(tr("USCS classification")))
+        symbol_label = QLabel(tr("USCS classification"))
+        symbol_label.setBuddy(self._symbol)  # spec 025f RF-3
+        right.addWidget(symbol_label)
         right.addWidget(self._symbol)
         properties_title = QLabel(tr("Engineering properties (NRCS NEH 631, figure 3-22)"))
         properties_title.setWordWrap(True)

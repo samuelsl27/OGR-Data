@@ -21,7 +21,7 @@ LANGUAGES: dict[str, str] = {"en": "English", "es": "Español"}
 #: Decimal separator of each language (what the user reads and types).
 DECIMAL_POINT: dict[str, str] = {"en": ".", "es": ","}
 _DECIMAL_DOT = re.compile(r"(?<=\d)\.(?=\d)")
-ZONES = ("main", "dialogs", "estimation", "registry", "report", "history")
+ZONES = ("main", "dialogs", "estimation", "registry", "report", "history", "tips")
 
 _LANG = "en"
 _DICTS: dict[str, dict[str, str]] = {"en": {}}

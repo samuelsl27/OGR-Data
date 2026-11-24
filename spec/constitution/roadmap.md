@@ -86,7 +86,8 @@ Siguientes (24-11-2026):
     resultados en un panel a la derecha (hecha), **025c**
     menús y convenciones (hecha), **025d** estados vacíos y confirmaciones (hecha),
     **025e** notación, decimales y unidades (hecha), **025f** ayuda,
-    accesibilidad y progreso (borradores).
+    accesibilidad y progreso (hechas todas; las fuentes que faltan para
+    la ayuda de parámetros, en `025f-.../fuentes-pendientes.md`).
 
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.

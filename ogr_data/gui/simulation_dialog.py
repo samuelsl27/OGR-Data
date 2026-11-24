@@ -65,6 +65,7 @@ class TestSimulationsDialog(_ItemsDialog):
         row.setContentsMargins(0, 0, 0, 0)
         row.addWidget(self._cyclic)
         row.addWidget(self._cycles, stretch=1)
+        self._cycles.setAccessibleName(self._cyclic.text())  # spec 025f RF-3: the check box names it
         # General Test: strain direction (proportional strain path)
         self._ratio_box = QWidget()
         grid = QGridLayout(self._ratio_box)
@@ -74,7 +75,9 @@ class TestSimulationsDialog(_ItemsDialog):
             spin = NumberSpinBox()
             spin.setRange(-1000.0, 1000.0)
             spin.setDecimals(4)
-            grid.addWidget(QLabel(name), i // 3 * 2, i % 3)
+            component = QLabel(name)
+            component.setBuddy(spin)  # spec 025f RF-3
+            grid.addWidget(component, i // 3 * 2, i % 3)
             grid.addWidget(spin, i // 3 * 2 + 1, i % 3)
             self._ratios.append(spin)
         self._test_type.currentIndexChanged.connect(self._config_changed)

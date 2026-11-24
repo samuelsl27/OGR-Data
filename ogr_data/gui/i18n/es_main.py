@@ -222,4 +222,38 @@ ES = {
     "Deleted '{0}'. Undo (Ctrl+Z) brings it back.": "Eliminado «{0}». Deshacer (Ctrl+Z) lo recupera.",
     "A project keeps at least one material.": "Un proyecto conserva al menos un material.",
     "This graph has no data to export.": "Esta gráfica no tiene datos que exportar.",
+    # ------------------------------------------------ spec 025f: help, accessibility, progress
+    "Unit": "Unidad",
+    "Typical range": "Rango típico",
+    "Source": "Fuente",
+    "Computing test simulations…": "Calculando las simulaciones de ensayo…",
+    "Compute cancelled: {0} of {1} test simulations computed": "Cálculo cancelado: {0} de {1} simulaciones calculadas",
+    "Field estimates of the uniaxial compressive strength (Hoek, Practical Rock Engineering, Table 2; grades after Brown 1981).": (
+        "Estimaciones de campo de la resistencia a compresión simple (Hoek, Practical Rock Engineering, tabla 2; grados según Brown 1981)."
+    ),
+    "Values of the constant mi by rock group (Hoek, Practical Rock Engineering, Table 3).": (
+        "Valores de la constante mi por grupo de roca (Hoek, Practical Rock Engineering, tabla 3)."
+    ),
+    "GSI chart (Marinos and Hoek 2000) and quantified GSI (Hoek, Carter and Diederichs 2013).": (
+        "Carta del GSI (Marinos y Hoek 2000) y GSI cuantificado (Hoek, Carter y Diederichs 2013)."
+    ),
+    "Guidelines for the disturbance factor D (Hoek, Carranza-Torres and Corkum 2002, Table 1).": (
+        "Guía para el factor de alteración D (Hoek, Carranza-Torres y Corkum 2002, tabla 1)."
+    ),
+    "Ei = MR x sigci, with MR after Deere (1968) and Palmstrom and Singh (2001) (Hoek, Practical Rock Engineering).": (
+        "Ei = MR x sigci, con MR según Deere (1968) y Palmstrom y Singh (2001) (Hoek, Practical Rock Engineering)."
+    ),
+    "Basic friction angle and the residual one with the Schmidt rebound correction (FHWA 1989, after Barton).": (
+        "Ángulo de rozamiento básico y el residual con la corrección del martillo Schmidt (FHWA 1989, según Barton)."
+    ),
+    "JRC from the profiles of Barton and Choubey (1977), with the scale correction of Barton and Bandis (1982).": (
+        "JRC a partir de los perfiles de Barton y Choubey (1977), con la corrección de escala de Barton y Bandis (1982)."
+    ),
+    "JCS from field estimates of strength (Hoek, Table 2; FHWA 1989, Table II), with the scale correction of Barton and Bandis (1982).": (
+        "JCS a partir de estimaciones de campo de la resistencia (Hoek, tabla 2; FHWA 1989, tabla II), con la corrección de escala "
+        "de Barton y Bandis (1982)."
+    ),
+    "Typical c and phi of compacted soils by USCS group (UFC 3-220-01N, Table 8-3.1).": (
+        "c y phi típicos de suelos compactados por grupo USCS (UFC 3-220-01N, tabla 8-3.1)."
+    ),
 }

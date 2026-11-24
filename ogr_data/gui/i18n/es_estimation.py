@@ -144,7 +144,6 @@ ES = {
     "Plasticity index, PI": "Índice de plasticidad, IP",
     "LL(oven dry) / LL(air dry)": "LL(secado en estufa) / LL(secado al aire)",
     "Highly organic soil (peat-like)": "Suelo muy orgánico (tipo turba)",
-    "Classify": "Clasificar",
     "USCS classification": "Clasificación USCS",
     "Engineering properties (NRCS NEH 631, figure 3-22)": "Propiedades geotécnicas (NRCS NEH 631, figura 3-22)",
     "Typical strength, compacted (UFC 3-220-01N Table 8-3.1, USBR data)":

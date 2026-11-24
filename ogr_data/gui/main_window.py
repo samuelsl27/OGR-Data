@@ -60,6 +60,7 @@ from . import accelerators
 from .i18n import tr
 from .number_spin import NumberSpinBox
 from .plots import EnvelopeCanvas, PathCanvas
+from .parameter_tooltip import parameter_tooltip
 from .results_panel import ResultsPanel
 from ..core.numbers import format_number, symbols
 from .settings import app_settings
@@ -70,6 +71,23 @@ def _t(text: str) -> str:
     """Marks an English text that is translated later, where it is shown (spec 024)."""
 
     return text
+
+
+def _pick_tooltip(key: str) -> str:
+    """The table a Pick… button opens and its source (spec 025f RF-8); sources as in ogr_data/data."""
+
+    tips = {
+        "sigci_grades": tr("Field estimates of the uniaxial compressive strength (Hoek, Practical Rock Engineering, Table 2; grades after Brown 1981)."),
+        "mi_values": tr("Values of the constant mi by rock group (Hoek, Practical Rock Engineering, Table 3)."),
+        "gsi_chart": tr("GSI chart (Marinos and Hoek 2000) and quantified GSI (Hoek, Carter and Diederichs 2013)."),
+        "disturbance": tr("Guidelines for the disturbance factor D (Hoek, Carranza-Torres and Corkum 2002, Table 1)."),
+        "modulus_ratio": tr("Ei = MR x sigci, with MR after Deere (1968) and Palmstrom and Singh (2001) (Hoek, Practical Rock Engineering)."),
+        "barton_phi": tr("Basic friction angle and the residual one with the Schmidt rebound correction (FHWA 1989, after Barton)."),
+        "barton_jrc": tr("JRC from the profiles of Barton and Choubey (1977), with the scale correction of Barton and Bandis (1982)."),
+        "barton_jcs": tr("JCS from field estimates of strength (Hoek, Table 2; FHWA 1989, Table II), with the scale correction of Barton and Bandis (1982)."),
+        "compacted_soil": tr("Typical c and phi of compacted soils by USCS group (UFC 3-220-01N, Table 8-3.1)."),
+    }
+    return symbols(tips.get(key, ""))
 
 
 #: Recent Projects kept in the settings (spec 025c).
@@ -166,6 +184,7 @@ class MainWindow(QMainWindow):
         app_form.setContentsMargins(0, 0, 0, 0)
         self._depth_label = QLabel(tr("Tunnel depth"))
         app_form.addRow(tr("Unit weight"), self._unit_weight)
+        self._depth_label.setBuddy(self._app_depth)  # spec 025f RF-3
         app_form.addRow(self._depth_label, self._app_depth)
         self._app_fields.setVisible(False)
 
@@ -214,6 +233,7 @@ class MainWindow(QMainWindow):
         range_form = QFormLayout(range_box)
         range_form.addRow(symbols(tr("Application (sigma3max range)")), self._application_combo)
         self._sig3max_label = QLabel(symbols(tr("sig3max (envelope range)")))
+        self._sig3max_label.setBuddy(self._sig3max)  # spec 025f RF-3
         range_form.addRow(self._sig3max_label, self._sig3max)
         range_form.addRow(self._app_fields)
         sidebar.addWidget(range_box)
@@ -319,6 +339,7 @@ class MainWindow(QMainWindow):
         self._unit_combo.currentTextChanged.connect(self._set_stress_unit)
         self._loading = False
         self._populate_tree()
+        self._apply_tab_order()
         self.refresh()
         self._history = hist.History(self._state())
         self._update_history_ui()
@@ -483,8 +504,11 @@ class MainWindow(QMainWindow):
         accelerators.assign(self._symbol_menu)
 
     def _assign_accelerators(self) -> None:
-        """Alt letters for every menu (spec 025c RF-4), once all entries exist."""
+        """Alt letters for every menu (spec 025c RF-4) and status tips (spec 025f RF-2), once all entries exist."""
 
+        from . import status_tips
+
+        status_tips.apply(self.menuBar())
         accelerators.assign(self.menuBar())
 
     # ------------------------------------------------- spec 025c: files, recent projects, delete
@@ -623,8 +647,9 @@ class MainWindow(QMainWindow):
             if index:
                 bar.addSeparator()
             for action in group:
-                action.setIcon(style.standardIcon(icons[action]))
                 bar.addAction(action)
+        self._toolbar_icons = icons
+        self._apply_toolbar_icons()
         # Undo/Redo name the step they take back ("Undo Change GSI"): as text
         # buttons they would resize the bar at every edit, so icon only
         for action in (self._undo_act, self._redo_act):
@@ -639,6 +664,43 @@ class MainWindow(QMainWindow):
         toggle = bar.toggleViewAction()
         toggle.setText(tr("Toolbar"))
         self._view_menu.addAction(toggle)
+
+    def _apply_toolbar_icons(self) -> None:
+        """Toolbar icons readable on both themes (spec 025b finding, 025f RF-5).
+
+        The style's arrows and play mark are black pictures: on the dark theme
+        an enabled Undo was dark grey on dark grey and a disabled Redo almost
+        invisible. Those single-colour icons are drawn in the theme's text
+        colour; every icon gets its disabled look in the theme's disabled colour.
+        """
+
+        from PySide6.QtGui import QPainter
+
+        dark = self._theme == "dark"
+        text = QColor("#e0e0e0" if dark else "#202020")
+        disabled = QColor("#8a8a8a" if dark else "#a0a0a0")
+        single_colour = {QStyle.StandardPixmap.SP_ArrowBack, QStyle.StandardPixmap.SP_ArrowForward, QStyle.StandardPixmap.SP_MediaPlay}
+
+        def tinted(pixmap: QPixmap, colour: QColor) -> QPixmap:
+            out = QPixmap(pixmap.size())
+            out.setDevicePixelRatio(pixmap.devicePixelRatio())
+            out.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(out)
+            painter.drawPixmap(0, 0, pixmap)
+            painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
+            painter.fillRect(out.rect(), colour)
+            painter.end()
+            return out
+
+        style = self.style()
+        for action, pixmap_id in getattr(self, "_toolbar_icons", {}).items():
+            base = style.standardIcon(pixmap_id)
+            icon = QIcon()
+            for size in (16, 24, 32):
+                pixmap = base.pixmap(size, size)
+                icon.addPixmap(tinted(pixmap, text) if pixmap_id in single_colour else pixmap, QIcon.Mode.Normal)
+                icon.addPixmap(tinted(pixmap, disabled), QIcon.Mode.Disabled)
+            action.setIcon(icon)
 
     def _results_heading(self) -> str:
         material = self._current_material()
@@ -1331,6 +1393,7 @@ class MainWindow(QMainWindow):
         for canvas in self._path_canvases.values():
             canvas.apply_theme(name)
         self._populate_tree()  # automatic-color swatches follow the theme
+        self._apply_toolbar_icons()
         self.refresh()
 
     # ---------------------------------------------------------- spec 017: display units
@@ -1546,18 +1609,43 @@ class MainWindow(QMainWindow):
     def compute(self, report_problems: bool = True) -> list[str]:
         """Compute (RSData menu): re-run every test simulation; returns the problems."""
 
+        from PySide6.QtWidgets import QApplication, QProgressDialog
+
         self._store_current()
         self._sim_cache.clear()
         problems, done = [], 0
-        for material in self._project.materials:
-            for test in material.test_simulations:
-                result = self.simulation_result(material, test)
-                if isinstance(result, str):
-                    problems.append(f"{material.name} / {test.name}: {result}")
-                else:
-                    done += 1
+        tests = [(material, test) for material in self._project.materials for test in material.test_simulations]
+        # spec 025f RF-6: one simulation takes up to ~0.5 s (NorSand, measured
+        # 2026-11-24), so several pass the second: progress and Cancel. The
+        # dialog only shows if the run lasts more than a second.
+        self._compute_progress = None
+        if len(tests) > 1:
+            # the Cancel button keeps Qt's own text (translated by Qt's catalogue, spec 024)
+            self._compute_progress = QProgressDialog(self)
+            self._compute_progress.setLabelText(tr("Computing test simulations…"))
+            self._compute_progress.setRange(0, len(tests))
+            self._compute_progress.setWindowModality(Qt.WindowModality.WindowModal)
+            self._compute_progress.setMinimumDuration(1000)
+        cancelled = False
+        for index, (material, test) in enumerate(tests):
+            if self._compute_progress is not None:
+                self._compute_progress.setValue(index)
+                QApplication.processEvents()
+                if self._compute_progress.wasCanceled():
+                    cancelled = True
+                    break
+            result = self.simulation_result(material, test)
+            if isinstance(result, str):
+                problems.append(f"{material.name} / {test.name}: {result}")
+            else:
+                done += 1
+        if self._compute_progress is not None:
+            self._compute_progress.setValue(len(tests))
+            self._compute_progress.close()
         self.refresh()
-        if done == 1:
+        if cancelled:
+            message = tr("Compute cancelled: {0} of {1} test simulations computed").format(done, len(tests))
+        elif done == 1:
             message = tr("Compute: 1 test simulation computed")
         else:
             message = tr("Compute: {0} test simulations computed").format(done)
@@ -1892,7 +1980,12 @@ class MainWindow(QMainWindow):
         self._redo_act.setEnabled(h.can_redo)
         self._undo_act.setText(tr("Undo {0}").format(h.undo_text_in(tr)) if h.can_undo else tr("Undo"))
         self._redo_act.setText(tr("Redo {0}").format(h.redo_text_in(tr)) if h.can_redo else tr("Redo"))
-        accelerators.assign(self._edit_menu)  # the new texts get their Alt letter again (spec 025c)
+        from shiboken6 import isValid
+
+        # the new texts get their Alt letter again (spec 025c); a window closed while
+        # the application shuts down may have lost its menus already
+        if isValid(self._edit_menu):
+            accelerators.assign(self._edit_menu)
         self._update_window_title()
         self.setWindowModified(h.modified)
 
@@ -2018,6 +2111,7 @@ class MainWindow(QMainWindow):
         while self._form_layout.rowCount():
             self._form_layout.removeRow(0)
         self._widgets = {}
+        self._pick_buttons: dict[str, QPushButton] = {}
         for field in self._criterion().fields:
             if field.kind == "bool":
                 widget = QCheckBox()
@@ -2059,9 +2153,58 @@ class MainWindow(QMainWindow):
                 row.setContentsMargins(0, 0, 0, 0)
                 row.addWidget(widget, stretch=1)
                 pick_button = QPushButton(tr("Pick…"))
+                # spec 025f RF-8: which table it opens and where the table comes from
+                pick_button.setToolTip(_pick_tooltip(field.pick))
+                pick_button.setAccessibleName(f"{tr('Pick…')} {tr(field.label)}")  # i18n: registry
                 pick_button.clicked.connect(lambda _=False, f=field, w=widget: self._pick(f, w))
                 row.addWidget(pick_button)
-            self._form_layout.addRow(tr(field.label), editor)  # i18n: registry
+                self._pick_buttons[field.key] = pick_button
+            label = QLabel(tr(field.label))  # i18n: registry
+            label.setBuddy(widget)  # spec 025f RF-3: the input, not the row holding it
+            # spec 025f RF-1: definition, unit, typical range and source
+            unit = self._stress_unit if field.unit == "kPa" else field.unit
+            tip = parameter_tooltip(self._criterion_combo.currentData(), field.key, tr(field.label), unit)  # i18n: registry
+            label.setToolTip(tip)
+            widget.setToolTip(tip)
+            self._form_layout.addRow(label, editor)
+        self._apply_range_tooltips()
+        self._apply_tab_order()
+
+    def _apply_range_tooltips(self) -> None:
+        """Help of the stress-range fields for the current criterion (spec 025f RF-1)."""
+
+        criterion = self._criterion_combo.currentData()
+        unit = self._stress_unit
+        for widget, key, label, field_unit in (
+            (self._sig3max, "sig3max", tr("sig3max (envelope range)"), unit),
+            (self._application_combo, "application", tr("Application (sigma3max range)"), ""),
+            (self._unit_weight, "unit_weight", tr("Unit weight"), "MN/m3"),
+            (self._app_depth, "tunnel_depth", tr("Tunnel depth"), "m"),
+        ):
+            widget.setToolTip(parameter_tooltip(criterion, key, label, field_unit))
+
+    def _apply_tab_order(self) -> None:
+        """Tab goes down the sidebar as it reads (spec 025f RF-4).
+
+        The widgets are created out of that order (the range fields before
+        the materials panel, the form rebuilt per criterion), so Qt's default
+        order, which follows creation, jumped around.
+        """
+
+        if not hasattr(self, "_tree") or not hasattr(self, "_stiffness_box"):
+            return
+        chain = [
+            self._tree, self._add_button, self._duplicate_button, self._delete_button,
+            self._name_edit, self._criterion_combo, self._classifier_button, self._fit_button,
+            self._application_combo, self._sig3max, self._unit_weight, self._app_depth,
+        ]
+        for key, widget in self._widgets.items():
+            chain.append(widget)
+            if key in self._pick_buttons:
+                chain.append(self._pick_buttons[key])
+        chain += self._stiffness_box.tab_chain()
+        for first, second in zip(chain, chain[1:]):
+            QWidget.setTabOrder(first, second)
 
     def pick_value(self, key: str) -> float | None:
         """Open the selector of a pick key; the value in registry units (kPa for stresses)."""

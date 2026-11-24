@@ -88,7 +88,9 @@ class AnimationPanel(QGroupBox):
         self.hint.setWordWrap(True)
         controls.addWidget(self.hint)
         top = QHBoxLayout()
-        top.addWidget(QLabel("Material:"))  # i18n: ignore (same in Spanish)
+        material_label = QLabel("Material:")  # i18n: ignore (same in Spanish)
+        material_label.setBuddy(self.material)  # spec 025f RF-3
+        top.addWidget(material_label)
         top.addWidget(self.material, stretch=1)
         controls.addLayout(top)
         row = QHBoxLayout()

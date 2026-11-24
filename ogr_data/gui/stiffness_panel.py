@@ -11,7 +11,7 @@ Minimum Shear Modulus). Stresses are stored in kPa and shown in the display unit
 from __future__ import annotations
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox, QHBoxLayout, QPushButton, QWidget
+from PySide6.QtWidgets import QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QPushButton, QWidget
 
 from ..core import simulation as sm
 from .i18n import tr
@@ -87,16 +87,33 @@ class StiffnessPanel(QGroupBox):
                 layout.setContentsMargins(0, 0, 0, 0)
                 layout.addWidget(spin, stretch=1)
                 layout.addWidget(self.use_erm)
-                self.form.addRow(tr(label), row)  # i18n: ignore (keys marked with _t)
+                young_label = QLabel(tr(label))  # i18n: ignore (keys marked with _t)
+                young_label.setBuddy(spin)  # spec 025f RF-3: the input, not its row
+                self.form.addRow(young_label, row)
                 self._young_row = row
             else:
                 self.form.addRow(tr(label), spin)  # i18n: ignore (keys marked with _t)
         self._update_rows()
 
+    def tab_chain(self) -> list:
+        """The panel's inputs in reading order (spec 025f RF-4)."""
+
+        chain = [self.elastic_parameter]
+        for key in _FIELDS:
+            chain.append(self.spins[key])
+            if key == "young":
+                chain.append(self.use_erm)
+        return chain
+
     # ------------------------------------------------------------- rows
 
     def set_criterion(self, criterion: str) -> None:
         self._kind = stiffness_kind(criterion)
+        # spec 025f RF-1: help of each stiffness parameter
+        from .parameter_tooltip import parameter_tooltip
+
+        for key, (label, stress, *_rest) in _FIELDS.items():
+            self.spins[key].setToolTip(parameter_tooltip(criterion, key, tr(label), self._unit if stress else ""))  # i18n: ignore (keys marked with _t)
         title = {"linear": tr(sm.STIFFNESS_TYPES[0]), "camclay": tr("CamClay Isotropic"), "norsand": "NorSand"}[self._kind]  # i18n: registry
         self.setTitle(tr("Stiffness ({0})").format(title))
         self.use_erm.setEnabled(criterion == "generalized_hoek_brown")

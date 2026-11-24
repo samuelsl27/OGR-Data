@@ -1,6 +1,6 @@
 # Spec 025f — Ayuda contextual, accesibilidad y progreso
 
-> Estado: **borrador** (2026-11-24), pendiente de aprobación.
+> Estado: **hecha** (2026-11-24; plan y validación en `plan-tasks.md`; lo que no tiene fuente, en `fuentes-pendientes.md`).
 
 ## Contexto y objetivo
 
@@ -68,6 +68,4 @@ verde.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: ¿quién redacta las definiciones de parámetros, a
-  partir de qué fuentes (Hoek 2007, manuales de RSData como guía)?]
-- [NECESITA ACLARACIÓN: el umbral de RF-6 se fija tras medir.]
+Resueltas (2026-11-24): las definiciones salen de fuentes fiables leídas (biblioteca de la suite y descargas públicas); lo que no tiene fuente queda en `fuentes-pendientes.md`. El umbral de RF-6 se fijó tras medir (una simulación ≤ 0,5 s).
