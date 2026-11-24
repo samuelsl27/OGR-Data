@@ -105,13 +105,19 @@ def shear_curve(key: str, params: Params, sig3max_mpa: float, points: int = 200)
         return None
 
     if key == "power_curve":
-        # RocData 2004 manual: tau = a (sigma + d)^b. Fields c and waviness
-        # are kept in the registry (RSData dialog) with no effect until their
-        # exact semantics are verified.
+        # spec 026: tau = a (sigma_n + d)^b + c + sigma_n tan(i), every stress
+        # in kPa, a included (its value depends on the stress unit when
+        # b != 1). a (sigma_n + d)^b is the power-law Mohr envelope of Hoek and
+        # Brown (FHWA 1989, eq. 30: a = A sigci^(1-B), b = B, d = -T sigci);
+        # c (strength at sigma_n = -d) and the waviness angle i, added to the
+        # friction as Patton's roughness angle (Hoek 2023, eq. 3), are deduced.
         a, b = _f(params, "a"), _f(params, "b")
-        d = _f(params, "d") * KPA_TO_MPA
+        c, d = _f(params, "c"), _f(params, "d")
+        waviness = math.radians(_f(params, "waviness"))
         normal = np.linspace(0.0, sig3max_mpa, points)
-        return normal, a * (normal + d) ** b
+        n_kpa = normal / KPA_TO_MPA
+        tau_kpa = a * np.maximum(n_kpa + d, 0.0) ** b + c + n_kpa * math.tan(waviness)
+        return normal, tau_kpa * KPA_TO_MPA
 
     if key == "barton_bandis":
         # tau = sigma_n tan(phi_r + JRC log10(JCS / sigma_n)), 0 < sigma_n <= JCS

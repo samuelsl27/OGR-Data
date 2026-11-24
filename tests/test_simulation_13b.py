@@ -151,7 +151,8 @@ HOSTUN = {"young": 180000.0, "poisson": 0.35}
 def test_softening_hardening_hyperbolic_law() -> None:
     """Drained triaxial, c = 0: sigma1/sigma3 = N(phi_m) with tan(phi_m) = tan(phi_f) k/(k + A), eq. 11.4."""
 
-    r = _run("softening_hardening", SH, HOSTUN, test_type="triaxial", confining=300.0, max_strain=0.15)
+    # the Mohr-Coulomb potential, explicit since spec 026 made compaction-dilation the default
+    r = _run("softening_hardening", dict(SH, cone_dilation_type="Mohr-Coulomb"), HOSTUN, test_type="triaxial", confining=300.0, max_strain=0.15)
     G = 180000.0 / (2.0 * 1.35)
     kappa = r.eps_q - r.q / (3.0 * G)  # deviatoric plastic strain (triaxial: e_q = e_q^e + e_q^p)
     tan_f = math.tan(math.radians(35.0))

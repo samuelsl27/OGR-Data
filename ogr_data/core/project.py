@@ -22,7 +22,9 @@ from .simulation import TestSimulation, stiffness_from
 from .states import FailureState, StressPath, failure_states_from_dicts
 
 FORMAT_V1 = "ogr-data-project/1"
-FORMAT = "ogr-data-project/2"
+FORMAT_V2 = "ogr-data-project/2"
+# v3 (spec 026): Power Curve a refers to stresses in kPa, as every other field
+FORMAT = "ogr-data-project/3"
 
 Params = Mapping[str, Union[float, bool, str]]
 
@@ -263,20 +265,21 @@ class Project:
     def from_dict(cls, data: Mapping) -> "Project":
         fmt = data.get("format")
         if fmt == FORMAT_V1:
-            return cls._from_v1(data)
-        if fmt != FORMAT:
+            return _power_curve_a_in_kpa(cls._from_v1(data))
+        if fmt not in (FORMAT, FORMAT_V2):
             raise ValueError(f"unsupported project format {fmt!r}")
         materials = [Material.from_dict(m) for m in data.get("materials", [])]
         if not materials:
             raise ValueError("project has no materials")
         selected = int(data.get("selected", 0))
-        return cls(
+        project = cls(
             materials=materials,
             selected=max(0, min(selected, len(materials) - 1)),
             title=str(data.get("title", "")),
             stress_unit=str(data.get("stress_unit", "kPa")),
             graph_options=dict(data.get("graph_options", {})),
         )
+        return _power_curve_a_in_kpa(project) if fmt == FORMAT_V2 else project
 
     @classmethod
     def _from_v1(cls, data: Mapping) -> "Project":
@@ -296,6 +299,19 @@ class Project:
             stress_unit=str(data.get("stress_unit", "kPa")),
             graph_options=dict(data.get("graph_options", {})),
         )
+
+
+def _power_curve_a_in_kpa(project: Project) -> Project:
+    """Files before v3 held Power Curve a for stresses in MPa (spec 026)."""
+
+    from .units import power_curve_a_to_kpa
+
+    for material in project.materials:
+        if material.criterion == "power_curve":
+            p = material.parameters
+            p["a"] = power_curve_a_to_kpa(p["a"], p["b"])
+            p["residual_a"] = power_curve_a_to_kpa(p["residual_a"], p["residual_b"])
+    return project
 
 
 def save_project(path: str | Path, project: Project) -> None:

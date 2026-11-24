@@ -18,6 +18,7 @@ ES = {
     # ----------------------------------------------------------- parameters
     "Material Type": "Tipo de material",
     "Plastic": "Plástico",
+    "Elastic": "Elástico",
     "Peak Cohesion": "Cohesión de pico",
     "Peak Friction Angle": "Ángulo de rozamiento de pico",
     "Peak Tensile Strength": "Resistencia a tracción de pico",

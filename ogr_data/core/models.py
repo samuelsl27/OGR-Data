@@ -23,6 +23,9 @@ class Field:
     pick: str = ""  # picker key: "sigci_grades" | "mi_values" | "gsi_chart"
     # table columns holding stresses (kPa), for display units (spec 013)
     stress_columns: tuple[bool, ...] = ()
+    # spec 026: False while no calculation of OGR Data reads the field; the
+    # form shows it disabled with that reason (rule 7: no setting that does nothing)
+    used: bool = True
 
     def __post_init__(self) -> None:
         if self.kind not in ("float", "bool", "enum", "table"):
@@ -66,7 +69,7 @@ CRITERIA: dict[str, Criterion] = {
         "soil",
         "principal",
         (
-            Field("material_type", "Material Type", "Plastic", kind="enum", options=("Plastic",)),
+            Field("material_type", "Material Type", "Plastic", kind="enum", options=("Plastic", "Elastic")),
             Field("peak_cohesion", "Peak Cohesion", 10.5, "kPa", pick="compacted_soil"),
             Field("peak_friction", "Peak Friction Angle", 35.0, "deg", pick="compacted_soil"),
             *_peak_residual_tensile(),
@@ -81,7 +84,7 @@ CRITERIA: dict[str, Criterion] = {
         "rock",
         "principal",
         (
-            Field("material_type", "Material Type", "Plastic", kind="enum", options=("Plastic",)),
+            Field("material_type", "Material Type", "Plastic", kind="enum", options=("Plastic", "Elastic")),
             Field("compressive_strength", "Compressive Strength", 100000.0, "kPa", pick="sigci_grades"),
             Field("mb", "mb Parameter", 1.0),
             Field("s", "s Parameter", 0.001),
@@ -111,7 +114,7 @@ CRITERIA: dict[str, Criterion] = {
         "rock",
         "principal",
         (
-            Field("define_by", "Define by", "GSI", kind="enum", options=("GSI",)),
+            Field("define_by", "Define by", "GSI", kind="enum", options=("GSI",), used=False),
             Field("sigci", "UCS of intact rock", 100000.0, "kPa", pick="sigci_grades"),
             Field("gsi", "GSI", 50.0, pick="gsi_chart"),
             Field("mi", "mi", 10.0, pick="mi_values"),
@@ -124,7 +127,7 @@ CRITERIA: dict[str, Criterion] = {
             Field("gsi_residual", "GSI Residual", 50.0),
             Field("mi_residual", "mi Residual", 10.0),
             Field("d_residual", "D Residual", 0.0),
-            Field("tensile_cutoff_type", "Tensile Cutoff Type", "None", kind="enum", options=("None",)),
+            Field("tensile_cutoff_type", "Tensile Cutoff Type", "None", kind="enum", options=("None",), used=False),
         ),
     ),
     "cam_clay": Criterion(
@@ -180,7 +183,7 @@ CRITERIA: dict[str, Criterion] = {
                 options=("Plastic Deviatoric Strain", "Friction Angle (deg)", "Cohesion"), stress_columns=(False, False, True),
             ),
             Field("dilation_angle", "Dilation Angle", 0.0, "deg"),
-            Field("cone_dilation_type", "Cone Dilation Type", "Mohr-Coulomb", kind="enum", options=("Mohr-Coulomb", "Compaction-Dilation")),
+            Field("cone_dilation_type", "Cone Dilation Type", "Compaction-Dilation", kind="enum", options=("Mohr-Coulomb", "Compaction-Dilation")),
             Field("cap_type", "Cap Type", "None", kind="enum", options=("None", "Vertical", "Elliptical")),
             Field("cap_hardening_type", "Cap Hardening Type", "Cam-Clay", kind="enum", options=("Cam-Clay", "Tabular")),
             Field("initial_mean_stress", "Initial Mean Stress", 1000.0, "kPa"),
@@ -202,15 +205,15 @@ CRITERIA: dict[str, Criterion] = {
             Field("lambda", "Lambda - Slope of CSL (natural log)", 0.06),
             Field("h0", "H0 - Plastic Hardening Modulus", 75.0),
             Field("chi_tc", "Chi_TC - Dilation Coefficient", 3.2),
-            Field("n", "N - Volumetric Coupling Coefficient", 0.05),
+            Field("n", "N - Volumetric Coupling Coefficient", 0.43),  # spec 026: Fraser River sand (Jefferies, Shuttle & Been 2015)
             Field("hy", "Hy - Change in Hardening Modulus", 0.0),
             Field("psi0", "Psi0 - Initial State Parameter", -0.025),
             Field("gamma", "Gamma - Altitude of CSL at 1 kPa", 1.2),
             # RSData labels OCR "(kPa)" (tutorial capture); it is a ratio
-            Field("initial_consolidation_condition", "Initial Consolidation Condition", "OCR", kind="enum", options=("OCR",)),
+            Field("initial_consolidation_condition", "Initial Consolidation Condition", "OCR", kind="enum", options=("OCR",), used=False),
             Field("ocr", "OCR", 1.0),
-            Field("cap_softening", "Cap Softening", False, kind="bool"),
-            Field("fluid_bulk_modulus", "Fluid Bulk Modulus", 1e9, "kPa"),
+            Field("cap_softening", "Cap Softening", False, kind="bool", used=False),
+            Field("fluid_bulk_modulus", "Fluid Bulk Modulus", 1e9, "kPa", used=False),
         ),
     ),
     "power_curve": Criterion(
@@ -224,12 +227,12 @@ CRITERIA: dict[str, Criterion] = {
             Field("c", "c Parameter", 0.0, "kPa"),
             Field("d", "d Parameter", 0.0, "kPa"),
             Field("waviness", "Waviness", 0.0, "deg"),
-            Field("residual_a", "Residual a Parameter", 0.7),
-            Field("residual_b", "Residual b Parameter", 1.0),
-            Field("residual_c", "Residual c Parameter", 0.0, "kPa"),
-            Field("residual_d", "Residual d Parameter", 0.0, "kPa"),
-            Field("residual_waviness", "Residual Waviness", 0.0, "deg"),
-            Field("dilation_ratio", "Dilation Ratio", 0.5),
+            Field("residual_a", "Residual a Parameter", 0.7, used=False),
+            Field("residual_b", "Residual b Parameter", 1.0, used=False),
+            Field("residual_c", "Residual c Parameter", 0.0, "kPa", used=False),
+            Field("residual_d", "Residual d Parameter", 0.0, "kPa", used=False),
+            Field("residual_waviness", "Residual Waviness", 0.0, "deg", used=False),
+            Field("dilation_ratio", "Dilation Ratio", 0.5, used=False),
         ),
     ),
     "barton_bandis": Criterion(
@@ -240,9 +243,9 @@ CRITERIA: dict[str, Criterion] = {
         (
             Field("phi_r", "Phi r", 30.0, "deg", pick="barton_phi"),
             Field("jrc", "JRC", 10.0, pick="barton_jrc"),
-            Field("jcs", "JCS", 1e7, "kPa", pick="barton_jcs"),
-            Field("residual_dilation", "Dilation Angle", 0.0, "deg"),
-            Field("residual_strength", "Residual Strength", 0.0),
+            Field("jcs", "JCS", 1e5, "kPa", pick="barton_jcs"),  # spec 026: fresh walls = intact UCS (Barton & Choubey 1977)
+            Field("residual_dilation", "Dilation Angle", 0.0, "deg", used=False),
+            Field("residual_strength", "Residual Strength", 0.0, used=False),
         ),
     ),
 }

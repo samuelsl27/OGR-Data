@@ -2164,6 +2164,11 @@ class MainWindow(QMainWindow):
             # spec 025f RF-1: definition, unit, typical range and source
             unit = self._stress_unit if field.unit == "kPa" else field.unit
             tip = parameter_tooltip(self._criterion_combo.currentData(), field.key, tr(field.label), unit)  # i18n: registry
+            if not field.used:
+                # spec 026 RF-3: nothing reads it yet; kept in the file and the clipboard as it is
+                editor.setEnabled(False)
+                note = tr("OGR Data does not use this value in any calculation yet; it is kept in the project and the clipboard.")
+                tip = f"{tip[:-5]}<br><i>{note}</i></qt>" if tip.endswith("</qt>") else note
             label.setToolTip(tip)
             widget.setToolTip(tip)
             self._form_layout.addRow(label, editor)

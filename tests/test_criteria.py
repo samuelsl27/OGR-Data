@@ -46,7 +46,7 @@ def test_defaults_match_rsdata_capture():
     d = defaults("power_curve")
     assert d["a"] == 0.7 and d["b"] == 1.0 and d["dilation_ratio"] == 0.5
     d = defaults("barton_bandis")
-    assert d["phi_r"] == 30.0 and d["jrc"] == 10.0 and d["jcs"] == 1e7
+    assert d["phi_r"] == 30.0 and d["jrc"] == 10.0 and d["jcs"] == 1e5  # spec 026: 1e7 kPa was out of range
 
 
 def test_mohr_coulomb_tangent_recovers_line():
@@ -113,7 +113,8 @@ def test_power_curve_formula():
     params["b"] = 0.8
     params["d"] = 50.0  # kPa
     normal, shear = ce.shear_curve("power_curve", params, 2.0)
-    expected = 0.7 * (normal + 0.05) ** 0.8
+    # spec 026: a with every stress in kPa
+    expected = 0.7 * (normal * 1000.0 + 50.0) ** 0.8 / 1000.0
     assert np.allclose(shear, expected, atol=1e-12)
 
 

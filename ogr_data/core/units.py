@@ -45,6 +45,16 @@ def from_display(display_value: float, unit: str) -> float:
     return display_value / stress_factor(unit)
 
 
+def power_curve_a_to_kpa(a_mpa: float, b: float) -> float:
+    """Power Curve a for stresses in kPa from the one for MPa (spec 026).
+
+    tau = a (sigma_n + d)^b: with tau and sigma_n 1000 times larger in kPa,
+    a_kPa = a_MPa 1000^(1 - b); unchanged when b = 1.
+    """
+
+    return float(a_mpa) * 1000.0 ** (1.0 - float(b))
+
+
 def stress_text(mpa_value: float, unit: str, decimals: int | None = None) -> str:
     """Formatted stress for UI messages: '<value> <unit>'.
 

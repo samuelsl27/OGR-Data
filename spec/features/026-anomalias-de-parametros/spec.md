@@ -1,7 +1,6 @@
 # Spec 026 — Anomalías de los parámetros de material
 
-> Estado: **borrador listo para aprobar** (2026-11-24). Las dudas se resolvieron con las fuentes aportadas por la
-> propietaria o por deducción, como ella indicó («el resto dedúcelo con lógica»).
+> Estado: **hecha** (2026-11-24) salvo RF-9, aplazada a su propia spec; validación en `plan-tasks.md`.
 
 ## Contexto y objetivo
 

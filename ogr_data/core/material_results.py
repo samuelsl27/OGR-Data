@@ -20,6 +20,7 @@ from . import criteria_envelopes as ce
 from . import samplers
 from .hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength, hoek_brown_constants
 from .models import MODULUS_METHODS
+from .units import power_curve_a_to_kpa
 
 Params = Mapping[str, Union[float, bool, str, list]]
 
@@ -159,6 +160,8 @@ def fit_to_parameters(result) -> tuple[str, dict[str, float]]:
 
     target, fields = FIT_TO_FORM[result.criterion]
     values = {field: float(result.parameters[key]) * factor for key, (field, factor) in fields.items() if key in result.parameters}
+    if result.criterion == "power_curve" and "a" in values and "b" in values:
+        values["a"] = power_curve_a_to_kpa(values["a"], values["b"])  # spec 026: fits run in MPa
     if target == "hoek_brown" and result.criterion == "hoek_brown":
         values["s"] = 1.0  # intact rock
     if target == "barton_bandis" and result.fixed and "phi_b_deg" in result.fixed:

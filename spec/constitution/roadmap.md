@@ -89,7 +89,7 @@ Siguientes (24-11-2026):
     accesibilidad y progreso (hechas todas; las fuentes que faltan para
     la ayuda de parámetros, en `025f-.../fuentes-pendientes.md`).
 
-16. **026 — Anomalías de los parámetros** (borrador listo para aprobar; dudas resueltas con fuentes y deducción): valores
+16. **026 — Anomalías de los parámetros** (hecha, salvo «Define by: mb, s, a», aplazada): valores
     por defecto fuera de rango (N de NorSand, JCS), Power Curve que ignora
     c y la ondulación, unidades de *a*, y 13 campos que ningún cálculo lee
     (regla 7).

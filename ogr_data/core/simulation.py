@@ -632,6 +632,22 @@ def _rebuild(V: np.ndarray, w: np.ndarray) -> np.ndarray:
     return (V * w) @ V.T
 
 
+class ElasticModel:
+    """Material Type "Elastic" (spec 026): linear elastic at any stress, never yields."""
+
+    def __init__(self, elastic: _Elastic) -> None:
+        self.el = elastic
+
+    def initial_state(self, S0: np.ndarray) -> dict:
+        return {"failed": False}
+
+    def update(self, S: np.ndarray, state: dict, dE: np.ndarray):
+        return self.el.trial(S, dE), state, False
+
+    def peak_violated(self, S: np.ndarray, dE: np.ndarray) -> bool:
+        return False
+
+
 class PerfectBrittleModel:
     """Elastic-perfectly plastic or elastic-brittle-plastic (peak -> residual)."""
 
@@ -744,8 +760,9 @@ class SofteningHardeningModel:
     "Tabular" (piecewise linear (e_q^p, phi, c) table, which can soften).
     Cap (§11.2): "Vertical" p <= pc or "Elliptical" (eq. 11.9), associated,
     pc0 = Initial Mean Stress (raised to the initial mean stress if below);
-    hardening "Cam-Clay" pc_{n+1} = pc_n exp(de_v^p / (lambda - kappa))
-    (eq. 11.10, Lambda Kappa = 0: rigid cap) or "Tabular" (e_v^p, pc). The
+    hardening "Cam-Clay" pc_{n+1} = pc_n exp(de_v^p / Lambda), so Lambda
+    Kappa is Lambda = (lambda - kappa) / v by the Cam-clay hardening rule
+    (Wood 1990, eq. 4.21; spec 026), 0 = rigid cap or "Tabular" (e_v^p, pc). The
     cone hardening is implicit (bracketed root); the cap hardening is
     updated at the end of each step (explicit, small steps).
     """
@@ -1226,6 +1243,8 @@ def build_model(criterion: str, params: Mapping, stiffness: Mapping | None):
     if criterion == "norsand":
         return NorSandModel(p, stiff)
     elastic = _Elastic(stiff)
+    if criterion in ("mohr_coulomb", "hoek_brown") and p.get("material_type") == "Elastic":
+        return ElasticModel(elastic)  # spec 026 RF-8
     if criterion == "softening_hardening":
         return SofteningHardeningModel(elastic, p)
     if criterion == "drucker_prager":

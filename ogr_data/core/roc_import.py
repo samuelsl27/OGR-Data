@@ -135,6 +135,10 @@ def parse_roc(path: str | Path) -> RocProject:
     for roc_key, field_key, scale in _PARAM_MAP[criterion]:
         if roc_key in values:
             parameters[field_key] = float(values[roc_key]) * scale
+    if criterion == "power_curve" and "a" in parameters and "b" in parameters:
+        from .units import power_curve_a_to_kpa
+
+        parameters["a"] = power_curve_a_to_kpa(parameters["a"], parameters["b"])  # spec 026: stresses in MPa in the file
 
     sig3max = None
     for key in _SIG3MAX_KEYS:

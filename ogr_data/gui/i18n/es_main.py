@@ -256,4 +256,8 @@ ES = {
     "Typical c and phi of compacted soils by USCS group (UFC 3-220-01N, Table 8-3.1).": (
         "c y phi típicos de suelos compactados por grupo USCS (UFC 3-220-01N, tabla 8-3.1)."
     ),
+    # ------------------------------------------------ spec 026
+    "OGR Data does not use this value in any calculation yet; it is kept in the project and the clipboard.": (
+        "OGR Data todavía no usa este valor en ningún cálculo; se conserva en el proyecto y en el portapapeles."
+    ),
 }

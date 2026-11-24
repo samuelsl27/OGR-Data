@@ -94,7 +94,8 @@ def test_direct_shear_models() -> None:
     sn = np.linspace(0.1, 2.0, 8)
     pc = _state_from(zip(sn * 1000, 0.9 * (sn + 0.05) ** 0.85 * 1000), "direct_shear")
     r = cal.calibrate([pc], _settings("power_curve"))
-    assert np.allclose([r.parameters["a"], r.parameters["b"], r.parameters["d"]], [0.9, 0.85, 50.0], atol=1e-4)
+    # spec 026: a for stresses in kPa (0.9 is the value with MPa)
+    assert np.allclose([r.parameters["a"], r.parameters["b"], r.parameters["d"]], [0.9 * 1000.0 ** 0.15, 0.85, 50.0], rtol=1e-4)
     bb = _state_from(zip(sn * 1000, sn * np.tan(np.radians(30 + 12 * np.log10(80 / sn))) * 1000), "direct_shear")
     r = cal.calibrate([bb], _settings("barton_bandis", phi_b_deg=30.0))
     assert abs(r.parameters["jrc"] - 12.0) < 1e-4 and abs(r.parameters["jcs"] - 80000.0) < 1.0

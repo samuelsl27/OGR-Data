@@ -35,6 +35,7 @@ from scipy.optimize import least_squares, minimize
 from . import fitting
 from .hoek_brown import HbInput, hoek_brown_constants
 from .states import FailureState
+from .units import power_curve_a_to_kpa
 
 STRENGTH_TYPES: dict[str, str] = {
     "mohr_coulomb": "Mohr Coulomb",
@@ -238,7 +239,8 @@ def _power_curve(x, y, s: CalibrationSettings) -> CalibrationResult:
     model = lambda xx, p: p[0] * np.maximum(xx + p[2], 0.0) ** p[1]
     p, residual, note = _solve(model, [0.8, 0.8, 0.01], ([1e-9, 1e-6, 0.0], [np.inf, 10.0, np.inf]), x, y, s.algorithm, s.error_type == "Relative")
     a, b, d = (float(v) for v in p)
-    params = {"a": a, "b": b, "d": d * 1000.0, "residual_a": a, "residual_b": b, "residual_d": d * 1000.0}
+    a_kpa = power_curve_a_to_kpa(a, b)  # spec 026: the form holds a with stresses in kPa
+    params = {"a": a_kpa, "b": b, "d": d * 1000.0, "residual_a": a_kpa, "residual_b": b, "residual_d": d * 1000.0}
     return _result("power_curve", params, {"a": a, "b": b, "d_mpa": d}, fitting.DIRECT, residual, note)
 
 

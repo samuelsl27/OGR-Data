@@ -93,7 +93,7 @@ def test_v2_round_trip_with_mixed_criteria() -> None:
         path = Path(tmp) / "multi.ogrdata"
         project.save_project(path, proj)
         raw = json.loads(path.read_text(encoding="utf-8"))
-        assert raw["format"] == "ogr-data-project/2" and len(raw["materials"]) == 4
+        assert raw["format"] == "ogr-data-project/3" and len(raw["materials"]) == 4
         back = project.load_project(path)
     assert [m.criterion for m in back.materials] == ["mohr_coulomb", "generalized_hoek_brown", "barton_bandis", "norsand"]
     assert back.materials[0].parameters["peak_cohesion"] == 25.0

@@ -53,7 +53,7 @@ sale en cuadros.
 
 El runner no filtra: corre todo. Un test suelto se prueba importando su
 archivo en un script; la evidencia de una tarea es siempre la suite entera.
-Coste medido el 2026-11-24 en el PC de desarrollo: 267 tests, entre 2 y 3 min
+Coste medido el 2026-11-24 en el PC de desarrollo: 273 tests, entre 2 y 3 min
 en serie. Si crece mucho, se dice en el changelog de la spec que lo causó.
 
 **Código de salida 127 con `Failed: 0`** (Git Bash; es 0xC0000409, un
