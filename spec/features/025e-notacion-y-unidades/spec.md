@@ -1,6 +1,6 @@
 # Spec 025e — Notación, decimales y unidades
 
-> Estado: **borrador** (2026-11-24), pendiente de aprobación.
+> Estado: **hecha** (2026-11-24; decisiones y validación en `plan-tasks.md`). RF-9 no se aplica (decisión de 025c).
 
 ## Contexto y objetivo
 
@@ -81,5 +81,4 @@ de que no queda `sigma1`/`deg` visible; suite en verde.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: tabla de RF-3]
-- [NECESITA ACLARACIÓN: RF-6, cambio automático de unidad en módulos]
+Resueltas en `plan-tasks.md` (2026-11-24): tabla de RF-3 por tipo de valor; módulos siempre en la unidad elegida (RF-6).

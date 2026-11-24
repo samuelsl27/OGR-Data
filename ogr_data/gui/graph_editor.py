@@ -18,7 +18,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
-    QDoubleSpinBox,
     QFormLayout,
     QGridLayout,
     QGroupBox,
@@ -35,6 +34,7 @@ from PySide6.QtWidgets import (
 
 from ..core.graph_options import LINE_STYLES, SERIES_KEYS, PlotOptions, SeriesStyle
 from .i18n import parse_number, tr
+from .number_spin import NumberSpinBox
 from .themes import mpl_colors
 
 
@@ -168,7 +168,7 @@ class GraphEditorDialog(QDialog):
             color.setFixedWidth(48)
             color.clicked.connect(lambda _=False, k=key: self._pick_color(k))
             grid.addWidget(color, row, 2)
-            width = QDoubleSpinBox()
+            width = NumberSpinBox()
             width.setRange(0.0, 10.0)
             width.setSingleStep(0.2)
             width.setSpecialValueText(tr("default"))

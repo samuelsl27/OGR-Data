@@ -39,6 +39,7 @@ from . import simulation as sm
 from . import units
 from .hoek_brown import HbInput, ModulusMethod, compute, equivalent_mc, global_strength
 from .models import CRITERIA
+from .numbers import format_number, symbols
 from .project import SYMBOLS, Material, Project
 from .states import FAILURE_TEST_TYPES, PATH_TEST_TYPES, FailureState, StressPath
 
@@ -156,7 +157,7 @@ class ReportViews:
 def _number(value: float) -> str:
     if value is None or (isinstance(value, float) and not math.isfinite(value)):
         return "-"
-    return f"{value:.6g}"
+    return format_number(value)  # spec 025e: the screen format
 
 
 def _kpa(value: float, unit: str) -> float:
@@ -188,7 +189,7 @@ def parameter_rows(material: Material, unit: str, translate: Translate | None = 
         elif f.unit == "kPa":
             text = f"{_number(_kpa(value, unit))} {unit}"
         elif f.unit == "deg":
-            text = f"{_number(float(value))} deg"
+            text = f"{format_number(float(value), 'angle')}°"
         else:
             text = _number(float(value))
         rows.append((_t(f.label, translate), text))
@@ -258,7 +259,7 @@ def computed_rows(material: Material, unit: str, translate: Translate | None = N
 
     p = material.parameters
     sig3max = float(material.sig3max_mpa)
-    deg = lambda value: f"{value:.2f} deg"  # noqa: E731
+    deg = lambda value: f"{format_number(value, 'angle')}°"  # noqa: E731
     try:
         if material.criterion == "generalized_hoek_brown":
             inp = HbInput(
@@ -352,7 +353,7 @@ def _e(text) -> str:
 def _kv_table(rows: Sequence[tuple[str, str]]) -> str:
     if not rows:
         return ""
-    body = "".join(f"<tr><th>{_e(k)}</th><td>{_e(v)}</td></tr>" for k, v in rows)
+    body = "".join(f"<tr><th>{_e(symbols(k))}</th><td>{_e(symbols(v))}</td></tr>" for k, v in rows)
     return f'<table class="kv"><tbody>{body}</tbody></table>'
 
 

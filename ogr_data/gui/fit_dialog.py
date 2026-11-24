@@ -20,17 +20,33 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ..core import fitting
+from ..core import fitting, units
 from ..core.fitting import DIRECT, LEVENBERG_MARQUARDT, LINEAR, SIMPLEX, TRIAXIAL
 from ..core.models import CRITERIA
+from ..core.numbers import format_number, symbols
 from .i18n import localize, parse_number, tr
+from .number_spin import NumberSpinBox
 
 
-def _data_labels() -> dict[str, tuple[str, str]]:
+def _data_labels(unit: str) -> dict[str, tuple[str, str]]:
     return {
-        TRIAXIAL: ("sigma3 (MPa)", "sigma1 (MPa)"),
-        DIRECT: (tr("normal stress (MPa)"), tr("shear stress (MPa)")),
+        TRIAXIAL: (symbols(tr("sigma3 ({0})").format(unit)), symbols(tr("sigma1 ({0})").format(unit))),
+        DIRECT: (tr("normal stress ({0})").format(unit), tr("shear stress ({0})").format(unit)),
     }
+
+
+#: Fit parameter key (without its unit suffix) -> the name shown (spec 025e: no internal keys)
+_SHOWN = {"cohesion": "c", "friction": "phi", "jrc": "JRC", "jcs": "JCS"}
+
+
+def _parameter_line(key: str, value: float, unit: str, scale: float) -> str:
+    if key.endswith("_mpa"):
+        name, text = key[:-4], f"{format_number(value * scale)} {unit}"
+    elif key.endswith("_deg"):
+        name, text = key[:-4], f"{format_number(value, 'angle')}°"
+    else:
+        name, text = key, format_number(value)
+    return f"{symbols(_SHOWN.get(name, name))} = {text}"
 
 
 def _methods() -> dict[str, str]:
@@ -44,9 +60,12 @@ def _methods() -> dict[str, str]:
 
 
 class FitDialog(QDialog):
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent=None, unit: str | None = None) -> None:
         super().__init__(parent)
         self.setWindowTitle(tr("Fit strength criterion to lab data"))
+        # spec 025e RF-7: the window's stress unit (MPa when opened on its own)
+        self._unit = unit or getattr(parent, "_stress_unit", None) or "MPa"
+        self._scale = units.stress_factor(self._unit)  # shown = MPa * scale
         self.resize(760, 560)
         self._result: fitting.FitResult | None = None
 
@@ -124,7 +143,7 @@ class FitDialog(QDialog):
         self._data_kind.blockSignals(False)
 
         kind = self._data_kind.currentData()
-        x_label, y_label = _data_labels().get(kind, ("x", "y"))
+        x_label, y_label = _data_labels(self._unit).get(kind, ("x", "y"))
         self._table.setHorizontalHeaderLabels([x_label, y_label])
 
         current_method = self._method.currentData()
@@ -147,7 +166,7 @@ class FitDialog(QDialog):
             self._fixed.removeRow(0)
         self._fixed_widgets = {}
         for label, name, value in self._fixed_fields(key):
-            spin = QDoubleSpinBox()
+            spin = NumberSpinBox()
             spin.setRange(0.0, 1e12)
             spin.setDecimals(4)
             spin.setValue(value)
@@ -156,9 +175,10 @@ class FitDialog(QDialog):
 
     def _fixed_fields(self, key: str) -> list[tuple[str, str, float]]:
         if key == "generalized_hoek_brown":
-            return [(tr("sigci, fixed (MPa)"), "sigci_mpa", 30.0), (tr("D, fixed"), "disturbance", 0.0)]
+            sigci = symbols(tr("sigci, fixed ({0})").format(self._unit))
+            return [(sigci, "sigci_mpa", 30.0 * self._scale), (tr("D, fixed"), "disturbance", 0.0)]
         if key == "barton_bandis":
-            return [(tr("phi_b, fixed (deg)"), "phi_b_deg", 30.0)]
+            return [(symbols(tr("phi_b, fixed (deg)")), "phi_b_deg", 30.0)]
         return []
 
     # ---------------------------------------------------------------- data
@@ -184,7 +204,7 @@ class FitDialog(QDialog):
                 continue
             xs.append(parse_number(item_x.text()))
             ys.append(parse_number(item_y.text()))
-        return np.array(xs), np.array(ys)
+        return np.array(xs) / self._scale, np.array(ys) / self._scale  # the fits work in MPa
 
     # ----------------------------------------------------------------- fit
 
@@ -193,7 +213,7 @@ class FitDialog(QDialog):
         kind = self._data_kind.currentData()
         method = self._method.currentData()
         x, y = self._data()
-        fixed = {name: w.value() for name, w in self._fixed_widgets.items()}
+        fixed = {name: w.value() / (self._scale if name.endswith("_mpa") else 1.0) for name, w in self._fixed_widgets.items()}
         try:
             result = fitting.fit(key, kind, x, y, method, fixed)
         except (ValueError, KeyError) as exc:
@@ -201,9 +221,9 @@ class FitDialog(QDialog):
             self._apply_button.setEnabled(False)
             return
         self._result = result
-        lines = [tr("method: {0}").format(result.method), tr("residuals: {0}").format(f"{result.residuals:.6g}"), ""]
+        lines = [tr("method: {0}").format(result.method), tr("residuals: {0}").format(format_number(result.residuals)), ""]
         for name, value in result.parameters.items():
-            lines.append(f"{name} = {value:.6g}")
+            lines.append(_parameter_line(name, value, self._unit, self._scale))
         if key == "generalized_hoek_brown":
             lines.append("")
             lines.append(tr("Note: apply fills the classic Hoek-Brown criterion (mb, s; a is fixed to 0.5 there)."))

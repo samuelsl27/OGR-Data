@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox,
 
 from ..core import simulation as sm
 from .i18n import tr
+from .number_spin import NumberSpinBox
 
 
 def _t(text: str) -> str:
@@ -66,7 +67,7 @@ class StiffnessPanel(QGroupBox):
         self.elastic_parameter.currentIndexChanged.connect(self.changed)
         self.form.addRow(tr("Elastic Parameter"), self.elastic_parameter)
         for key, (label, stress, lo, hi, decimals) in _FIELDS.items():
-            spin = QDoubleSpinBox()
+            spin = NumberSpinBox()
             spin.setRange(lo, hi)
             spin.setDecimals(decimals)
             spin.setSingleStep(0.01 if not stress else 100.0)

@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 
 from ..core import uscs
 from .i18n import localize, tr
+from .number_spin import NumberSpinBox
 
 
 class _PlasticityCanvas(FigureCanvasQTAgg):
@@ -71,7 +72,7 @@ class SoilClassifierDialog(QDialog):
             ("pi", tr("Plasticity index, PI"), 0.0, 0.0, 200.0, 1),
             ("organic_ratio", tr("LL(oven dry) / LL(air dry)"), 1.0, 0.0, 1.5, 3),
         ]:
-            spin = QDoubleSpinBox()
+            spin = NumberSpinBox()
             spin.setRange(lo, hi)
             spin.setDecimals(dec)
             spin.setValue(value)

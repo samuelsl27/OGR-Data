@@ -22,7 +22,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
-    QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
     QHBoxLayout,
@@ -43,6 +42,7 @@ from ..core import states as st
 from ..core import units
 from ..core.project import SYMBOLS
 from .i18n import localize, tr
+from .number_spin import NumberSpinBox
 
 
 def _header_text(name: str) -> str:
@@ -555,11 +555,11 @@ class StressPathsDialog(_ItemsDialog):
         self._test_type = combo(st.PATH_TEST_TYPES)
         self._seepage = combo(st.SEEPAGE_CONDITIONS)
         self._loading_dir = combo(st.LOADING_DIRECTIONS)
-        self._lateral = QDoubleSpinBox()
+        self._lateral = NumberSpinBox()
         self._lateral.setRange(-1e12, 1e12)
         self._lateral.setDecimals(4)
         self._lateral.setSuffix(f" {self._unit}")
-        self._k0 = QDoubleSpinBox()
+        self._k0 = NumberSpinBox()
         self._k0.setRange(0.0, 100.0)
         self._k0.setDecimals(4)
         self._strain_type = combo(st.STRAIN_TYPES)

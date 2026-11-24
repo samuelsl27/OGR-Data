@@ -58,8 +58,10 @@ from ..core.models import CRITERIA, Criterion, defaults
 from . import i18n
 from . import accelerators
 from .i18n import tr
+from .number_spin import NumberSpinBox
 from .plots import EnvelopeCanvas, PathCanvas
 from .results_panel import ResultsPanel
+from ..core.numbers import format_number, symbols
 from .settings import app_settings
 from .themes import THEMES, apply_theme
 
@@ -131,7 +133,7 @@ class MainWindow(QMainWindow):
         self._criterion_combo.currentIndexChanged.connect(self._update_application)
         self._criterion_combo.currentIndexChanged.connect(self.refresh)
 
-        self._sig3max = QDoubleSpinBox()
+        self._sig3max = NumberSpinBox()
         self._sig3max.setRange(0.00001, 1000000000.0)
         self._sig3max.setDecimals(4)
         self._sig3max.setValue(7.5 * self._scale())
@@ -145,7 +147,7 @@ class MainWindow(QMainWindow):
         for label, app_key in ((tr("Custom"), "custom"), (tr("Tunnel"), "tunnel"), (tr("Slope"), "slope")):
             self._application_combo.addItem(label, app_key)
         self._application_combo.currentIndexChanged.connect(self._update_application)
-        self._unit_weight = QDoubleSpinBox()
+        self._unit_weight = NumberSpinBox()
         self._unit_weight.setRange(0.0001, 1.0)
         self._unit_weight.setDecimals(4)
         self._unit_weight.setValue(0.026)
@@ -153,7 +155,7 @@ class MainWindow(QMainWindow):
         self._unit_weight.setSuffix(" MN/m3")
         self._unit_weight.valueChanged.connect(self.refresh)
         self._unit_weight.editingFinished.connect(self._close_history_group)
-        self._app_depth = QDoubleSpinBox()
+        self._app_depth = NumberSpinBox()
         self._app_depth.setRange(0.1, 10000.0)
         self._app_depth.setValue(50.0)
         self._app_depth.setSuffix(" m")
@@ -210,8 +212,8 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(material_box)
         range_box = QGroupBox(tr("Stress range"))
         range_form = QFormLayout(range_box)
-        range_form.addRow(tr("Application (sigma3max range)"), self._application_combo)
-        self._sig3max_label = QLabel(tr("sig3max (envelope range)"))
+        range_form.addRow(symbols(tr("Application (sigma3max range)")), self._application_combo)
+        self._sig3max_label = QLabel(symbols(tr("sig3max (envelope range)")))
         range_form.addRow(self._sig3max_label, self._sig3max)
         range_form.addRow(self._app_fields)
         sidebar.addWidget(range_box)
@@ -1657,7 +1659,7 @@ class MainWindow(QMainWindow):
     def _open_fit_dialog(self) -> None:
         from .fit_dialog import FitDialog
 
-        FitDialog(self).exec()
+        FitDialog(self, self._stress_unit).exec()
 
     def apply_fit_parameters(self, result) -> None:
         """Fill the parameter form from a FitResult (spec 006).
@@ -2035,7 +2037,7 @@ class MainWindow(QMainWindow):
                 )
                 widget.changed.connect(self.refresh)
             else:
-                widget = QDoubleSpinBox()
+                widget = NumberSpinBox()
                 widget.setDecimals(6)
                 widget.setRange(-1e9, 1e12)
                 if field.unit == "kPa":
@@ -2043,7 +2045,7 @@ class MainWindow(QMainWindow):
                 else:
                     widget.setValue(float(field.default))
                 if field.unit == "deg":
-                    widget.setSuffix(" deg")
+                    widget.setSuffix("°")  # spec 025e
                 elif field.unit == "kPa":
                     widget.setSuffix(f" {self._stress_unit}")
                 widget.valueChanged.connect(self.refresh)
@@ -2265,7 +2267,7 @@ class MainWindow(QMainWindow):
                 self._principal.show_sample(inst.point_x, tangent=t_principal, marker=(inst.point_x, inst.point_y))
                 self._shear.show_sample(n_t, tangent=t_shear, marker=(n_t, t_t))
                 text = (
-                    f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
+                    f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {format_number(inst.friction_deg, 'angle')} deg   "
                     f"sigma3 = {units.stress_text(inst.point_x, self._stress_unit)}   sigma1 = {units.stress_text(inst.point_y, self._stress_unit)}   "
                     f"sigma_n = {units.stress_text(n_t, self._stress_unit)}   tau = {units.stress_text(t_t, self._stress_unit)}"
                 )
@@ -2293,7 +2295,7 @@ class MainWindow(QMainWindow):
             t_principal = samplers.mc_tangent_principal(inst, xr)
             self._principal.show_sample(None, tangent=t_principal)
             text = (
-                f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {inst.friction_deg:.2f} deg   "
+                f"c = {units.stress_text(inst.cohesion_mpa, self._stress_unit)}   phi = {format_number(inst.friction_deg, 'angle')} deg   "
                 f"sigma_n = {units.stress_text(inst.point_x, self._stress_unit)}   tau = {units.stress_text(inst.point_y, self._stress_unit)}"
             )
         self._show_sample_text(i18n.localize(text))
@@ -2301,6 +2303,7 @@ class MainWindow(QMainWindow):
     def _show_sample_text(self, text: str) -> None:
         """The sampler's reading, in the status bar and the results panel (spec 025b RF-8)."""
 
+        text = symbols(text)  # spec 025e: σ₃, φ, ° on screen
         self.statusBar().showMessage(text)
         self._results.set_sampler_text(text)
 
@@ -2368,15 +2371,15 @@ class MainWindow(QMainWindow):
                 result = compute(inp, self._modulus_method(params))
                 unit = self._stress_unit
                 rows = [
-                    ("mb", f"{result.mb:.4f}"),
-                    ("s", f"{result.s:.4f}"),
-                    ("a", f"{result.a:.4f}"),
+                    ("mb", format_number(result.mb)),
+                    ("s", format_number(result.s)),
+                    ("a", format_number(result.a)),
                     ("sigt", units.stress_text(result.sigt, unit)),
                     ("sigc", units.stress_text(result.sigc, unit)),
                     ("sigcm", units.stress_text(result.sigcm, unit)),
                     ("c", units.stress_text(result.mc.cohesion, unit)),
-                    ("phi", f"{result.mc.friction_deg:.2f} deg"),
-                    ("Erm", units.stress_text(result.erm, unit, decimals=2)),
+                    ("phi", f"{format_number(result.mc.friction_deg, 'angle')}°"),
+                    ("Erm", units.stress_text(result.erm, unit)),
                 ]
                 self._results.set_results(self._results_heading(), [(k, i18n.localize(v)) for k, v in rows])
             else:

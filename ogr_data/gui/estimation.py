@@ -41,12 +41,13 @@ from ..core import gsi as qgsi
 from ..core import tables
 from .gsi_chart_view import DigitizedGsiPage
 from .i18n import current_language, decimal_point, localize, tr
+from .number_spin import NumberSpinBox
 from .pickers import GsiPickerDialog
 from .themes import mpl_colors
 
 
 def _spin(lo: float, hi: float, value: float, decimals: int = 2, step: float = 1.0) -> QDoubleSpinBox:
-    spin = QDoubleSpinBox()
+    spin = NumberSpinBox()
     spin.setRange(lo, hi)
     spin.setDecimals(decimals)
     spin.setSingleStep(step)

@@ -8,6 +8,7 @@ from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 from ..core.graph_options import PlotOptions
+from ..core.numbers import symbols
 from .i18n import localize, tr
 from .themes import mpl_colors
 
@@ -42,8 +43,8 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         super().__init__(self.figure)
         self.axes = self.figure.add_subplot(111)
         self.axes.set_title(title)
-        self.axes.set_xlabel(xlabel)
-        self.axes.set_ylabel(ylabel)
+        self.axes.set_xlabel(symbols(xlabel))
+        self.axes.set_ylabel(symbols(ylabel))
         (self._line,) = self.axes.plot([], [], linewidth=1.8)
         (self._mc_line,) = self.axes.plot([], [], linewidth=1.2, linestyle="--")
         (self._tangent_line,) = self.axes.plot([], [], linewidth=1.3, linestyle="-.")
@@ -284,8 +285,8 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
     def set_axes_labels(self, xlabel: str, ylabel: str) -> None:
         """Relabel the axes (spec 017: display units)."""
 
-        self.axes.set_xlabel(xlabel)
-        self.axes.set_ylabel(ylabel)
+        self.axes.set_xlabel(symbols(xlabel))  # spec 025e: σ₃, τ on screen
+        self.axes.set_ylabel(symbols(ylabel))
         self.apply_theme(self._theme)
 
     def redraw(self, x, y, x_mc=None, y_mc=None) -> None:
@@ -411,8 +412,8 @@ class PathCanvas(FigureCanvasQTAgg):
 
         self._unit = unit
         xlabel, ylabel = (tr(label) for label in self._labels)  # i18n: ignore (keys marked where the canvases are made)
-        self.axes.set_xlabel(f"{xlabel} ({unit})" if self._stress_axes[0] else xlabel)
-        self.axes.set_ylabel(f"{ylabel} ({unit})" if self._stress_axes[1] else ylabel)
+        self.axes.set_xlabel(symbols(f"{xlabel} ({unit})" if self._stress_axes[0] else xlabel))
+        self.axes.set_ylabel(symbols(f"{ylabel} ({unit})" if self._stress_axes[1] else ylabel))
         for axis, is_stress in ((self.axes.xaxis, self._stress_axes[0]), (self.axes.yaxis, self._stress_axes[1])):
             if is_stress:
                 axis.set_major_formatter(FuncFormatter(lambda v, _pos, k=scale: localize(f"{v * k:g}")))

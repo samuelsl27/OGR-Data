@@ -85,7 +85,7 @@ Siguientes (24-11-2026):
     errores visibles (hecha), **025b** ventana principal con los
     resultados en un panel a la derecha (hecha), **025c**
     menús y convenciones (hecha), **025d** estados vacíos y confirmaciones (hecha),
-    **025e** notación, decimales y unidades, **025f** ayuda,
+    **025e** notación, decimales y unidades (hecha), **025f** ayuda,
     accesibilidad y progreso (borradores).
 
 Otras ideas registradas sin spec aún: export PDF nativo, unidades

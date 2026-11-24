@@ -99,7 +99,7 @@ def test_parameter_and_computed_rows() -> None:
     assert rows["UCS of intact rock"] == "120 MPa" and rows["GSI"] == "60" and rows["Set Residual to Peak"] == "Yes"
     assert dict(report.parameter_rows(rock, "kPa"))["UCS of intact rock"] == "120000 kPa"
     soil_rows = dict(report.parameter_rows(soil, "kPa"))
-    assert soil_rows["Peak Cohesion"] == "10.5 kPa" and soil_rows["Peak Friction Angle"] == "35 deg"
+    assert soil_rows["Peak Cohesion"] == "10.5 kPa" and soil_rows["Peak Friction Angle"] == "35°"
     computed = dict(report.computed_rows(rock, "MPa"))
     assert set(computed) >= {"mb", "s", "a", "Global strength sigcm", "Equivalent cohesion c", "Rock mass modulus Erm"}
     # same numbers as the window (core.compute): mb = mi exp((GSI-100)/28) for D = 0
@@ -143,7 +143,7 @@ def test_two_material_report_is_valid_and_self_contained() -> None:
     # title escaped, project data present, values in the project's display unit
     assert "Dam &lt;foundation&gt; &amp; abutments" in document and "<foundation>" not in document
     for text in ("Granite", "Clayey sand", "Generalized Hoek Brown", "Mohr Coulomb", "Triaxial UCS", "Path 1",
-                 "Global strength sigcm", "120 MPa", "Metric, stress as MPa", "2026-11-23 10:30", "sigma1 = 50 MPa"):
+                 "Global strength σcm", "120 MPa", "Metric, stress as MPa", "2026-11-23 10:30", "sigma1 = 50 MPa"):
         assert text in document, text
     # excluded point listed as such; sections in RSData order (the soil template brings a test, spec 013)
     assert re.search(r"<td class=\"num\">10</td><td class=\"num\">210</td><td class=\"num\">Yes</td>", document)
@@ -195,7 +195,7 @@ def test_spanish_report_same_numbers() -> None:
     assert '<html lang="en">' in english and '<html lang="es">' in spanish
     for text in ("Modelos de material definidos", "Estados de rotura definidos", "Índice", "Resumen del proyecto",
                  "Proyecto sin título", "Hoek Brown generalizado", "Ensayo triaxial", "Ensayo de compresión simple",
-                 "Resistencia global sigcm", "Profundidad del túnel", "Peso específico", "Métricas, tensiones en MPa",
+                 "Resistencia global σcm", "Profundidad del túnel", "Peso específico", "Métricas, tensiones en MPa",
                  "Hoek &amp; Diederichs generalizado (2006)", "<td class=\"num\">Sí</td>", "Informe de OGR Data"):
         assert text in spanish, text
     for text in ("Defined Material Models", "Table of Contents", "Untitled Project", "Global strength", "Triaxial Test",

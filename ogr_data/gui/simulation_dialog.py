@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QFormLayout,
 from ..core import simulation as sm
 from ..core.project import SYMBOLS
 from .i18n import tr
+from .number_spin import NumberSpinBox
 from .states_dialog import _ItemsDialog
 
 
@@ -41,15 +42,15 @@ class TestSimulationsDialog(_ItemsDialog):
         self._test_type = combo(sm.TEST_TYPES)
         self._seepage = combo(sm.SEEPAGE)
         self._loading_dir = combo(sm.LOADING)
-        self._confining = QDoubleSpinBox()
+        self._confining = NumberSpinBox()
         self._confining.setRange(0.0, 1e12)
         self._confining.setDecimals(4)
         self._confining.setSuffix(f" {self._unit}")
-        self._k0 = QDoubleSpinBox()
+        self._k0 = NumberSpinBox()
         self._k0.setRange(0.01, 100.0)
         self._k0.setDecimals(4)
         self._k0.setSingleStep(0.05)
-        self._max_strain = QDoubleSpinBox()
+        self._max_strain = NumberSpinBox()
         self._max_strain.setRange(1e-6, 1.0)
         self._max_strain.setDecimals(6)
         self._max_strain.setSingleStep(0.01)
@@ -70,7 +71,7 @@ class TestSimulationsDialog(_ItemsDialog):
         grid.setContentsMargins(0, 0, 0, 0)
         self._ratios: list[QDoubleSpinBox] = []
         for i, name in enumerate(sm.STRAIN_COMPONENTS):
-            spin = QDoubleSpinBox()
+            spin = NumberSpinBox()
             spin.setRange(-1000.0, 1000.0)
             spin.setDecimals(4)
             grid.addWidget(QLabel(name), i // 3 * 2, i % 3)

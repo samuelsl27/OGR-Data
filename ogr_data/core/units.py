@@ -45,7 +45,15 @@ def from_display(display_value: float, unit: str) -> float:
     return display_value / stress_factor(unit)
 
 
-def stress_text(mpa_value: float, unit: str, decimals: int = 4) -> str:
-    """Formatted stress for UI messages: '<value> <unit>'."""
+def stress_text(mpa_value: float, unit: str, decimals: int | None = None) -> str:
+    """Formatted stress for UI messages: '<value> <unit>'.
 
-    return f"{to_display(mpa_value, unit):.{decimals}f} {unit}"
+    Without ``decimals``, the screen format of spec 025e (up to 6
+    significant figures, no padding zeros).
+    """
+
+    from .numbers import format_number
+
+    shown = to_display(mpa_value, unit)
+    text = format_number(shown) if decimals is None else f"{shown:.{decimals}f}"
+    return f"{text} {unit}"

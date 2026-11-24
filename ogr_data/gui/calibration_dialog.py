@@ -13,7 +13,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
-    QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
     QLabel,
@@ -28,7 +27,13 @@ from ..core import calibration as cal
 from ..core import fitting
 from ..core import units
 from ..core.models import CRITERIA
+from ..core.numbers import format_number, symbols
 from .i18n import localize, tr
+from .number_spin import NumberSpinBox
+
+
+#: Calibrated parameter key (without its unit suffix) -> the name shown
+_SHOWN = {"cohesion": "c", "friction": "phi", "jrc": "JRC", "jcs": "JCS"}
 
 
 class CalibrationDialog(QDialog):
@@ -93,25 +98,25 @@ class CalibrationDialog(QDialog):
         self.data_type = QComboBox()
         for value in cal.DATA_TYPES:
             self.data_type.addItem(tr(value), value)  # i18n: registry
-        self.sigci = QDoubleSpinBox()
+        self.sigci = NumberSpinBox()
         self.sigci.setRange(0.0, 1e12)
         self.sigci.setDecimals(4)
         self.sigci.setSuffix(f" {unit}")
         params = source.parameters
         self.sigci.setValue(float(params.get("sigci", params.get("compressive_strength", 100000.0))) * self._kpa_scale)
-        self.disturbance = QDoubleSpinBox()
+        self.disturbance = NumberSpinBox()
         self.disturbance.setRange(0.0, 1.0)
         self.disturbance.setSingleStep(0.1)
         self.disturbance.setValue(float(params.get("d", 0.0)))
-        self.phi_b = QDoubleSpinBox()
+        self.phi_b = NumberSpinBox()
         self.phi_b.setRange(0.0, 89.0)
-        self.phi_b.setSuffix(" deg")
+        self.phi_b.setSuffix("°")
         self.phi_b.setValue(float(params.get("phi_r", 30.0)))
         states_form.addRow(tr("Failure States:"), self.states)
         states_form.addRow(tr("Failure Data Type:"), self.data_type)
-        states_form.addRow(tr("sigci (rock mass data):"), self.sigci)
+        states_form.addRow(symbols(tr("sigci (rock mass data):")), self.sigci)
         states_form.addRow(tr("D (rock mass data):"), self.disturbance)
-        states_form.addRow("phi b (Barton-Bandis):", self.phi_b)
+        states_form.addRow("φb (Barton-Bandis):", self.phi_b)  # i18n: ignore (symbol)
         self._states_form = states_form
         layout.addWidget(states_box)
 
@@ -207,12 +212,14 @@ class CalibrationDialog(QDialog):
         scale = units.stress_factor(self._unit)  # MPa -> display
         lines = []
         for key, value in r.fitted.items():
+            # spec 025e RF-8: parameter names and symbols, never the dictionary keys
             if key.endswith("_mpa"):
-                lines.append(f"{key[:-4]} = {value * scale:.6g} {self._unit}")
-            elif key.endswith("_deg") or key == "friction_deg":
-                lines.append(f"{key.replace('_deg', '')} = {value:.4f} deg")
+                name, text = key[:-4], f"{format_number(value * scale)} {self._unit}"
+            elif key.endswith("_deg"):
+                name, text = key[:-4], f"{format_number(value, 'angle')}°"
             else:
-                lines.append(f"{key} = {value:.6g}")
+                name, text = key, format_number(value)
+            lines.append(f"{symbols(_SHOWN.get(name, name))} = {text}")
         relative = self.error_type.currentData() == "Relative"
         error = tr("relative") if relative else f"{self._unit}²"
         ssr = r.ssr if relative else r.ssr * scale**2
@@ -222,6 +229,6 @@ class CalibrationDialog(QDialog):
             summary = tr("{0} direct shear points · residuals (sum of squares, vertical, {1}) = {2}")
         return (
             "<b>" + " · ".join(lines) + "</b><br>"
-            + summary.format(r.n_points, error, f"{ssr:.6g}")
+            + summary.format(r.n_points, error, format_number(ssr))
             + f"<br><i>{r.method_note}</i>"
         )

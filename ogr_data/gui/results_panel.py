@@ -13,6 +13,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QGridLayout, QGroupBox, QLabel, QPushButton, QVBoxLayout, QWidget
 
+from ..core.numbers import symbols
 from .i18n import tr
 
 _VALUE_STYLE = "font-family: Consolas, monospace;"
@@ -62,7 +63,7 @@ class ResultsPanel(QWidget):
     def set_results(self, heading: str, rows: list[tuple[str, str]], note: str = "") -> None:
         """Show ``rows`` of (label, formatted value) under ``heading``."""
 
-        self._rows = list(rows)
+        self._rows = [(symbols(label), symbols(value)) for label, value in rows]  # spec 025e
         self._message = ""
         self._heading.setText(heading)
         self._fill_grid()

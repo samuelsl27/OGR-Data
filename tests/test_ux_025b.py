@@ -102,7 +102,7 @@ def test_results_panel_is_in_view_on_the_right() -> None:
         dock, panel = w._results_dock, w._results
         assert dock.isVisible() and w.dockWidgetArea(dock) == Qt.DockWidgetArea.RightDockWidgetArea
         labels = [label for label, _ in panel.rows()]
-        assert labels == ["mb", "s", "a", "sigt", "sigc", "sigcm", "c", "phi", "Erm"]
+        assert labels == ["mb", "s", "a", "σt", "σc", "σcm", "c", "φ", "Erm"]  # spec 025e symbols
         # the whole block, button included, lies inside the window: nothing to scroll to
         bottom = panel.copy_button.mapTo(w, QPoint(0, panel.copy_button.height())).y()
         assert bottom <= w.height(), (bottom, w.height())
@@ -242,7 +242,9 @@ def test_other_criteria_show_derived_results_or_why_not() -> None:
     app, w = _window()
     try:
         _select(app, w, "power_curve")
-        expected = [(label, localize(value)) for label, value in report.computed_rows(w._current_material(), "kPa")]
+        from ogr_data.core.numbers import symbols
+
+        expected = [(symbols(label), symbols(localize(value))) for label, value in report.computed_rows(w._current_material(), "kPa")]
         assert expected and w._results.rows() == expected
         _select(app, w, "mohr_coulomb")
         assert w._results.rows() == []

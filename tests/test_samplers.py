@@ -161,7 +161,7 @@ def test_sampler_window_offscreen() -> None:
     w._on_plot_event("principal", "move", 4.0)
     w._on_plot_event("principal", "release", 4.0)
     msg = w.statusBar().currentMessage()
-    assert "sigma3 = 4000.0000 kPa" in msg and "[MC]" in msg
+    assert "σ₃ = 4000 kPa" in msg and "[MC]" in msg  # spec 025e: symbols and format
     assert w._principal._vline.get_visible()
 
     # A move without pressing must not sample.
@@ -176,7 +176,9 @@ def test_sampler_window_offscreen() -> None:
     inst = samplers.instantaneous_mc(sig3, sig1, 2.0, slope=w._d1_func(2.0))
     msg = w.statusBar().currentMessage()
     assert f"c = {units.stress_text(inst.cohesion_mpa, 'kPa')}" in msg
-    assert f"phi = {inst.friction_deg:.2f} deg" in msg
+    from ogr_data.core.numbers import format_number
+
+    assert f"φ = {format_number(inst.friction_deg, 'angle')}°" in msg  # spec 025e
     assert len(w._shear._tangent_line.get_xdata()) == 2
     assert w._shear._marker.get_offsets().size > 0
 
@@ -190,7 +192,7 @@ def test_sampler_window_offscreen() -> None:
     w._criterion_combo.setCurrentIndex(w._criterion_combo.findData("barton_bandis"))
     w._stress_sampler_act.setChecked(True)
     w._on_plot_event("shear", "press", 5.0)
-    assert "sigma_n = 5000.0000 kPa" in w.statusBar().currentMessage()
+    assert "σn = 5000 kPa" in w.statusBar().currentMessage()
 
     # MC sampler on a shear-space envelope.
     w._mc_sampler_act.setChecked(True)

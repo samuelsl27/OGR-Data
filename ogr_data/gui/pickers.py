@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
-    QDoubleSpinBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -17,6 +16,7 @@ from PySide6.QtWidgets import (
 
 from ..core import tables
 from .i18n import localize, tr
+from .number_spin import NumberSpinBox
 
 
 class TablePickerDialog(QDialog):
@@ -140,7 +140,7 @@ class GsiPickerDialog(QDialog):
         self._surface_desc = QLabel()
         self._surface_desc.setWordWrap(True)
         self._range_label = QLabel()
-        self._value = QDoubleSpinBox()
+        self._value = NumberSpinBox()
         self._value.setRange(1.0, 100.0)
 
         self._structure.currentIndexChanged.connect(self._update)

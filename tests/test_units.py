@@ -25,8 +25,9 @@ def test_factors_and_round_trip() -> None:
 def test_stress_text() -> None:
     from ogr_data.core import units
 
-    assert units.stress_text(5.23, "MPa") == "5.2300 MPa"
-    assert units.stress_text(5.23, "kPa") == "5230.0000 kPa"
+    # spec 025e: the screen format by default, fixed decimals on request
+    assert units.stress_text(5.23, "MPa") == "5.23 MPa"
+    assert units.stress_text(5.23, "kPa") == "5230 kPa"
     assert units.stress_text(3686.23, "kPa", decimals=2) == "3686230.00 kPa"
 
 
@@ -82,7 +83,7 @@ def test_units_window_offscreen() -> None:
         assert w._sig3max.value() == 7.5 and w._sig3max.suffix() == " MPa"
         assert w._params()["sigci"] == 100000.0
         assert w._sig3max_mpa() == 7.5
-        assert "sigma3 (MPa)" == w._principal.axes.get_xlabel()
+        assert "σ₃ (MPa)" == w._principal.axes.get_xlabel()  # spec 025e
         # tick labels follow the display unit (plotted data stay in MPa)
         assert w._principal.axes.xaxis.get_major_formatter()(7.5, 0) == "7.5"
         assert w._shear.axes.yaxis.get_major_formatter()(2.0, 0) == "2"
