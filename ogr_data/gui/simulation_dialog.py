@@ -20,6 +20,9 @@ from .states_dialog import _ItemsDialog
 class TestSimulationsDialog(_ItemsDialog):
     noun = "Test"
 
+    def empty_hint(self) -> str:
+        return tr("No test simulations yet. Click Add, choose the test type and run Tests > Compute (F5).")
+
     def __init__(self, parent, material_name: str, tests: list, unit: str, initial: int = 0) -> None:
         super().__init__(parent, tr("Define Test Simulations - {0}").format(material_name), tests, unit, initial)
         self.resize(680, 460)

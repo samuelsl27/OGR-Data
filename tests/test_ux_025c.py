@@ -256,7 +256,6 @@ def test_delete_key_in_the_tree_only() -> None:
         w._add_material("rock")
         app.processEvents()
         assert len(w._project.materials) == 2
-        w._delete_confirm = False
         w._name_edit.setFocus()
         app.processEvents()
         QTest.keyClick(w._name_edit, Qt.Key.Key_Delete)

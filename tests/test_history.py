@@ -166,7 +166,7 @@ def test_window_material_actions() -> None:
 
         item.setCheckState(0, Qt.CheckState.Unchecked)
         assert plain(w._undo_act.text()) == "Undo Hide Material"
-        w._delete_material(confirm=False)
+        w._delete_material()
         assert plain(w._undo_act.text()).startswith("Undo Delete Material") and len(w._project.materials) == 2
         w.undo()
         assert len(w._project.materials) == 3 and w._project.materials[w._current].name == "Granite"

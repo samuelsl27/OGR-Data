@@ -1,6 +1,6 @@
 # Spec 025d — Estados vacíos y confirmaciones
 
-> Estado: **borrador** (2026-11-24), pendiente de aprobación.
+> Estado: **hecha** (2026-11-24; plan, inventario y validación en `plan-tasks.md`).
 
 ## Contexto y objetivo
 
@@ -62,5 +62,4 @@ con cada uno (queda, pasa a barra de estado, pasa a acción deshabilitada).
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: ¿el texto del estado vacío lleva un botón que
-  ejecuta la acción, o solo dice dónde está en el menú?]
+Resuelta (2026-11-24): el estado vacío lleva botones que ejecutan la acción.

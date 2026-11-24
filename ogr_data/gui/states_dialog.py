@@ -278,8 +278,9 @@ class _ItemsDialog(QDialog):
         left_layout.setContentsMargins(0, 0, 0, 0)
         left_layout.addWidget(self._list)
         buttons = QHBoxLayout()
+        self._list_buttons: list[QPushButton] = []
         for label, slot in (
-            ("+", self.add_item),
+            (tr("Add"), self.add_item),  # spec 025d RF-3: a word, not "+"
             (tr("Delete"), self.delete_item),
             (tr("Duplicate"), self.duplicate_item),
             (tr("Up"), lambda: self.move_item(-1)),
@@ -288,6 +289,7 @@ class _ItemsDialog(QDialog):
             button = QPushButton(label)
             button.clicked.connect(lambda _=False, f=slot: f())
             buttons.addWidget(button)
+            self._list_buttons.append(button)
         left_layout.addLayout(buttons)
 
         self._editor = QWidget()
@@ -305,9 +307,19 @@ class _ItemsDialog(QDialog):
         editor_layout.addLayout(header)
         self._build_editor(editor_layout)
 
+        # spec 025d RF-3: an empty list shows its first step, not a disabled editor
+        self._empty = QLabel(self.empty_hint())
+        self._empty.setWordWrap(True)
+        self._empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        right = QWidget()
+        right_layout = QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.addWidget(self._empty, stretch=1)
+        right_layout.addWidget(self._editor, stretch=1)
+
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(left)
-        splitter.addWidget(self._editor)
+        splitter.addWidget(right)
         splitter.setSizes([220, 560])
         box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         box.accepted.connect(self.accept)
@@ -320,8 +332,19 @@ class _ItemsDialog(QDialog):
         if self.items:
             self._list.setCurrentRow(max(0, min(initial, len(self.items) - 1)))
         self._editor.setEnabled(bool(self.items))
+        self._show_empty_state()
+
+    def _show_empty_state(self) -> None:
+        self._empty.setVisible(not self.items)
+        self._editor.setVisible(bool(self.items))
+        # Delete, Duplicate, Up, Down act on an item: off while there is none
+        for button in self._list_buttons[1:]:
+            button.setEnabled(bool(self.items))
 
     # ------------------------------------------------ subclass interface
+
+    def empty_hint(self) -> str:
+        return tr("Nothing here yet. Click Add to create the first one.")
 
     def _build_editor(self, layout: QVBoxLayout) -> None:  # pragma: no cover - abstract
         raise NotImplementedError
@@ -365,6 +388,7 @@ class _ItemsDialog(QDialog):
             return
         self._row = row
         self._editor.setEnabled(0 <= row < len(self.items))
+        self._show_empty_state()
         if 0 <= row < len(self.items):
             self._loading = True
             try:
@@ -449,6 +473,9 @@ class FailureStatesDialog(_ItemsDialog):
 
     noun = "State"
 
+    def empty_hint(self) -> str:
+        return tr("No failure states yet. Click Add, then type or import the test points of the state.")
+
     def __init__(self, parent, material_name: str, failure_states: list, unit: str, initial: int = 0) -> None:
         super().__init__(parent, tr("Define Failure States - {0}").format(material_name), failure_states, unit, initial)
 
@@ -505,6 +532,9 @@ class StressPathsDialog(_ItemsDialog):
     """Fields and columns per configuration, as verified in RSData 1.009."""
 
     noun = "Path"
+
+    def empty_hint(self) -> str:
+        return tr("No stress paths yet. Click Add, then choose the test type and type or import its readings.")
 
     def __init__(self, parent, material_name: str, stress_paths: list, unit: str, initial: int = 0) -> None:
         super().__init__(parent, tr("Define Stress Paths - {0}").format(material_name), stress_paths, unit, initial)

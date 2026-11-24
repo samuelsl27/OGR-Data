@@ -77,9 +77,12 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
         from PySide6.QtWidgets import QMenu
 
         menu = QMenu(self)
+        menu.setToolTipsVisible(True)
         menu.addAction(tr("Copy Graph as Image"), lambda: self.menu_handler(self, "copy"))
         menu.addAction(tr("Save Graph as Image…"), lambda: self.menu_handler(self, "save"))
-        menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
+        export = menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
+        export.setEnabled(self.can_export())  # spec 025d RF-5: disabled with its reason
+        export.setToolTip(self.export_reason())
         menu.addSeparator()
         menu.addAction(tr("Zoom Extents"), lambda: self.menu_handler(self, "zoom"))
         menu.addAction(tr("Graph Editor…"), lambda: self.menu_handler(self, "editor"))
@@ -341,6 +344,12 @@ class EnvelopeCanvas(FigureCanvasQTAgg):
                 data[key] = (np.asarray(x, dtype=float), np.asarray(y, dtype=float))
         return data
 
+    def can_export(self) -> bool:
+        return bool(self.series_data() or self.other_series() or self.layer_series())
+
+    def export_reason(self) -> str:
+        return "" if self.can_export() else tr("This graph has no data to export.")
+
     def other_series(self) -> list[tuple[str, np.ndarray, np.ndarray]]:
         """(material name, x, y) of the other materials drawn (spec 011)."""
 
@@ -377,6 +386,10 @@ class PathCanvas(FigureCanvasQTAgg):
         super().__init__(self.figure)
         self.axes = self.figure.add_subplot(111)
         self._lines: list = []
+        # spec 025d RF-1: what an empty graph is missing, in the middle of it
+        self._empty = self.axes.text(
+            0.5, 0.5, "", transform=self.axes.transAxes, ha="center", va="center", wrap=True, fontsize="small"
+        )
         # spec 013c: animation marker and the current yield surface (q-p graph)
         (self._anim_marker,) = self.axes.plot([], [], "o", color="#1f4fd8", markersize=7, zorder=6)
         (self._anim_surface,) = self.axes.plot([], [], "--", color="#1f4fd8", linewidth=1.0, zorder=2)
@@ -446,6 +459,7 @@ class PathCanvas(FigureCanvasQTAgg):
             (line,) = self.axes.plot(x, y, color=color, **style)
             line.ogr_label = label
             self._lines.append(line)
+        self._empty.set_text("" if self._lines else tr("No stress paths or computed test simulations"))
         self.axes.relim()
         self.axes.autoscale_view()
         self._legend()
@@ -467,6 +481,15 @@ class PathCanvas(FigureCanvasQTAgg):
     def series_data(self) -> list[tuple[str, np.ndarray, np.ndarray]]:
         return [(l.ogr_label, *(np.asarray(v, dtype=float) for v in l.get_data())) for l in self._lines]
 
+    def empty_message(self) -> str:
+        return self._empty.get_text()
+
+    def can_export(self) -> bool:
+        return bool(self._lines)
+
+    def export_reason(self) -> str:
+        return "" if self.can_export() else tr("This graph has no data to export.")
+
     def save_image(self, path: str) -> None:
         self.figure.savefig(path)
 
@@ -476,7 +499,10 @@ class PathCanvas(FigureCanvasQTAgg):
         from PySide6.QtWidgets import QMenu
 
         menu = QMenu(self)
+        menu.setToolTipsVisible(True)
         menu.addAction(tr("Copy Graph as Image"), lambda: self.menu_handler(self, "copy"))
         menu.addAction(tr("Save Graph as Image…"), lambda: self.menu_handler(self, "save"))
-        menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
+        export = menu.addAction(tr("Export Graph to Excel (CSV)…"), lambda: self.menu_handler(self, "export"))
+        export.setEnabled(self.can_export())  # spec 025d RF-5: disabled with its reason
+        export.setToolTip(self.export_reason())
         menu.exec(event.globalPos())

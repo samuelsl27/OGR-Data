@@ -246,4 +246,16 @@ ES: dict[str, str] = {
     "HTML report (*.html)": "Informe HTML (*.html)",
     "Report": "Informe",
     "Report written to {0}": "Informe guardado en {0}",
+    # ------------------------------------------------ spec 025d: empty lists
+    "Add": "Añadir",
+    "Nothing here yet. Click Add to create the first one.": "Aún no hay nada. Pulse Añadir para crear el primero.",
+    "No failure states yet. Click Add, then type or import the test points of the state.": (
+        "Aún no hay estados de rotura. Pulse Añadir y escriba o importe los puntos de ensayo del estado."
+    ),
+    "No stress paths yet. Click Add, then choose the test type and type or import its readings.": (
+        "Aún no hay trayectorias de tensiones. Pulse Añadir, elija el tipo de ensayo y escriba o importe sus lecturas."
+    ),
+    "No test simulations yet. Click Add, choose the test type and run Tests > Compute (F5).": (
+        "Aún no hay simulaciones de ensayo. Pulse Añadir, elija el tipo de ensayo y ejecute Ensayos > Calcular (F5)."
+    ),
 }

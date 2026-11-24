@@ -83,6 +83,10 @@ class AnimationPanel(QGroupBox):
         self.timer.setInterval(40)
         self.timer.timeout.connect(self._tick)
         controls = QVBoxLayout()
+        # spec 025d RF-2: what the panel needs before it can animate
+        self.hint = QLabel(tr("No computed test simulation to animate: define one in Tests > Define Test Simulations… and run Tests > Compute (F5)."))
+        self.hint.setWordWrap(True)
+        controls.addWidget(self.hint)
         top = QHBoxLayout()
         top.addWidget(QLabel("Material:"))  # i18n: ignore (same in Spanish)
         top.addWidget(self.material, stretch=1)
@@ -119,6 +123,7 @@ class AnimationPanel(QGroupBox):
         enabled = bool(self._targets)
         for w in (self.play, self.pause, self.slider):
             w.setEnabled(enabled)
+        self.hint.setVisible(not enabled)
         if not enabled:
             self.stop()
         self.set_step(min(self.slider.value(), self._steps() - 1) if enabled else 0)

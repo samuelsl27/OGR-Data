@@ -299,10 +299,10 @@ def test_window_duplicate_rename_delete() -> None:
         w._set_material_symbol("s")
         assert w._project.materials[1].symbol == "s"
         # delete the selected material; the last one cannot be deleted
-        w._delete_material(confirm=False)
+        w._delete_material()
         assert w._tree.topLevelItemCount() == 1 and w._current == 0
         assert not w._delete_button.isEnabled()
-        w._delete_material(confirm=False)
+        w._delete_material()
         assert w._tree.topLevelItemCount() == 1
     finally:
         w.deleteLater()

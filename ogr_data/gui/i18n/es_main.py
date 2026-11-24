@@ -78,8 +78,6 @@ ES = {
     "Failure state": "Estado de rotura",
     "Test simulation": "Simulación de ensayo",
     "Stress path": "Trayectoria de tensiones",
-    "Delete material": "Eliminar material",
-    "Delete material '{0}'?": "¿Eliminar el material «{0}»?",
     "Material color": "Color del material",
     # ----------------------------------------------------------- graphs
     "Principal Stresses": "Tensiones principales",
@@ -106,7 +104,6 @@ ES = {
     "PNG image (*.png);;JPEG image (*.jpg);;BMP image (*.bmp)":
         "Imagen PNG (*.png);;Imagen JPEG (*.jpg);;Imagen BMP (*.bmp)",
     "Export graph to CSV": "Exportar gráfica a CSV",
-    "Export": "Exportar",
     "There is no series to export on this plot.": "Esta gráfica no tiene series que exportar.",
     # ------------------------------------------------- status and messages
     "Material Database": "Base de datos de materiales",
@@ -213,4 +210,16 @@ ES = {
     "Keyboard Shortcuts": "Atajos de teclado",
     "Action": "Acción",
     "Shortcut": "Atajo",
+    # ------------------------------------------------ spec 025d: empty states and confirmations
+    "No stress paths or computed test simulations": "Sin trayectorias ni simulaciones calculadas",
+    "This material has no stress paths or computed test simulations. Define one to fill these graphs:": (
+        "Este material no tiene trayectorias de tensiones ni simulaciones calculadas. Defina una para ver estas gráficas:"
+    ),
+    "No computed test simulation to animate: define one in Tests > Define Test Simulations… and run Tests > Compute (F5).": (
+        "No hay simulaciones calculadas que animar: defina una en Ensayos > Definir simulaciones de ensayo… "
+        "y ejecute Ensayos > Calcular (F5)."
+    ),
+    "Deleted '{0}'. Undo (Ctrl+Z) brings it back.": "Eliminado «{0}». Deshacer (Ctrl+Z) lo recupera.",
+    "A project keeps at least one material.": "Un proyecto conserva al menos un material.",
+    "This graph has no data to export.": "Esta gráfica no tiene datos que exportar.",
 }

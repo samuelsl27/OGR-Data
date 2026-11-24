@@ -104,7 +104,6 @@ class MainWindow(QMainWindow):
         # is being loaded into the form.
         self._project = projects.Project.new()
         self._file_path: str | None = None  # spec 025c: Save writes here
-        self._delete_confirm = True  # Supr asks before deleting a material (tests turn it off)
         self._current = 0
         self._loading = True
         self._tree_updating = False
@@ -264,7 +263,30 @@ class MainWindow(QMainWindow):
             "pq": PathCanvas(tr("q vs p"), "p", "q", True, True, self._theme),
         }
         path_page = QWidget()
-        path_grid = QGridLayout(path_page)
+        path_layout = QVBoxLayout(path_page)
+        # spec 025d RF-1: with nothing to draw, say so and offer the way in
+        self._path_hint = QWidget()
+        hint_layout = QHBoxLayout(self._path_hint)
+        hint_layout.setContentsMargins(4, 4, 4, 4)
+        hint_text = QLabel(
+            tr("This material has no stress paths or computed test simulations. Define one to fill these graphs:")
+        )
+        hint_text.setWordWrap(True)
+        hint_layout.addWidget(hint_text, stretch=1)
+        self._path_hint_buttons = []
+        for label, slot in (
+            (tr("Define Stress Paths…"), lambda: self._define_stress_paths()),
+            (tr("Define Test Simulations…"), lambda: self._define_test_simulations()),
+        ):
+            button = QPushButton(label)
+            button.clicked.connect(slot)
+            hint_layout.addWidget(button)
+            self._path_hint_buttons.append(button)
+        path_layout.addWidget(self._path_hint)
+        path_grid_host = QWidget()
+        path_grid = QGridLayout(path_grid_host)
+        path_grid.setContentsMargins(0, 0, 0, 0)
+        path_layout.addWidget(path_grid_host, stretch=1)
         for index, canvas in enumerate(self._path_canvases.values()):
             canvas.menu_handler = self._on_path_canvas_menu
             canvas.set_display(self._scale(), self._stress_unit)
@@ -534,16 +556,14 @@ class MainWindow(QMainWindow):
         self._update_window_title()
         return True
 
-    def _delete_selected(self, confirm: bool | None = None) -> None:
+    def _delete_selected(self) -> None:
         """Edit > Delete / Supr in the tree: the selected material, state, path or simulation."""
 
-        if confirm is None:
-            confirm = self._delete_confirm
         item = self._tree.currentItem()
         if item is None:
             return
         if item.parent() is None:
-            self._delete_material(confirm)
+            self._delete_material()
         else:
             kind, index = item.data(0, Qt.ItemDataRole.UserRole)
             self._delete_child(kind, index)
@@ -755,7 +775,17 @@ class MainWindow(QMainWindow):
             self._tree.setCurrentItem(self._tree.topLevelItem(self._current))
         finally:
             self._tree_updating = False
-        self._delete_button.setEnabled(len(self._project.materials) > 1)
+        self._update_action_states()
+
+    def _update_action_states(self) -> None:
+        """What cannot run is disabled and says why (spec 025d RF-5)."""
+
+        can_delete = len(self._project.materials) > 1
+        reason = "" if can_delete else tr("A project keeps at least one material.")
+        for widget in (self._delete_button, getattr(self, "_delete_material_act", None)):
+            if widget is not None:
+                widget.setEnabled(can_delete)
+                widget.setToolTip(reason)
 
     def _current_material(self) -> projects.Material:
         return self._project.materials[self._current]
@@ -890,17 +920,19 @@ class MainWindow(QMainWindow):
         if item is not None:
             self._tree.editItem(item, 0)
 
-    def _delete_material(self, confirm: bool = True) -> None:
+    def _delete_material(self) -> None:
+        """Delete the selected material, without asking: Undo brings it back (spec 025d RF-4)."""
+
         if len(self._project.materials) <= 1:
             return
         name = self._current_material().name
-        if confirm:
-            answer = QMessageBox.question(self, tr("Delete material"), tr("Delete material '{0}'?").format(name))
-            if answer != QMessageBox.StandardButton.Yes:
-                return
         index = self._project.remove(self._current)
         self._load_material(index)
         self._populate_tree()
+        self._say_deleted(name)
+
+    def _say_deleted(self, name: str) -> None:
+        self.statusBar().showMessage(tr("Deleted '{0}'. Undo (Ctrl+Z) brings it back.").format(name), 8000)
 
     def _set_material_color(self, color: str) -> None:
         self._current_material().color = color
@@ -978,10 +1010,14 @@ class MainWindow(QMainWindow):
 
     def _delete_child(self, kind: str, index: int) -> None:
         objects = self._children(self._current_material(), kind)
+        name = None
         if 0 <= index < len(objects):
+            name = objects[index].name
             del objects[index]
         self._populate_tree()
         self.refresh()
+        if name is not None:
+            self._say_deleted(name)
 
     def _define_failure_states(self, initial: int = 0) -> None:
         from .states_dialog import FailureStatesDialog
@@ -1228,6 +1264,8 @@ class MainWindow(QMainWindow):
                 series["pq"].append((label, result.p / kpa, result.q / kpa, test.color, style))
         for key, canvas in self._path_canvases.items():
             canvas.set_series(series[key])
+        if hasattr(self, "_path_hint"):
+            self._path_hint.setVisible(not any(series.values()))
         if hasattr(self, "_animation"):
             self._animation.refresh_items()
 
@@ -1434,7 +1472,7 @@ class MainWindow(QMainWindow):
         for x_col, y_col, x, y in canvas.layer_series():
             columns.append((x_col, y_col, x * scale, y * scale))
         if not columns:
-            QMessageBox.information(self, tr("Export"), tr("There is no series to export on this plot."))
+            self.statusBar().showMessage(tr("There is no series to export on this plot."), 6000)
             return
         series_export.write_series_csv(path, columns, unit=self._stress_unit)
 
