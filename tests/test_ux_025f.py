@@ -287,7 +287,7 @@ def test_help_and_status_tips_name_no_vendor() -> None:
     from ogr_data.gui import status_tips
     from ogr_data.gui.i18n import es_tips
 
-    vendor = re.compile(r"rocscience|rocdata|rsdata|rocprop|rocplane|\brs2\b|\brs3\b|\bslide[23]\b", re.I)  # "slide 23" of a lecture is not the product
+    vendor = re.compile(r"rocscience|rocdata|rsdata|rocprop|rocplane|\brs2\b|\brs3\b|\bslide[23]\b", re.I)  # rule 9: pattern ("slide 23" of a lecture is not the product)
     root = Path(__file__).resolve().parent.parent
     help_text = (root / "ogr_data" / "data" / "parameter_help.json").read_text(encoding="utf-8")
     assert not vendor.search(help_text), vendor.search(help_text)

@@ -1,6 +1,6 @@
 # Spec 027 — Retirar las referencias al fabricante del programa de referencia
 
-> Estado: **borrador** (2026-11-24), pendiente de clarificación y aprobación.
+> Estado: **aprobada** (2026-11-24, «sí, las apruebo»).
 
 ## Contexto y objetivo
 
@@ -50,8 +50,15 @@ limpiar.
 
 ## Dudas abiertas
 
-- [NECESITA ACLARACIÓN: ¿la regla alcanza a los documentos de `spec/`
-  (análisis, planes y changelogs de las specs 001–026), o solo al
-  programa y a `README`/`AGENTS`/constitución?]
-- [NECESITA ACLARACIÓN: ¿se mantiene la importación de `.roc` (RF-5)?]
-- [NECESITA ACLARACIÓN: ¿y la historia de git, se deja como está?]
+Resueltas al aprobarla (2026-11-24), con el alcance que ya fija la regla 9
+de `AGENTS.md`:
+
+- La regla alcanza **también a los documentos de `spec/`** («la
+  documentación del repositorio»).
+- La importación de `.roc` **se mantiene**, nombrada por su extensión. La
+  etiqueta con que empieza un `.roc` se sigue comparando en el importador:
+  es un dato del formato y la línea va marcada `rule 9: file-format tag`.
+- La **historia de git no se reescribe** (obligaría a forzar el push).
+- Las rutas a la carpeta privada `../Referencias/` se escriben sin nombres
+  de carpeta que lleven el nombre de un producto; los tests localizan los
+  ejemplos `.roc` buscándolos, no por su ruta.
