@@ -39,7 +39,7 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
 
 | RF | Test (`tests/test_ux_025f.py`) | Resultado |
 |---|---|---|
-| RF-1 | `test_every_parameter_has_sourced_help_or_is_pending`, `test_tooltips_show_definition_unit_range_and_source` | verde: 98 entradas con fuente, 2 pendientes (Initial Mean Stress de Softening-Hardening, Residual Strength de Barton-Bandis) |
+| RF-1 | `test_every_parameter_has_sourced_help_or_is_pending`, `test_tooltips_show_definition_unit_range_and_source` | verde: 65 entradas con fuente citable y 35 pendientes, tras la regla 9 (ver abajo) |
 | RF-2 | `test_every_menu_action_has_a_status_tip` (EN y ES) | verde |
 | RF-3 | `test_inputs_have_labels_or_names` (barra lateral con 4 criterios y 7 diálogos) | verde |
 | RF-4 | `test_tab_goes_down_the_sidebar` | verde |
@@ -60,3 +60,16 @@ listado** → [`fuentes-pendientes.md`](fuentes-pendientes.md).
 - El botón «Cancelar» del progreso usa el texto de Qt (su catálogo lo
   traduce); con una clave propia, el test de la spec 024 lo marcaba como
   inglés sin traducir en todos los diálogos.
+
+## Decisiones de la propietaria tras la validación (2026-11-24)
+
+- Rangos derivados por cálculo: **se aceptan**, con la derivación dicha.
+- Γ de Cam-Clay en lb/in²: **se deja**, con la advertencia.
+- **Regla 9 de `AGENTS.md`**: no se cita al fabricante del programa de
+  referencia. Las 33 entradas que solo tenían sus manuales como fuente
+  pasaron a pendientes (98 → 65 con ayuda); las citas de los libros de
+  Hoek ya no nombran a quien los aloja. Test nuevo:
+  `test_help_and_status_tips_name_no_vendor`. La investigación completa se
+  guarda fuera del repositorio (`../Referencias/Ejemplos/ayuda_parametros_025f/`).
+- Las anomalías encontradas pasan a la spec 026; las menciones antiguas
+  al fabricante en el resto del repositorio, a la spec 027.

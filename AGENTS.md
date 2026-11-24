@@ -2,11 +2,10 @@
 
 Propiedades de materiales para la suite OpenGeoRock: criterios de
 resistencia (Hoek-Brown generalizado, Mohr-Coulomb, Barton-Bandis, Power
-Curve y los demás de RSData), clasificación USCS, estimación desde
-bibliografía, ajuste y calibración con datos de ensayo, simulación de
-ensayos, informes y transferencia por portapapeles a OGR Slip2D y OGR
-FEM2D. Heredero del viejo RocData (2004), con la línea de diseño de OGR
-Slip2D.
+Curve, Drucker-Prager, Cam-Clay, NorSand…), clasificación USCS,
+estimación desde bibliografía, ajuste y calibración con datos de ensayo,
+simulación de ensayos, informes y transferencia por portapapeles a OGR
+Slip2D y OGR FEM2D, con la línea de diseño de OGR Slip2D.
 
 *OpenGeoRock* (u *OGR Suite*) es el paraguas; **OGR Data** es este
 programa y lo único que contiene este repositorio. Paquete instalable
@@ -54,7 +53,7 @@ sale en cuadros.
 
 El runner no filtra: corre todo. Un test suelto se prueba importando su
 archivo en un script; la evidencia de una tarea es siempre la suite entera.
-Coste medido el 2026-11-24 en el PC de desarrollo: 266 tests, entre 2 y 3 min
+Coste medido el 2026-11-24 en el PC de desarrollo: 267 tests, entre 2 y 3 min
 en serie. Si crece mucho, se dice en el changelog de la spec que lo causó.
 
 **Código de salida 127 con `Failed: 0`** (Git Bash; es 0xC0000409, un
@@ -83,8 +82,8 @@ hoy solo impone la ventana se **mueve** al núcleo y la ventana la
 pregunta; copiarla es cómo acaban diciendo cosas distintas.
 
 Fuera del repositorio, en la carpeta de la suite: `../Referencias/`
-(bibliografía, análisis de RSData/ORMAS, documentación de terceros: nunca
-se publica) y `../Promps/` (prompts de desarrollo).
+(bibliografía, análisis de los programas de referencia, documentación de
+terceros: nunca se publica) y `../Promps/` (prompts de desarrollo).
 
 ---
 
@@ -122,8 +121,9 @@ y adaptadas a este programa.
 ### 1. El trabajo numérico se valida contra algo EXTERNO
 
 Una fórmula necesita un valor de referencia: un caso publicado (Hoek et
-al. 2002, Hoek-Diederichs 2006…), una solución cerrada, o ORMAS/RSData
-con su captura en `../Referencias/`. **Nunca** una instantánea de lo que
+al. 2002, Hoek-Diederichs 2006…), una solución cerrada, o un programa de
+referencia con su captura en `../Referencias/` (que no se nombra en el
+repositorio, regla 9). **Nunca** una instantánea de lo que
 el código imprime hoy: consagra el bug. Si no hay referencia, se dice en
 la spec y en el test.
 
@@ -181,6 +181,19 @@ una opción, añade el test que demuestra que **mueve el número**.
 (reglas U1–U17, patrones prohibidos y lista de comprobación). Toda spec
 que toque la interfaz dice qué reglas aplica y marca la lista al validar.
 
+### 9. Ninguna referencia a Rocscience ni a sus productos
+
+Regla de la propietaria (2026-11-24). Ni la empresa ni sus programas
+(RocData, RSData, RS2, RS3, Slide, RocPlane, RocProp…) se nombran en el
+código, los comentarios, la interfaz, la ayuda, los datos que se
+distribuyen, los tests ni la documentación del repositorio. Sus manuales
+se pueden **leer** en `../Referencias/` para entender qué hace una
+función, pero **no se citan**: las fórmulas se citan por su fuente
+científica original, y lo que solo documenta ese fabricante queda sin
+fuente hasta encontrar una citable. Donde haga falta, «el programa de
+referencia». Las menciones que quedan de antes de la regla las retira la
+spec 027.
+
 ---
 
 ## Forma de trabajar
@@ -215,8 +228,8 @@ que toque la interfaz dice qué reglas aplica y marca la lista al validar.
 - **No cambies el formato `.ogrdata` ni el contrato del portapapeles**
   sin actualizar antes su spec (007/011 y 005); los ficheros viejos deben
   seguir abriendo.
-- **No toques los tests de validación** (ORMAS, soluciones cerradas,
-  RSData) para hacer pasar un cambio: si fallan, el fallo está en el código.
+- **No toques los tests de validación** (soluciones cerradas, casos
+  publicados, programas de referencia) para hacer pasar un cambio: si fallan, el fallo está en el código.
 - **No añadas telemetría ni llamadas de red.**
 - **No cambies `LICENSE`** ni las cabeceras SPDX sin pedirlo.
 - **No copies texto de manuales comerciales** (`../Referencias/`): se

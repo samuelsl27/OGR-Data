@@ -249,7 +249,7 @@ def test_every_parameter_has_sourced_help_or_is_pending() -> None:
                 missing.append((criterion, field.key))
     stiffness = ["poisson", "young", "elastic_parameter", "shear_modulus", "g_ref", "p_ref", "g_exp", "ns_poisson", "g_min"]
     for key in stiffness:
-        if not any(e.key == key for e in ph.entries()) and ("*", key) not in pending:
+        if not any(e.key == key for e in ph.entries()) and not any(p["key"] == key for p in ph.pending()):
             missing.append(("stiffness", key))
     assert not missing, missing
     # what is pending says what is missing
@@ -276,3 +276,20 @@ def test_tooltips_show_definition_unit_range_and_source() -> None:
         finally:
             _close(w)
             i18n.set_language("en")
+
+
+def test_help_and_status_tips_name_no_vendor() -> None:
+    """Rule 9 of AGENTS.md: the help and the status tips cite no vendor manual nor name its programs."""
+
+    import re
+    from pathlib import Path
+
+    from ogr_data.gui import status_tips
+    from ogr_data.gui.i18n import es_tips
+
+    vendor = re.compile(r"rocscience|rocdata|rsdata|rocprop|rocplane|\brs2\b|\brs3\b|\bslide[23]\b", re.I)  # "slide 23" of a lecture is not the product
+    root = Path(__file__).resolve().parent.parent
+    help_text = (root / "ogr_data" / "data" / "parameter_help.json").read_text(encoding="utf-8")
+    assert not vendor.search(help_text), vendor.search(help_text)
+    texts = list(status_tips.TIPS) + list(status_tips.TIPS.values()) + list(es_tips.ES.values())
+    assert not [t for t in texts if vendor.search(t)]

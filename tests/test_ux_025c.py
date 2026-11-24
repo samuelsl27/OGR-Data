@@ -4,7 +4,7 @@
 Invariants:
 
 - at most 9 menus, none with a single entry, every window action in one
-  (rule 3 of AGENTS.md), the RSData action names kept;
+  (rule 3 of AGENTS.md), the established action names kept;
 - every menu entry has an Alt accelerator, never repeated inside a menu, in
   English and in Spanish; the standard shortcuts are there;
 - Save writes to the project's file (Save As only without one); recent
@@ -93,7 +93,7 @@ def _entries(menu) -> list[str]:
 
 
 def test_eight_menus_none_with_one_entry() -> None:
-    """RF-1, RF-3: the grouped menus, with the RSData action names."""
+    """RF-1, RF-3: the grouped menus, with the established action names."""
 
     app, w = _window()
     try:

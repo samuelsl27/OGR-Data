@@ -7,7 +7,7 @@ ES = {
     "Open one of the last projects opened or saved.": "Abre uno de los últimos proyectos abiertos o guardados.",
     "Save the project to its file, or choose one if it has none.": "Guarda el proyecto en su archivo, o elige uno si aún no tiene.",
     "Save the project to a new file.": "Guarda el proyecto en un archivo nuevo.",
-    "Add the material of a RocData .roc file to the project.": "Añade al proyecto el material de un archivo .roc de RocData.",
+    "Add the material of a .roc file to the project.": "Añade al proyecto el material de un archivo .roc.",
     "Project title and display stress unit.": "Título del proyecto y unidad de tensión en pantalla.",
     "Close OGR Data (asks to save unsaved changes).": "Cierra OGR Data (pregunta si hay cambios sin guardar).",
     "Undo the last change to the project.": "Deshace el último cambio del proyecto.",

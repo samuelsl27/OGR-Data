@@ -4,7 +4,7 @@
 Invariants:
 
 - numbers on screen: at most 6 significant figures and no padding zeros
-  (angles: 4 decimals), as RSData 1.009 shows them; never scientific
+  (angles: 4 decimals), as the reference program shows them; never scientific
   notation for the usual magnitudes; float noise shows as 0;
 - what is copied, exported or saved keeps every decimal;
 - a value typed with more decimals than shown is the value used;
@@ -21,8 +21,8 @@ from ogr_data.core.numbers import format_number, symbols
 # ---------------------------------------------------------------- T1: the format
 
 
-def test_format_matches_rsdata_captures() -> None:
-    # RSData 1.009, captures 39 and 74 (../Referencias/Ejemplos/RSData_analisis/capturas)
+def test_format_matches_the_reference_values() -> None:
+    # values as the reference program shows them (captures in the private references)
     assert format_number(100000.0) == "100000"
     assert format_number(100.0) == "100"
     assert format_number(0.0) == "0"

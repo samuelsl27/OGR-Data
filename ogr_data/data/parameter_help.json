@@ -1,241 +1,103 @@
 {
- "about": "Help of the material parameters (spec 025f RF-1). Each entry: a short definition in English and Spanish written from the cited sources (own words), the typical range only when a source gives one, and where in the source it is stated (locator). 'pending' lists what no reliable source could support; see spec/features/025f-ayuda-accesibilidad-progreso/fuentes-pendientes.md.",
+ "about": "Help of the material parameters (spec 025f RF-1): a short definition in English and Spanish written from the cited sources, the typical range only when a source gives it (a derived range says how it was derived), and where in the source it is stated. 'pending' lists what has no citable source yet.",
  "sources": {
   "drucker_prager_1952": {
    "citation": "Drucker, D.C., Prager, W. (1952). Soil mechanics and plastic analysis or limit design. Quarterly of Applied Mathematics, 10(2), 157-165.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\Drucker_Prager_1952_Soil-mechanics-and-plastic-analysis-or-limit-design.pdf (downloaded from the AMS public archive, https://www.ams.org/journals/qam/1952-10-02/S0033-569X-1952-48291-2/S0033-569X-1952-48291-2.pdf)",
-   "short": "Drucker & Prager (1952)"
+   "short": "Drucker & Prager (1952)",
+   "kind": "paper"
   },
   "vermeer_deborst_1984": {
    "citation": "Vermeer, P.A., de Borst, R. (1984). Non-associated plasticity for soils, concrete and rock. Heron, 29(3).",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\General\\Vermeer_deBorst_1984_Non-associated-plasticity-for-soils-concrete-and-rock.pdf (downloaded from the TU Delft repository, https://repository.tudelft.nl/record/uuid:4ee188ab-8ce0-4df3-adf5-9010ebfaabf0)",
-   "short": "Vermeer & de Borst (1984)"
+   "short": "Vermeer & de Borst (1984)",
+   "kind": "paper"
   },
   "hoek_2023": {
-   "citation": "Hoek, E. (2023). Practical Rock Engineering. Rocscience Inc., Toronto (online edition).",
-   "kind": "book",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_Practical-Rock-Engineering_2023_completo.pdf",
-   "short": "Hoek (2023)"
+   "citation": "Hoek, E. (2023). Practical Rock Engineering. Course notes, online edition.",
+   "short": "Hoek (2023)",
+   "kind": "book"
   },
   "sabatini_2002_gec5": {
    "citation": "Sabatini, P.J., Bachus, R.C., Mayne, P.W., Schneider, J.A., Zettler, T.E. (2002). Geotechnical Engineering Circular No. 5: Evaluation of Soil and Rock Properties. Report FHWA-IF-02-034, Federal Highway Administration, U.S. Department of Transportation, Washington, DC.",
-   "kind": "standard",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\General\\Sabatini_et_al_2002_FHWA-IF-02-034_GEC5_Evaluation-of-Soil-and-Rock-Properties.pdf (downloaded from govinfo.gov, GOVPUB-TD2-PURL-gpo93376; marked 'Archived Document')",
-   "short": "Sabatini et al., FHWA GEC 5 (2002)"
+   "short": "Sabatini et al., FHWA GEC 5 (2002)",
+   "kind": "standard"
   },
   "ufc_3_220_01n_2005": {
    "citation": "U.S. Department of Defense (2005). UFC 3-220-01N: Geotechnical Engineering Procedures for Foundation Design of Buildings and Structures. Unified Facilities Criteria, 15 August 2005 (superseded; pages marked CANCELLED).",
-   "kind": "standard",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\UFC_3-220-01N_2005_Geotechnical-Engineering-Procedures.pdf",
-   "short": "UFC 3-220-01N (2005)"
+   "short": "UFC 3-220-01N (2005)",
+   "kind": "standard"
   },
   "canmet_1995": {
    "citation": "Jackson, R., Gorski, B., Gyenge, M. (1995). Geotechnical Properties of Rock. CANMET, Natural Resources Canada, Ottawa.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Bases_de_datos\\CANMET_1995_Jackson-Gorski-Gyenge_Geotechnical-Properties-of-Rock.pdf (Table 1 values taken from the verified transcription c:\\Desarrollo\\OGR_Suite\\Data\\OGR-Data\\ogr_data\\data\\db_sources\\canmet_1995_table1.csv; extremes checked on the page image)",
-   "short": "Jackson, Gorski & Gyenge, CANMET (1995)"
-  },
-  "rsdata_theory_mc": {
-   "citation": "Rocscience Inc. (2025). 5. Mohr-Coulomb Material Model. RS2/RS3/RSData theory manual.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\RSData_Theory_Mohr-Coulomb-Material-Model.pdf",
-   "short": "Rocscience, theory manual: Mohr-Coulomb (2025)"
-  },
-  "rsdata_theory_dp": {
-   "citation": "Rocscience Inc. (2025). 4. Drucker-Prager Material Model. RS2/RS3/RSData theory manual.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\RSData_Theory_Drucker-Prager-Model.pdf",
-   "short": "Rocscience, theory manual: Drucker-Prager (2025)"
-  },
-  "rsdata_theory_hb": {
-   "citation": "Rocscience Inc. (2025). 6. Hoek-Brown and Generalized Hoek-Brown Material Models. RS2/RS3/RSData theory manual.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\RSData_Theory_Hoek-Brown-and-GHB-Material-Models.pdf",
-   "short": "Rocscience, theory manual: Hoek-Brown (2025)"
-  },
-  "rsdata_theory_cc": {
-   "citation": "Rocscience Inc. (2025). 8. Cam-Clay and Modified Cam-Clay Material Models. RS2/RS3/RSData theory manual.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\RSData_Theory_Cam-Clay-and-Modified-Cam-Clay.pdf",
-   "short": "Rocscience, theory manual: Cam-Clay (2025)"
-  },
-  "rsdata_theory_sh": {
-   "citation": "Rocscience Inc. (2025). Softening-Hardening Material Model. RS2/RS3/RSData theory manual.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\RSData_Theory_Softening-Hardening-Material-Model.pdf",
-   "short": "Rocscience, theory manual: Softening-Hardening (2025)"
-  },
-  "rs2_help_strength": {
-   "citation": "Rocscience Inc. RS2 Help: Define Material Properties - Strength Properties (online documentation, consulted 2026-11-24).",
-   "kind": "manual",
-   "read_from": "https://www.rocscience.com/help/rs2/documentation/rs2-model/material-properties/define-material-properties/strength-properties",
-   "short": "Rocscience, RS2 help: Strength Properties"
-  },
-  "rsdata_norsand_tutorial": {
-   "citation": "Rocscience Inc. RSData Tutorials: NorSand - Fraser River Sand (online documentation, consulted 2026-11-24).",
-   "kind": "manual",
-   "read_from": "https://rocscience.com/help/rsdata/tutorials/soil-stress-path-tutorials/norsand-fraser-river-sand-tutorial",
-   "short": "Rocscience, RSData tutorial: NorSand"
+   "short": "Jackson, Gorski & Gyenge, CANMET (1995)",
+   "kind": "paper"
   },
   "itasca_norsand": {
    "citation": "Itasca Consulting Group (2024). NorSand Model. FLAC3D 9.2 Theory and Background, Constitutive Models (online documentation, version 9.2.23).",
-   "kind": "manual",
-   "read_from": "https://docs.itascacg.com/itasca920/common/models/norsand/doc/modelnorsand.html",
-   "short": "Itasca, FLAC3D manual: NorSand (2024)"
+   "short": "Itasca, FLAC3D manual: NorSand (2024)",
+   "kind": "manual"
   },
   "hoek_2002": {
    "citation": "Hoek, E., Carranza-Torres, C., Corkum, B. (2002). Hoek-Brown failure criterion - 2002 edition. Proc. NARMS-TAC Conference, Toronto, 1, 267-273.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_CarranzaTorres_Corkum_2002_Hoek-Brown_2002_edition.pdf",
-   "short": "Hoek et al. (2002)"
+   "short": "Hoek et al. (2002)",
+   "kind": "paper"
   },
   "hoek_diederichs_2006": {
    "citation": "Hoek, E., Diederichs, M.S. (2006). Empirical estimation of rock mass modulus. International Journal of Rock Mechanics and Mining Sciences, 43, 203-215.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_Diederichs_2006_Empirical-estimation-of-rock-mass-modulus.pdf (downloaded 2026-11-24 from https://www.rocscience.com/assets/resources/learning/hoek/2006-Hoek-and-Diederichs-estimating-rock-mass-modulus.pdf)",
-   "short": "Hoek & Diederichs (2006)"
+   "short": "Hoek & Diederichs (2006)",
+   "kind": "paper"
   },
   "marinos_hoek_2000": {
    "citation": "Marinos, P., Hoek, E. (2000). GSI: a geologically friendly tool for rock mass strength estimation. Proc. GeoEng2000 Conference, Melbourne.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Marinos_Hoek_2000_GSI_Geologically-Friendly-Tool.pdf",
-   "short": "Marinos & Hoek (2000)"
+   "short": "Marinos & Hoek (2000)",
+   "kind": "paper"
   },
   "hoek_carter_diederichs_2013": {
    "citation": "Hoek, E., Carter, T.G., Diederichs, M.S. (2013). Quantification of the Geological Strength Index chart. 47th US Rock Mechanics / Geomechanics Symposium, San Francisco, paper ARMA 13-672.",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\General\\2013-Quantification-of-the-GSI-Chart.pdf",
-   "short": "Hoek et al. (2013)"
+   "short": "Hoek et al. (2013)",
+   "kind": "paper"
   },
   "hoek_pre_2023": {
-   "citation": "Hoek, E. (2023). Practical Rock Engineering (2023 edition). Chapters 'Rock mass properties' (PDF pp. 91-111) and 'In situ and induced stresses' (PDF p. 133). Course notes distributed by Rocscience.",
-   "kind": "book",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_Practical-Rock-Engineering_2023_completo.pdf",
-   "short": "Hoek (2023)"
+   "citation": "Hoek, E. (2023). Practical Rock Engineering (2023 edition), chapters 'Rock mass properties' and 'In situ and induced stresses'. Course notes.",
+   "short": "Hoek (2023)",
+   "kind": "book"
   },
   "hoek_pre_ch11": {
-   "citation": "Hoek, E. (n.d., edition after 2006). Practical Rock Engineering, Chapter 11 'Rock mass properties'. Course notes distributed by Rocscience.",
-   "kind": "book",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_Practical-Rock-Engineering_Ch11_Rock-Mass-Properties.pdf",
-   "short": "Hoek, Practical Rock Engineering, ch. 11"
-  },
-  "hoek_brown.rsdata_theory_hb": {
-   "citation": "Rocscience Inc. (2025). RSData Theory Manual, Chapter 6: Hoek-Brown and Generalized Hoek-Brown Material Models. Toronto: Rocscience.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\RSData_Theory_Hoek-Brown-and-GHB-Material-Models.pdf",
-   "short": "Rocscience, theory manual: Hoek-Brown (2025)"
-  },
-  "rocdata_ug": {
-   "citation": "Rocscience Inc. (n.d.). RocData 3.0 User's Guide. Toronto: Rocscience.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Doc_Guia\\Doc_Roc_Data3_0\\Manuals\\RocData Users Guide.pdf",
-   "short": "Rocscience, RocData 3.0 User's Guide"
+   "citation": "Hoek, E. Practical Rock Engineering, Chapter 11 'Rock mass properties'. Course notes (edition after 2006).",
+   "short": "Hoek, Practical Rock Engineering, ch. 11",
+   "kind": "book"
   },
   "schofield_wroth_1968": {
    "citation": "Schofield, A.N., Wroth, C.P. (1968). Critical State Soil Mechanics. McGraw-Hill, London. 310 pp.",
-   "kind": "book",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\Schofield_Wroth_1968_Critical-State-Soil-Mechanics.pdf (authors' PDF edition formerly published by Cambridge University Engineering Department at http://www-civ.eng.cam.ac.uk/geotech_new/publications/schofield_wroth_1968.pdf; retrieved from the Internet Archive snapshot of 2021-11-08 because the university URL now returns 404). Page numbers cited are the book page numbers printed on the page (PDF page = book page + 10).",
-   "short": "Schofield & Wroth (1968)"
-  },
-  "rocscience_cam_clay": {
-   "citation": "Rocscience Inc. (2025). Cam Clay and Modified Cam Clay Material Models. RS2/RS3/RSData theory manual, chapter 8. Rocscience, Toronto.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\RSData_Theory_Cam-Clay-and-Modified-Cam-Clay.pdf",
-   "short": "Rocscience, theory manual: Cam-Clay (2025)"
-  },
-  "rocscience_softening_hardening": {
-   "citation": "Rocscience Inc. (2025). Softening-Hardening Material Model. RS2/RS3/RSData theory manual, chapter 11. Rocscience, Toronto.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\RSData_Theory_Softening-Hardening-Material-Model.pdf",
-   "short": "Rocscience, theory manual: Softening-Hardening (2025)"
+   "short": "Schofield & Wroth (1968)",
+   "kind": "book"
   },
   "utm_cssm_notes": {
    "citation": "Zurairahetty, N. (n.d.). MAJ 1013 Advanced Soil Mechanics: Stress Paths; Critical State Soil Mechanics (university lecture notes, weeks 4-5). Universiti Teknologi Malaysia.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Ensayos\\UTM_Stress-Paths-CSSM-week4-5.pdf",
-   "short": "Zurairahetty, UTM lecture notes (CSSM)"
+   "short": "Zurairahetty, UTM lecture notes (CSSM)",
+   "kind": "manual"
   },
   "jefferies_shuttle_been_2015": {
    "citation": "Jefferies, M., Shuttle, D., Been, K. (2015). Principal stress rotation as cause of cyclic mobility. Geotechnical Research, 2(2), 66-96. doi:10.1680/jgere.15.00002 (open access, CC BY 4.0).",
-   "kind": "paper",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Suelos\\Jefferies_Shuttle_Been_2015_Principal-stress-rotation-as-cause-of-cyclic-mobility.pdf (downloaded from https://www.emerald.com/jgere/article-pdf/2/2/66/11851646/jgere.15.00002en.pdf)",
-   "short": "Jefferies et al. (2015)"
+   "short": "Jefferies et al. (2015)",
+   "kind": "paper"
   },
   "itasca_norsand_2025": {
    "citation": "Itasca Consulting Group (2025). NorSand Model. FLAC3D 9.3 Theory and Background, Constitutive Models (online documentation, version 9.3.27).",
-   "kind": "manual",
-   "read_from": "https://docs.itascacg.com/itasca930/common/models/norsand/doc/modelnorsand.html",
-   "short": "Itasca, FLAC3D manual: NorSand (2025)"
-  },
-  "rocscience_rsdata_norsand_tutorial": {
-   "citation": "Rocscience Inc. (n.d.). RSData Tutorial: NorSand - Fraser River Sand. RSData online help.",
-   "kind": "manual",
-   "read_from": "https://www.rocscience.com/help/rsdata/tutorials/soil-stress-path-tutorials/norsand-fraser-river-sand-tutorial",
-   "short": "Rocscience, RSData tutorial: NorSand"
-  },
-  "rocscience_rs2_hydraulic": {
-   "citation": "Rocscience Inc. (n.d.). RS2 Documentation: Define Hydraulic Properties (section Fluid Bulk Modulus). RS2 online help.",
-   "kind": "manual",
-   "read_from": "https://rocscience.com/help/rs2/documentation/rs2-model/material-properties/define-hydraulic-properties",
-   "short": "Rocscience, RS2 help: Hydraulic Properties"
-  },
-  "rocscience_rs2_theory_20": {
-   "citation": "Rocscience Inc. (n.d.). 20 - Slide-Isotropic Models. RS2 Verification and Theory, Theory Manuals.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Rocscience_RS2_Theory_20_Slide-Isotropic-Models.pdf (downloaded from https://www.rocscience.com/assets/verification-and-theory/RS2/20-Slide-Isotropic-Models.pdf)",
-   "short": "Rocscience, RS2 theory manual ch. 20"
-  },
-  "rocscience_slide3_power_curve": {
-   "citation": "Rocscience Inc. (n.d.). Slide3 Documentation: Material Properties - Failure Criterion - Power Curve. Slide3 online help.",
-   "kind": "manual",
-   "read_from": "https://rocscience.com/help/slide3/documentation/material-properties/define-materials/strength-parameters/strength-parameters-2/failure-criterion/power-curve",
-   "short": "Rocscience, Slide3 help: Power Curve"
-  },
-  "rocdata_users_guide_2004": {
-   "citation": "Rocscience Inc. (2004). RocData User's Guide: Strength analysis of rock and soil masses using the Generalized Hoek-Brown, Mohr-Coulomb, Barton-Bandis and Power Curve failure criteria. Toronto: Rocscience.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Doc_Guia\\Doc_Roc_Data3_0\\Manuals\\RocData Users Guide.pdf",
-   "short": "Rocscience, RocData User's Guide (2004)"
+   "short": "Itasca, FLAC3D manual: NorSand (2025)",
+   "kind": "manual"
   },
   "norsand_power_barton.hoek_pre_2023": {
-   "citation": "Hoek, E. (2023). Practical Rock Engineering. Rocscience Inc. (course notes; chapter 4 'Shear strength of discontinuities' and chapter 12 'Rock mass classification').",
-   "kind": "book",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\Hoek_Practical-Rock-Engineering_2023_completo.pdf",
-   "short": "Hoek (2023)"
+   "citation": "Hoek, E. (2023). Practical Rock Engineering, chapters 'Shear strength of discontinuities' and 'Rock mass classification'. Course notes.",
+   "short": "Hoek (2023)",
+   "kind": "book"
   },
   "fhwa_1989": {
    "citation": "Golder Associates for FHWA (1989). Rock Slopes: Design, Excavation, Stabilization. Publication FHWA-TS-89-045, U.S. Department of Transportation, Federal Highway Administration, Turner-Fairbank Highway Research Center, McLean, VA.",
-   "kind": "manual",
-   "read_from": "c:\\Desarrollo\\OGR_Suite\\Data\\Referencias\\Bibliografia\\Rocas\\FHWA-TS-89-045_Rock-Slopes_Design-Excavation-Stabilization_1989.pdf",
-   "short": "FHWA-TS-89-045 (1989)"
-  },
-  "rocscience_rocplane_strength": {
-   "citation": "Rocscience Inc. (n.d.). RocPlane Documentation: Failure Plane Properties - Failure Shear Strength (Waviness; Barton-Bandis). RocPlane online help.",
-   "kind": "manual",
-   "read_from": "https://www.rocscience.com/help/rocplane/documentation/input-data/failure-plane-properties/failure-shear-strength",
-   "short": "Rocscience, RocPlane help: shear strength"
+   "short": "FHWA-TS-89-045 (1989)",
+   "kind": "manual"
   }
  },
  "parameters": [
-  {
-   "key": "material_type",
-   "criteria": [
-    "mohr_coulomb",
-    "hoek_brown"
-   ],
-   "definition_en": "Elastic: the material never yields and the strength parameters are only used to compute the strength factor. Plastic: the material yields when the stress reaches the failure criterion and then follows the peak and residual strength and dilation inputs.",
-   "definition_es": "Elástico: el material no plastifica nunca y los parámetros resistentes solo sirven para calcular el factor de resistencia. Plástico: el material plastifica al alcanzar el criterio de rotura y sigue la resistencia de pico, la residual y la dilatancia introducidas.",
-   "range_en": "Options: Elastic | Plastic",
-   "range_es": "Opciones: Elástico | Plástico",
-   "sources": [
-    "rs2_help_strength",
-    "rsdata_theory_mc"
-   ],
-   "locator": "RS2 Help, Strength Properties, 'Material Type' (Elastic or Plastic); RSData MC theory manual p. 2 (elasto-brittle-plastic in general, elasto-perfectly plastic when residual = peak)",
-   "notes": "Software concept with no scientific original (kind: manual). RS2 help and the RSData capture (Referencias/Ejemplos/RSData_analisis/05_profundizacion.md: 'Material Type: Elastic | Plastic') list only two options; there is NO 'Brittle' material type. Brittle behaviour is obtained with Plastic and residual strength below peak (see set_residual_to_peak). The OGR registry currently offers only 'Plastic'."
-  },
   {
    "key": "peak_cohesion",
    "criteria": [
@@ -250,11 +112,9 @@
     "drucker_prager_1952",
     "hoek_2023",
     "sabatini_2002_gec5",
-    "ufc_3_220_01n_2005",
-    "rsdata_theory_sh"
+    "ufc_3_220_01n_2005"
    ],
-   "locator": "Definition: Drucker & Prager 1952 eq. 1 and Fig. 1; Hoek 2023 ch. 4 eq. 1 (PDF p. 79). Ranges: GEC 5 §5.6.2.4 p. 163 (c' = 0 granular); UFC 3-220-01N Table 8-1.4 pp. 8-20 to 8-24 (PDF pp. 48-52), columns 'Cohesion (as compacted)' and 'Cohesion (saturated)', range taken over all USCS groups; Hoek 2023 ch. 12 Table 4 part D, after Bieniawski 1989 (PDF p. 246). SH meaning: RSData SH manual eq. for the cone (ultimate friction/cohesion).",
-   "notes": "Coulomb (1776) / Mohr (1900) originals not read; attribution through Drucker & Prager 1952 ('extended Coulomb's rule', 'Mohr-Coulomb hypothesis') and Hoek 2023. GEC 5 Fig. 75 also gives c'/sigma_p' = 0.024-0.10 for overconsolidated clays (Mesri & Abdel-Ghaffar 1993). UFC 3-220-01N is cancelled/superseded but is the version in the library."
+   "locator": "Definition: Drucker & Prager 1952 eq. 1 and Fig. 1; Hoek 2023 ch. 4 eq. 1 (PDF p. 79). Ranges: GEC 5 §5.6.2.4 p. 163 (c' = 0 granular); UFC 3-220-01N Table 8-1.4 pp. 8-20 to 8-24 (PDF pp. 48-52), columns 'Cohesion (as compacted)' and 'Cohesion (saturated)', range taken over all USCS groups"
   },
   {
    "key": "peak_friction",
@@ -271,11 +131,9 @@
     "hoek_2023",
     "vermeer_deborst_1984",
     "sabatini_2002_gec5",
-    "ufc_3_220_01n_2005",
-    "rsdata_theory_sh"
+    "ufc_3_220_01n_2005"
    ],
-   "locator": "Definition: Drucker & Prager 1952 eq. 1, Fig. 1; Hoek 2023 ch. 4 eq. 1 (PDF p. 79). Ranges: Vermeer & de Borst 1984 §3.4 p. 15; GEC 5 §5.6.2.4 p. 163; UFC 3-220-01N Table 8-1.4 (PDF pp. 48-52), column 'Effective stress envelope, deg'; Hoek 2023 ch. 12 Table 4 part D after Bieniawski 1989 (PDF p. 246).",
-   "notes": "Coulomb (1776) / Mohr (1900) originals not read (see pending). GEC 5 Table 34 (after Meyerhof 1956) relates phi of cohesionless soils to SPT N: < 30 deg very loose to > 45 deg very dense."
+   "locator": "Definition: Drucker & Prager 1952 eq. 1, Fig. 1; Hoek 2023 ch. 4 eq. 1 (PDF p. 79). Ranges: Vermeer & de Borst 1984 §3.4 p. 15; GEC 5 §5.6.2.4 p. 163; UFC 3-220-01N Table 8-1.4 (PDF pp. 48-52), column 'Effective stress envelope, deg'; Hoek 2023 ch. 12 Table 4 part D after Bieniawski 1989 (PDF p. 246)."
   },
   {
    "key": "peak_tensile",
@@ -289,51 +147,10 @@
    "range_en": "0 for a material without tensile strength (program default). Intact rock (77 Canadian rocks, CANMET Table 1): about 0.4-26 MPa.",
    "range_es": "0 para un material sin resistencia a tracción (valor por defecto). Roca intacta (77 rocas canadienses, tabla 1 de CANMET): de unos 0,4 a 26 MPa.",
    "sources": [
-    "rsdata_theory_mc",
-    "rsdata_theory_dp",
     "vermeer_deborst_1984",
     "canmet_1995"
    ],
-   "locator": "RSData MC manual eq. 0.7 (p. 5); RSData DP manual eq. 0.3 (p. 4); Vermeer & de Borst 1984 §6/7, pp. 43-44 (why the Coulomb apex is cut off); CANMET 1995 Table 1, column sigma_t (PDF pp. 102-109), min 0.43 MPa (coal) to 25.96 MPa (andesite), range computed from the table.",
-   "notes": "CANMET prints sigma_t as negative; one value (sulphide iron 27.90 MPa) differs between Tables 1 and 2 of the source and was left out of the range. No source found for soil or rock-mass tensile strength values (see pending)."
-  },
-  {
-   "key": "set_residual_to_peak",
-   "criteria": [
-    "mohr_coulomb",
-    "drucker_prager",
-    "hoek_brown",
-    "generalized_hoek_brown"
-   ],
-   "definition_en": "When checked, the residual strength parameters equal the peak ones, so the material is elastic-perfectly plastic (no strength drop after yield). When unchecked, the residual values apply after yield and the strength drops instantly from peak to residual (elastic-brittle-plastic).",
-   "definition_es": "Activado, los parámetros residuales son iguales a los de pico y el material es elastoplástico perfecto (sin caída de resistencia tras la plastificación). Desactivado, tras la plastificación se aplican los valores residuales y la resistencia cae de golpe del pico al residual (elastofrágil-plástico).",
-   "range_en": "On | Off",
-   "range_es": "Activado | Desactivado",
-   "sources": [
-    "rsdata_theory_mc",
-    "rsdata_theory_dp",
-    "rsdata_theory_hb",
-    "rs2_help_strength"
-   ],
-   "locator": "RSData MC manual p. 2; DP manual p. 1; HB manual p. 2 ('elasto-brittle-plastic in general... residual equal to peak gives elasto-perfect-plastic'); RS2 Help, Strength Properties (residual = peak gives an 'ideally' elastic-plastic material).",
-   "notes": "Software option with no scientific original (kind: manual). The underlying peak/residual concept is in Hoek 2023 ch. 4 Fig. 1 and GEC 5 §5.6.2.2."
-  },
-  {
-   "key": "residual_tensile",
-   "criteria": [
-    "mohr_coulomb",
-    "drucker_prager"
-   ],
-   "definition_en": "Tension cut-off T that applies once the material has failed (after the drop from peak to residual).",
-   "definition_es": "Corte a tracción T que se aplica una vez el material ha roto (tras la caída de pico a residual).",
-   "range_en": "Not greater than the peak tensile strength; 0 is the program default.",
-   "range_es": "No mayor que la resistencia a tracción de pico; 0 es el valor por defecto.",
-   "sources": [
-    "rsdata_theory_mc",
-    "rsdata_theory_dp"
-   ],
-   "locator": "RSData MC manual eq. 0.7 and p. 2 (peak and residual values, instant drop); RSData DP manual eq. 0.3 and p. 1.",
-   "notes": "Software concept (kind: manual). The bound 'not greater than peak' follows from the manuals' description of residual as a lower state; no document gives numeric values (see pending)."
+   "locator": "Vermeer & de Borst 1984 §6/7, pp. 43-44 (why the Coulomb apex is cut off); CANMET 1995 Table 1, column sigma_t (PDF pp. 102-109), min 0.43 MPa (coal) to 25.96 MPa (andesite), range computed from the table."
   },
   {
    "key": "residual_cohesion",
@@ -346,11 +163,9 @@
    "range_es": "0 en estado residual para discontinuidades y arcillas; no mayor que la cohesión de pico.",
    "sources": [
     "hoek_2023",
-    "sabatini_2002_gec5",
-    "rsdata_theory_mc"
+    "sabatini_2002_gec5"
    ],
-   "locator": "Hoek 2023 ch. 4 eq. 2 and Fig. 1 (PDF p. 79: at residual c has dropped to zero); GEC 5 §5.6.2.2 eq. 59 p. 162 (tau_r = sigma' tan phi_r); RSData MC manual p. 2.",
-   "notes": "No source gives a non-zero typical range."
+   "locator": "Hoek 2023 ch. 4 eq. 2 and Fig. 1 (PDF p. 79: at residual c has dropped to zero); GEC 5 §5.6.2.2 eq. 59 p. 162 (tau_r = sigma' tan phi_r)"
   },
   {
    "key": "residual_friction",
@@ -365,8 +180,7 @@
     "hoek_2023",
     "sabatini_2002_gec5"
    ],
-   "locator": "Definition: Hoek 2023 ch. 4 eq. 2 (PDF p. 79); GEC 5 §5.6.2.2 eq. 59 p. 162. Ranges: GEC 5 Fig. 76 p. 166 (after Stark & Eid 1994), read from the curves (about 32 deg at low LL and CF <= 20 %, about 5 deg for CF >= 50 % and high LL); GEC 5 Table 43 p. 214 (after Barton 1973; Jaeger & Cook 1976).",
-   "notes": "The clay range is read from a chart, so it is approximate. GEC 5 Table 43 values are friction angles of unfilled planar joints, used here as indicative of residual joint friction."
+   "locator": "Definition: Hoek 2023 ch. 4 eq. 2 (PDF p. 79); GEC 5 §5.6.2.2 eq. 59 p. 162. Ranges: GEC 5 Fig. 76 p. 166 (after Stark & Eid 1994), read from the curves (about 32 deg at low LL and CF <= 20 %, about 5 deg for CF >= 50 % and high LL); GEC 5 Table 43 p. 214 (after Barton 1973; Jaeger & Cook 1976)."
   },
   {
    "key": "dilation",
@@ -378,11 +192,9 @@
    "range_en": "About 0-20 deg for soils, concrete and rock; about 15 deg for very dense sand, a few degrees for loose sand, 0 for normally consolidated clay. Must not exceed the (residual) friction angle.",
    "range_es": "Entre 0 y 20° aproximadamente para suelos, hormigón y roca; unos 15° en arena muy densa, pocos grados en arena suelta y 0 en arcilla normalmente consolidada. No debe superar el ángulo de rozamiento (residual).",
    "sources": [
-    "vermeer_deborst_1984",
-    "rsdata_theory_mc"
+    "vermeer_deborst_1984"
    ],
-   "locator": "Vermeer & de Borst 1984 eqs. 3.2-3.3 (p. 12-13), eqs. 4.14-4.16 (pp. 18-19), §3.3 pp. 13-15 (values), §3.4 p. 15 (phi much greater than psi); RSData MC manual eq. 0.6 (p. 2: psi <= residual phi).",
-   "notes": "Vermeer & de Borst attribute the plane-strain plastic potential to Radenkovic (1961), not read."
+   "locator": "Vermeer & de Borst 1984 eqs. 3.2-3.3 (p. 12-13), eqs. 4.14-4.16 (pp. 18-19), §3.3 pp. 13-15 (values), §3.4 p. 15 (phi much greater than psi)"
   },
   {
    "key": "peak_q",
@@ -394,11 +206,9 @@
    "range_en": "0 (no pressure dependence) up to sqrt(3)/2 = 0.866 when matched to Mohr-Coulomb in plane strain (12 alpha^2 <= 1, i.e. sin phi <= 1).",
    "range_es": "De 0 (sin dependencia de la presión) a sqrt(3)/2 = 0,866 cuando se ajusta a Mohr-Coulomb en deformación plana (12 alfa² <= 1, es decir sen phi <= 1).",
    "sources": [
-    "drucker_prager_1952",
-    "rsdata_theory_dp"
+    "drucker_prager_1952"
    ],
-   "locator": "Drucker & Prager 1952 eq. 2 (p. 158), eq. 10 (p. 159: 3 alpha / (1 - 3 alpha^2)^0.5 = sin phi), p. 160 (12 alpha^2 cannot exceed unity); RSData DP manual eq. 0.1. The upper bound q = 3 alpha <= 3/sqrt(12) is computed from that statement.",
-   "notes": "Dimensionless. The identification q = 3 alpha comes from comparing the RSData form (q I1/3) with Drucker & Prager's (alpha J1, J1 = I1). The plane-strain match to c is given under peak_k. Other matchings (e.g. to triaxial compression) give other bounds; none was read."
+   "locator": "Drucker & Prager 1952 eq. 2 (p. 158), eq. 10 (p. 159: 3 alpha / (1 - 3 alpha^2)^0.5 = sin phi), p. 160 (12 alpha^2 cannot exceed unity)"
   },
   {
    "key": "peak_k",
@@ -410,11 +220,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "drucker_prager_1952",
-    "rsdata_theory_dp"
+    "drucker_prager_1952"
    ],
-   "locator": "Drucker & Prager 1952 eq. 2 (p. 158) and eq. 10 (p. 159: c = k / (1 - 12 alpha^2)^0.5); RSData DP manual eq. 0.1.",
-   "notes": "Stress unit (kPa in the program). No source gives typical values; k follows from c and phi via Drucker & Prager eq. 10 (plane strain)."
+   "locator": "Drucker & Prager 1952 eq. 2 (p. 158) and eq. 10 (p. 159: c = k / (1 - 12 alpha^2)^0.5)"
   },
   {
    "key": "residual_q",
@@ -426,26 +234,9 @@
    "range_en": "Same bounds as peak q (0 to 0.866 under the plane-strain Mohr-Coulomb match).",
    "range_es": "Mismos límites que q de pico (0 a 0,866 con el ajuste a Mohr-Coulomb en deformación plana).",
    "sources": [
-    "rsdata_theory_dp",
     "drucker_prager_1952"
    ],
-   "locator": "RSData DP manual p. 1 (peak and residual values of q and k, instant drop); Drucker & Prager 1952 p. 160 for the bound.",
-   "notes": "The peak/residual split is a software concept (kind: manual)."
-  },
-  {
-   "key": "residual_k",
-   "criteria": [
-    "drucker_prager"
-   ],
-   "definition_en": "Drucker-Prager constant k that applies after failure, once the strength has dropped from peak to residual.",
-   "definition_es": "Constante k de Drucker-Prager que se aplica tras la rotura, cuando la resistencia ha caído del pico al residual.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rsdata_theory_dp"
-   ],
-   "locator": "RSData DP manual p. 1 and eq. 0.1.",
-   "notes": "Software concept (kind: manual); no typical values in any document read."
+   "locator": "Drucker & Prager 1952 p. 160 for the bound."
   },
   {
    "key": "dilation_parameter",
@@ -457,27 +248,10 @@
    "range_en": "0 to q (peak or residual q).",
    "range_es": "De 0 a q (q de pico o residual).",
    "sources": [
-    "rsdata_theory_dp",
     "drucker_prager_1952",
     "vermeer_deborst_1984"
    ],
-   "locator": "RSData DP manual eq. 0.2 (p. 1: q_psi <= q_phi); Drucker & Prager 1952 eqs. 3-5 (p. 158: associated flow, plastic dilatation 3 alpha lambda); Vermeer & de Borst 1984 §3.4 p. 15-16 (friction much greater than dilatancy, so non-associated flow is needed).",
-   "notes": "Dimensionless. Same registry key as in hoek_brown but a different quantity (see next entry)."
-  },
-  {
-   "key": "dilation_parameter",
-   "criteria": [
-    "hoek_brown"
-   ],
-   "definition_en": "Parameter m_psi that replaces m in the Hoek-Brown plastic potential and controls plastic volume change. m_psi = m (mb) gives associated flow, m_psi < m non-associated, and m_psi = 0 no plastic volume change.",
-   "definition_es": "Parámetro m_psi que sustituye a m en el potencial plástico de Hoek-Brown y controla el cambio de volumen plástico. m_psi = m (mb) da flujo asociado, m_psi < m no asociado y m_psi = 0 sin cambio de volumen plástico.",
-   "range_en": "0 to m (mb).",
-   "range_es": "De 0 a m (mb).",
-   "sources": [
-    "rsdata_theory_hb"
-   ],
-   "locator": "RSData HB/GHB manual eq. 0.7 (p. 2: m_psi <= m).",
-   "notes": "Only the Rocscience manual defines it (kind: manual). It is NOT the same quantity as the Drucker-Prager dilation parameter (q_psi). RSData also shows a Dilation Parameter for GHB, which the OGR registry does not have."
+   "locator": "Drucker & Prager 1952 eqs. 3-5 (p. 158: associated flow, plastic dilatation 3 alpha lambda); Vermeer & de Borst 1984 §3.4 p. 15-16 (friction much greater than dilatancy, so non-associated flow is needed)."
   },
   {
    "key": "poisson",
@@ -494,8 +268,7 @@
     "ufc_3_220_01n_2005",
     "canmet_1995"
    ],
-   "locator": "Vermeer & de Borst 1984 §3.1 p. 11 (soils 0.0-0.3; concrete 0.15-0.2); GEC 5 §5.5.3 p. 151 (0.1-0.2, citing Jamiolkowski et al. 1994) and §6.4.1 p. 205 (rock 0.25-0.4) with Table 41; UFC 3-220-01N eq. 12-21 p. 12-18 (G = E/(2(1+nu)); saturated soils nu = 0.5); CANMET 1995 Table 1 column nu (PDF pp. 102-109), min 0.11 (mudstone) to max 0.58 (talc-carbonate), computed from the table.",
-   "notes": "Shown in the Linear Isotropic and the Cam-Clay (Constant Poisson Ratio) stiffness. CANMET prints 0.58 for talc-carbonate (checked on the page image), above the 0.5 isotropic limit; the program limits nu to < 0.5."
+   "locator": "Vermeer & de Borst 1984 §3.1 p. 11 (soils 0.0-0.3; concrete 0.15-0.2); GEC 5 §5.5.3 p. 151 (0.1-0.2, citing Jamiolkowski et al. 1994) and §6.4.1 p. 205 (rock 0.25-0.4) with Table 41; UFC 3-220-01N eq. 12-21 p. 12-18 (G = E/(2(1+nu)); saturated soils nu = 0.5); CANMET 1995 Table 1 column nu (PDF pp. 102-109), min 0.11 (mudstone) to max 0.58 (talc-carbonate), computed from the table."
   },
   {
    "key": "young",
@@ -511,8 +284,7 @@
     "sabatini_2002_gec5",
     "canmet_1995"
    ],
-   "locator": "Definition: Vermeer & de Borst 1984 §3.1 p. 11 (Hooke's law, E and nu). Ranges: GEC 5 Table 28 p. 148 (modified after AASHTO 1996); GEC 5 §6.4.1 p. 205 (intact rock 0.1-100 GPa); CANMET 1995 Table 1 column E (PDF pp. 102-109), min 1.76 GPa (coal) to max 166.3 GPa (sulphide pyrite), computed from the table.",
-   "notes": "Intact-rock values are not rock-mass values; the rock-mass modulus is much lower (the 'Erm' button fills it from Generalized Hoek-Brown). Vermeer & de Borst also state concrete 20-40 GPa, about a thousand times typical sand values."
+   "locator": "Definition: Vermeer & de Borst 1984 §3.1 p. 11 (Hooke's law, E and nu). Ranges: GEC 5 Table 28 p. 148 (modified after AASHTO 1996); GEC 5 §6.4.1 p. 205 (intact rock 0.1-100 GPa); CANMET 1995 Table 1 column E (PDF pp. 102-109), min 1.76 GPa (coal) to max 166.3 GPa (sulphide pyrite), computed from the table."
   },
   {
    "key": "elastic_parameter",
@@ -525,11 +297,9 @@
    "range_en": "Options: Constant Poisson Ratio | Constant Shear Modulus",
    "range_es": "Opciones: Coeficiente de Poisson constante | Módulo de corte constante",
    "sources": [
-    "rsdata_theory_cc",
     "itasca_norsand"
    ],
-   "locator": "RSData Cam-Clay manual §8.4 (p. 5: bulk modulus depends on mean stress, specific volume and swelling slope; either G or nu must be given) and Figs. 8.5-8.6 (constant nu vs constant G). Relation K = 2(1+nu)G / (3(1-2nu)): Itasca NorSand page, Elastic Law.",
-   "notes": "Software option (kind: manual). The statement that the non-fixed constant varies follows from K varying with stress while the other constant is fixed. The scientific discussion of the two choices (Zytynski et al. 1978) was not read (see pending)."
+   "locator": "either G or nu must be given) and Figs. 8.5-8.6 (constant nu vs constant G). Relation K = 2(1+nu)G / (3(1-2nu)): Itasca NorSand page, Elastic Law."
   },
   {
    "key": "shear_modulus",
@@ -542,12 +312,10 @@
    "range_en": "Small-strain values: soft clays 2,750-13,750 kPa; firm clays 6,900-34,500 kPa (silty sands 27,600-138,000; dense sands and gravels 69,000-345,000 kPa).",
    "range_es": "Valores a pequeñas deformaciones: arcillas blandas 2.750-13.750 kPa; arcillas firmes 6.900-34.500 kPa (arenas limosas 27.600-138.000; arenas densas y gravas 69.000-345.000 kPa).",
    "sources": [
-    "rsdata_theory_cc",
     "ufc_3_220_01n_2005",
     "sabatini_2002_gec5"
    ],
-   "locator": "RSData Cam-Clay manual §8.4 p. 5; UFC 3-220-01N eq. 12-21 p. 12-18 (G = E / (2(1+nu))); GEC 5 Table 30 p. 154.",
-   "notes": "GEC 5 Table 30 gives small-strain (maximum) G0; GEC 5 §5.5.6 says it must be reduced for the larger strains of foundation loading, so operational values are lower."
+   "locator": "UFC 3-220-01N eq. 12-21 p. 12-18 (G = E / (2(1+nu))); GEC 5 Table 30 p. 154."
   },
   {
    "key": "g_ref",
@@ -559,11 +327,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "itasca_norsand",
-    "rsdata_norsand_tutorial"
+    "itasca_norsand"
    ],
-   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law', Case 1; RSData NorSand Fraser River sand tutorial, Stiffness tab (40000 kPa at p_ref = 395 kPa).",
-   "notes": "Only software manuals state the law (kind: manual); Jefferies & Been (2015) is cited by Itasca but was not read. GEC 5 Table 30 small-strain G0 values are at in situ stress, not at p_ref, so they were not used as a range."
+   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law', Case 1"
   },
   {
    "key": "p_ref",
@@ -575,11 +341,9 @@
    "range_en": "Usually 100 kPa (about atmospheric pressure).",
    "range_es": "Normalmente 100 kPa (del orden de la presión atmosférica).",
    "sources": [
-    "itasca_norsand",
-    "rsdata_norsand_tutorial"
+    "itasca_norsand"
    ],
-   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' and property 'pressure-reference' (default 100 kPa, should match atmospheric pressure); RSData tutorial uses 395 kPa.",
-   "notes": "Software manual only (kind: manual)."
+   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' and property 'pressure-reference' (default 100 kPa, should match atmospheric pressure)"
   },
   {
    "key": "g_exp",
@@ -592,11 +356,9 @@
    "range_es": "De 0 a 1; 0,5 en las correlaciones a pequeñas deformaciones de Hardin y Drnevich (1972) y Seed e Idriss (1971) para suelos.",
    "sources": [
     "itasca_norsand",
-    "ufc_3_220_01n_2005",
-    "rsdata_norsand_tutorial"
+    "ufc_3_220_01n_2005"
    ],
-   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' (0 <= m <= 1); UFC 3-220-01N eqs. 12-23 and 12-24, pp. 12-19 to 12-20 (G proportional to sigma'0^0.5); RSData tutorial m = 0.47 (Fraser River sand).",
-   "notes": "Hardin & Drnevich 1972 and Seed & Idriss 1971 read only as reproduced in UFC 3-220-01N."
+   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' (0 <= m <= 1); UFC 3-220-01N eqs. 12-23 and 12-24, pp. 12-19 to 12-20 (G proportional to sigma'0^0.5)"
   },
   {
    "key": "ns_poisson",
@@ -612,23 +374,7 @@
     "sabatini_2002_gec5",
     "vermeer_deborst_1984"
    ],
-   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' (K from G and nu; default 0.2); GEC 5 §5.5.3 p. 151; Vermeer & de Borst 1984 §3.1 p. 11; RSData tutorial 0.15.",
-   "notes": "Same physical quantity as 'poisson', in the NorSand stiffness group."
-  },
-  {
-   "key": "g_min",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Lower limit of the elastic shear modulus, so that G does not fall to zero when the mean stress approaches zero.",
-   "definition_es": "Límite inferior del módulo de corte elástico, para que G no se anule cuando la tensión media tiende a cero.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rsdata_norsand_tutorial"
-   ],
-   "locator": "RSData NorSand Fraser River sand tutorial, Stiffness tab: 'Minimum Shear Modulus (kPa) = 1'.",
-   "notes": "No document defines it: the definition is read from the RSData field label and the power law (G -> 0 as p' -> 0 when m > 0). Itasca's NorSand page has no such limit. Listed in pending."
+   "locator": "Itasca FLAC3D 9.2 NorSand page, 'Elastic Law' (K from G and nu; default 0.2); GEC 5 §5.5.3 p. 151; Vermeer & de Borst 1984 §3.1 p. 11"
   },
   {
    "key": "compressive_strength",
@@ -643,8 +389,7 @@
     "hoek_2002",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek et al. 2002, eq. 1 and its definitions; Hoek 2023, Rock mass properties, Fig. 1 (field estimates of UCS, grades after Brown 1981), PDF p. 93",
-   "notes": "Same meaning as 'sigci' of Generalized Hoek-Brown. Program unit kPa: the range is 250 to >250000 kPa. The range is the span of the grade table already in ogr_data/data/rock_strength_grades.json."
+   "locator": "Hoek et al. 2002, eq. 1 and its definitions; Hoek 2023, Rock mass properties, Fig. 1 (field estimates of UCS, grades after Brown 1981), PDF p. 93"
   },
   {
    "key": "mb",
@@ -658,8 +403,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 1 (original criterion, constant m) and eq. 3 (mb = mi·exp((GSI-100)/(28-14D)), whose factor is ≤ 1 for GSI ≤ 100)",
-   "notes": "In this model the exponent is fixed at a = 0.5 (original criterion, Hoek et al. 2002 eq. 1). The bound mb ≤ mi follows from eq. 3; no source gives a numeric typical range for mb itself."
+   "locator": "Hoek et al. 2002, eq. 1 (original criterion, constant m) and eq. 3 (mb = mi·exp((GSI-100)/(28-14D)), whose factor is ≤ 1 for GSI ≤ 100)"
   },
   {
    "key": "s",
@@ -673,38 +417,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, definitions after eq. 1 (s = 1 for intact rock) and eq. 4",
-   "notes": "In this model the exponent is fixed at a = 0.5."
-  },
-  {
-   "key": "residual_mb",
-   "criteria": [
-    "hoek_brown"
-   ],
-   "definition_en": "Value of mb used after failure (post-peak residual strength); only active when residual is not set to peak.",
-   "definition_es": "Valor de mb tras la rotura (resistencia residual postpico); solo se usa si el residual no se iguala al pico.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "hoek_brown.rsdata_theory_hb"
-   ],
-   "locator": "RSData Theory ch. 6, p. 2 (peak and residual values of all properties)",
-   "notes": "Definition from the Rocscience manual only. No source read gives typical residual values; see pending list."
-  },
-  {
-   "key": "residual_s",
-   "criteria": [
-    "hoek_brown"
-   ],
-   "definition_en": "Value of s used after failure (post-peak residual strength); only active when residual is not set to peak.",
-   "definition_es": "Valor de s tras la rotura (resistencia residual postpico); solo se usa si el residual no se iguala al pico.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "hoek_brown.rsdata_theory_hb"
-   ],
-   "locator": "RSData Theory ch. 6, p. 2",
-   "notes": "Definition from the Rocscience manual only. No source read gives typical residual values; see pending list."
+   "locator": "Hoek et al. 2002, definitions after eq. 1 (s = 1 for intact rock) and eq. 4"
   },
   {
    "key": "define_by",
@@ -718,8 +431,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eqs. 3, 4 and 5",
-   "notes": "Selector of the RSData dialog; no Rocscience text describing its other options was found (see pending list). The equations behind the 'GSI' option are sourced."
+   "locator": "Hoek et al. 2002, eqs. 3, 4 and 5"
   },
   {
    "key": "sigci",
@@ -734,8 +446,7 @@
     "hoek_2002",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek et al. 2002, eqs. 1-2; Hoek 2023, Rock mass properties, list of the three required properties (PDF p. 92) and Fig. 1 (PDF p. 93)",
-   "notes": "Program unit kPa: 250 to >250000 kPa. Range = span of ogr_data/data/rock_strength_grades.json. Hoek 2023 (PDF p. 92) warns that for foliated rocks the choice of σci is uncertain because it depends on loading direction."
+   "locator": "Hoek et al. 2002, eqs. 1-2; Hoek 2023, Rock mass properties, list of the three required properties (PDF p. 92) and Fig. 1 (PDF p. 93)"
   },
   {
    "key": "gsi",
@@ -751,8 +462,7 @@
     "hoek_pre_2023",
     "hoek_carter_diederichs_2013"
    ],
-   "locator": "Hoek 2023, Rock mass properties, 'Geological Strength Index' and Fig. 6 (GSI chart after Hoek and Marinos 2000), PDF pp. 98-99; Marinos & Hoek 2000, section 3 and Tables 5-13 (typical GSI ranges by rock type); Hoek et al. 2013, eq. 1 (GSI = 1.5 JCond89 + RQD/2)",
-   "notes": "Range read from the contour labels of the chart. The chart text advises quoting e.g. 33-37 rather than 35. GSI = 100 corresponds to intact rock (s = 1 with D = 0, Hoek et al. 2002 eq. 4); the program accepts 1-100. GSI should not be estimated from RMR (Hoek 2023, PDF p. 98) and is not applicable to structurally controlled failures."
+   "locator": "Hoek 2023, Rock mass properties, 'Geological Strength Index' and Fig. 6 (GSI chart after Hoek and Marinos 2000), PDF pp. 98-99; Marinos & Hoek 2000, section 3 and Tables 5-13 (typical GSI ranges by rock type); Hoek et al. 2013, eq. 1 (GSI = 1.5 JCond89 + RQD/2)"
   },
   {
    "key": "mi",
@@ -767,8 +477,7 @@
     "hoek_pre_ch11",
     "marinos_hoek_2000"
    ],
-   "locator": "Hoek, Practical Rock Engineering ch. 11, Table 3 (values of mi by rock group), p. 6; Marinos & Hoek 2000, section 2.0 and Table 2",
-   "notes": "Range = minimum and maximum of ogr_data/data/mi_values.json (taken from that Table 3). Values in parentheses in the source are estimates; conglomerates and breccias can vary widely; foliated-rock values are for loading normal to foliation (Marinos & Hoek 2000, Table 2 footnotes)."
+   "locator": "Hoek, Practical Rock Engineering ch. 11, Table 3 (values of mi by rock group), p. 6; Marinos & Hoek 2000, section 2.0 and Table 2"
   },
   {
    "key": "d",
@@ -784,8 +493,7 @@
     "hoek_pre_2023",
     "hoek_diederichs_2006"
    ],
-   "locator": "Hoek et al. 2002, text after eq. 5 and section 7, Table 1; Hoek 2023, Rock mass properties, PDF p. 102 and Fig. 9 (PDF p. 103); Hoek & Diederichs 2006, eqs. 2 and 4 and section 7",
-   "notes": "Hoek 2023 (PDF p. 102) stresses that D applies only to the blast-damaged zone (typically 1-2 m around a tunnel), modelled as a separate weaker material, not to the whole rock mass. Guideline values are those of ogr_data/data/disturbance_factor.json."
+   "locator": "Hoek et al. 2002, text after eq. 5 and section 7, Table 1; Hoek 2023, Rock mass properties, PDF p. 102 and Fig. 9 (PDF p. 103); Hoek & Diederichs 2006, eqs. 2 and 4 and section 7"
   },
   {
    "key": "ei",
@@ -800,8 +508,7 @@
     "hoek_diederichs_2006",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek & Diederichs 2006, eq. 3 and Table 3 (p. 210); Hoek 2023, Rock mass properties, eq. 21 and Fig. 13 (PDF pp. 108-110)",
-   "notes": "Range of MR derived from ogr_data/data/modulus_ratio.json (min and max of the table); not a range of Ei itself. Hoek & Diederichs note that measured Ei is often unreliable because of specimen damage, so MR·σci is usually preferred."
+   "locator": "Hoek & Diederichs 2006, eq. 3 and Table 3 (p. 210); Hoek 2023, Rock mass properties, eq. 21 and Fig. 13 (PDF pp. 108-110)"
   },
   {
    "key": "modulus_method",
@@ -817,38 +524,7 @@
     "hoek_2002",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek & Diederichs 2006, eq. 2 (simplified, p. 208), eq. 4 (generalized, p. 209), section 6 (recommendation, p. 209) and Table 1 eq. 7 (2002 equation, σci ≤ 100 MPa, p. 204); Hoek et al. 2002, eq. 11; Hoek 2023, Rock mass properties, eqs. 20 and 22 (PDF p. 108)",
-   "notes": "Hoek & Diederichs recommend eq. 4 with Ei = MR·σci when σci is known, and the simplified eq. 2 when reliable intact data are not available (its D = 0 curve is an upper bound). In the 2002 equation σci is limited to 100 MPa (Hoek & Diederichs 2006 Table 1; Marinos & Hoek 2000 spreadsheet, Table 4)."
-  },
-  {
-   "key": "gsi_residual",
-   "criteria": [
-    "generalized_hoek_brown"
-   ],
-   "definition_en": "GSI used to compute the residual (post-peak) mb, s and a; only active when residual is not set to peak.",
-   "definition_es": "GSI con el que se calculan mb, s y a residuales (postpico); solo se usa si el residual no se iguala al pico.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "hoek_brown.rsdata_theory_hb"
-   ],
-   "locator": "RSData Theory ch. 6, p. 2 (peak and residual values of all properties)",
-   "notes": "Definition from the Rocscience manual. No source read gives guidance on residual GSI values; see pending list."
-  },
-  {
-   "key": "mi_residual",
-   "criteria": [
-    "generalized_hoek_brown"
-   ],
-   "definition_en": "mi used to compute the residual (post-peak) strength parameters; only active when residual is not set to peak.",
-   "definition_es": "mi con el que se calculan los parámetros resistentes residuales (postpico); solo se usa si el residual no se iguala al pico.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "hoek_brown.rsdata_theory_hb"
-   ],
-   "locator": "RSData Theory ch. 6, p. 2",
-   "notes": "Definition from the Rocscience manual. No residual-specific range found; see pending list."
+   "locator": "Hoek & Diederichs 2006, eq. 2 (simplified, p. 208), eq. 4 (generalized, p. 209), section 6 (recommendation, p. 209) and Table 1 eq. 7 (2002 equation, σci ≤ 100 MPa, p. 204); Hoek et al. 2002, eq. 11; Hoek 2023, Rock mass properties, eqs. 20 and 22 (PDF p. 108)"
   },
   {
    "key": "d_residual",
@@ -860,11 +536,9 @@
    "range_en": "0 to 1",
    "range_es": "0 a 1",
    "sources": [
-    "hoek_brown.rsdata_theory_hb",
     "hoek_2002"
    ],
-   "locator": "RSData Theory ch. 6, p. 2; bounds of D from Hoek et al. 2002, text after eq. 5",
-   "notes": "The 0-1 bound is the definition range of D; no guidance specific to residual D was found."
+   "locator": "bounds of D from Hoek et al. 2002, text after eq. 5"
   },
   {
    "key": "tensile_cutoff_type",
@@ -876,11 +550,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "hoek_brown.rsdata_theory_hb",
     "hoek_2002"
    ],
-   "locator": "RSData Theory ch. 6, p. 5, eqs. 0.8-0.10 (tension cutoff, Tmax = s·σci/m, Hoek & Martin 2014 alternative, user defined); Hoek et al. 2002, eq. 7",
-   "notes": "Software option (kind manual). The meaning of 'None' is taken from the program code (core/simulation.py: 'Hoek-Brown family: tensile strength inherent to the criterion'), not from a manual. RSData offers more options (Hoek & Martin 2014, user defined) that this program does not."
+   "locator": "Hoek et al. 2002, eq. 7"
   },
   {
    "key": "sig3max",
@@ -893,11 +565,9 @@
    "range_es": "Debe fijarse en cada caso; criterio anterior: 0,25·σci para túneles a más de 30 m, σv = profundidad × peso específico para túneles someros y taludes",
    "sources": [
     "hoek_2002",
-    "marinos_hoek_2000",
-    "rocdata_ug"
+    "marinos_hoek_2000"
    ],
-   "locator": "Hoek et al. 2002, section 4 (fit over σt < σ3 < σ3max, eqs. 12-13) and section 6; Marinos & Hoek 2000, sections 2.1 and 2.2; RocData User's Guide, 'Failure Envelope Range' (no effect on the non-linear parameters)",
-   "notes": "In 'Custom' mode the user types it; in Tunnel/Slope mode it is computed (see 'application'). RocData also offers a 'General' option σ3max = σci/4 that this program lacks. For block caving Hoek et al. 2002 advise not relating Hoek-Brown and Mohr-Coulomb at all."
+   "locator": "Hoek et al. 2002, section 4 (fit over σt < σ3 < σ3max, eqs. 12-13) and section 6; Marinos & Hoek 2000, sections 2.1 and 2.2"
   },
   {
    "key": "application",
@@ -913,8 +583,7 @@
     "hoek_2002",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek et al. 2002, section 6, eqs. 18 (tunnels) and 19 (slopes), Fig. 2; Hoek 2023, Rock mass properties, eqs. 17-18, PDF pp. 106-107",
-   "notes": "Tunnel equation valid for deep and shallow tunnels (depth < 3 diameters) as long as caving to surface is avoided; slope equation from Bishop circular failure analyses. Only for the Hoek-Brown family in this program (core/material_results.py HB_FAMILY)."
+   "locator": "Hoek et al. 2002, section 6, eqs. 18 (tunnels) and 19 (slopes), Fig. 2; Hoek 2023, Rock mass properties, eqs. 17-18, PDF pp. 106-107"
   },
   {
    "key": "unit_weight",
@@ -930,8 +599,7 @@
     "hoek_2002",
     "hoek_pre_2023"
    ],
-   "locator": "Hoek et al. 2002, definitions after eq. 18; Hoek 2023, In situ and induced stresses, 'In situ stresses', PDF p. 133",
-   "notes": "Program unit for this field is MN/m³ (not kN/m³), so γH comes out in MPa. The 0.027 MN/m³ is a single typical value stated by Hoek, not a range."
+   "locator": "Hoek et al. 2002, definitions after eq. 18; Hoek 2023, In situ and induced stresses, 'In situ stresses', PDF p. 133"
   },
   {
    "key": "tunnel_depth",
@@ -946,8 +614,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, section 6, eq. 18 and following text",
-   "notes": "Same widget as 'slope_height' (relabelled by mode). Hoek et al. 2002 say that if the horizontal stress exceeds the vertical one, the horizontal stress should replace γH; this program has no input for that case."
+   "locator": "Hoek et al. 2002, section 6, eq. 18 and following text"
   },
   {
    "key": "slope_height",
@@ -962,8 +629,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, section 6, eq. 19",
-   "notes": "Same widget as 'tunnel_depth' (relabelled by mode)."
+   "locator": "Hoek et al. 2002, section 6, eq. 19"
   },
   {
    "key": "result.mb",
@@ -977,8 +643,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 3",
-   "notes": "Result row 'mb' of the results panel. Bound follows from eq. 3."
+   "locator": "Hoek et al. 2002, eq. 3"
   },
   {
    "key": "result.s",
@@ -992,8 +657,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 4 and definitions after eq. 1",
-   "notes": "Result row 's'."
+   "locator": "Hoek et al. 2002, eq. 4 and definitions after eq. 1"
   },
   {
    "key": "result.a",
@@ -1007,8 +671,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 5",
-   "notes": "Range evaluated from eq. 5 at its limits (GSI = 100 and GSI → 0), not stated in words by the source."
+   "locator": "Hoek et al. 2002, eq. 5"
   },
   {
    "key": "result.sigt",
@@ -1022,8 +685,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 7 and following text",
-   "notes": "Shown negative (tension negative). Result row 'sigt'."
+   "locator": "Hoek et al. 2002, eq. 7 and following text"
   },
   {
    "key": "result.sigc",
@@ -1037,8 +699,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, eq. 6 and section 5",
-   "notes": "Result row 'sigc'."
+   "locator": "Hoek et al. 2002, eq. 6 and section 5"
   },
   {
    "key": "result.sigcm",
@@ -1053,8 +714,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, section 5, eqs. 16-17",
-   "notes": "Does not depend on σ3max. For classic Hoek-Brown it is computed with a = 0.5."
+   "locator": "Hoek et al. 2002, section 5, eqs. 16-17"
   },
   {
    "key": "result.c",
@@ -1069,8 +729,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, section 4, eq. 13 (with σ3n = σ3max/σci)",
-   "notes": "Depends strongly on σ3max. Hoek et al. 2002 apply it to the Hoek-Brown family; other criteria in the program are fitted by other means (other groups)."
+   "locator": "Hoek et al. 2002, section 4, eq. 13 (with σ3n = σ3max/σci)"
   },
   {
    "key": "result.phi",
@@ -1085,8 +744,7 @@
    "sources": [
     "hoek_2002"
    ],
-   "locator": "Hoek et al. 2002, section 4, eq. 12",
-   "notes": "Depends strongly on σ3max. Example in Hoek et al. 2002 section 7: σci 50 MPa, mi 10, GSI 45 gives φ' = 47.16° (tunnel 100 m deep, D = 0) and 27.61° (slope 100 m high, D = 1)."
+   "locator": "Hoek et al. 2002, section 4, eq. 12"
   },
   {
    "key": "result.erm",
@@ -1101,8 +759,7 @@
     "hoek_diederichs_2006",
     "hoek_2002"
    ],
-   "locator": "Hoek & Diederichs 2006, eqs. 2 and 4; Hoek et al. 2002, eq. 11",
-   "notes": "Result row 'Erm'. The 100000 in the simplified equation is a scaling constant, not a physical modulus (Hoek & Diederichs 2006, p. 208)."
+   "locator": "Hoek & Diederichs 2006, eqs. 2 and 4; Hoek et al. 2002, eq. 11"
   },
   {
    "key": "critical_state_slope",
@@ -1116,11 +773,9 @@
    "range_es": "0,845-1,02 en cinco arcillas remoldeadas (Klein Belt Ton, Wiener Tegel V, Londres, Weald, caolín); ángulos de rozamiento equivalentes 21,75-26°",
    "sources": [
     "schofield_wroth_1968",
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Schofield & Wroth 1968, §5.9 eq. (5.22) p. 73, §6.8 p. 104, Table 6.1 p. 109, eq. (8.9) p. 151 (q/p = 6 sin ρ / (3 − sin ρ) in triaxial compression); Rocscience ch. 8, §8.2 and §8.3 eqs. (0.5)-(0.6); UTM notes slides 17-18 (M = 6 sin φ'c / (3 − sin φ'c)).",
-   "notes": "Dimensionless. The range is the set of laboratory values in Schofield & Wroth Table 6.1 (data of Hvorslev, Parry and Loudon), not a statistical range for all soils. The 6 sin φ/(3 − sin φ) relation holds for triaxial compression only (extension uses 3 + sin φ, Schofield & Wroth eq. (8.8))."
+   "locator": "Schofield & Wroth 1968, §5.9 eq. (5.22) p. 73, §6.8 p. 104, Table 6.1 p. 109, eq. (8.9) p. 151 (q/p = 6 sin ρ / (3 − sin ρ) in triaxial compression); UTM notes slides 17-18 (M = 6 sin φ'c / (3 − sin φ'c))."
   },
   {
    "key": "volume_reference",
@@ -1133,11 +788,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "rocscience_cam_clay",
     "schofield_wroth_1968"
    ],
-   "locator": "Rocscience ch. 8, §8.2 eqs. (0.3) and (0.4); Schofield & Wroth 1968, eq. (6.20) p. 100 and eq. (7.18) p. 139 (for an isotropically normally compressed Cam-clay specimen the λ-line lies (λ − κ) above the critical state line, which is the Cam-Clay relation).",
-   "notes": "Enum option (Normal Compression Line (N) / Critical State Line (Gamma)) is an RSData input convention. The Cam-Clay relation is in Schofield & Wroth; the Modified Cam-Clay relation (ln 2 factor) was only seen in the Rocscience manual; the original (Roscoe & Burland 1968) was not read."
+   "locator": "Schofield & Wroth 1968, eq. (6.20) p. 100 and eq. (7.18) p. 139 (for an isotropically normally compressed Cam-clay specimen the λ-line lies (λ − κ) above the critical state line, which is the Cam-Clay relation)."
   },
   {
    "key": "specific_volume_unit_pressure",
@@ -1151,11 +804,9 @@
    "range_es": "Γ = 1,88-3,99 en cinco arcillas remoldeadas, con la presión en lb/in² (Schofield & Wroth, tabla 6.1); no se encontró tabla de valores de N",
    "sources": [
     "schofield_wroth_1968",
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Schofield & Wroth 1968, eq. (5.23) p. 73, Table 6.1 p. 109, text on Γ and units p. 111; Rocscience ch. 8, §8.1 eq. (0.1) and §8.2; UTM notes slides 14, 17 and 23.",
-   "notes": "UNIT WARNING: Schofield & Wroth define unit pressure as 1 lb/in² and state that Γ changes with the pressure unit; the program works in kPa. From v = Γ − λ ln p, a value tabulated with p in lb/in² becomes Γ(kPa) = Γ(lb/in²) + λ·ln(6.895) (unit conversion derived by the integrator from eq. (5.23), not a value stated by the source). Do not show the Table 6.1 range without this caveat. The UTM worked example gets N = 2.58 (kPa) for one oedometer test (slide 16), a single example, not a range."
+   "locator": "Schofield & Wroth 1968, eq. (5.23) p. 73, Table 6.1 p. 109, text on Γ and units p. 111; UTM notes slides 14, 17 and 23."
   },
   {
    "key": "kappa",
@@ -1169,11 +820,9 @@
    "range_es": "0,026-0,184 (κ medio de cinco arcillas remoldeadas); arcilla de Londres 0,062 ± 0,016",
    "sources": [
     "schofield_wroth_1968",
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (6.3) p. 94, §7.4 p. 120 (London clay), Table 6.1 p. 109; Rocscience ch. 8, §8.1 eq. (0.2) and §8.4 eq. (0.7); UTM notes slides 14 and 26 (κ = Cs/2.3).",
-   "notes": "Dimensionless (natural logarithm). If only the oedometer swelling index Cs (base-10) is available, κ ≈ Cs/2.303 (UTM slide 26)."
+   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (6.3) p. 94, §7.4 p. 120 (London clay), Table 6.1 p. 109; UTM notes slides 14 and 26 (κ = Cs/2.3)."
   },
   {
    "key": "lambda",
@@ -1187,11 +836,9 @@
    "range_es": "0,093-0,356 en cinco arcillas remoldeadas (caolín 0,26, arcilla de Londres 0,161, arcilla de Weald 0,093)",
    "sources": [
     "schofield_wroth_1968",
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (5.23) p. 73, Table 6.1 p. 109, eq. (6.33) p. 107 (λ ≈ 0.585·PI, PI as a ratio), eq. (6.38) p. 110 (Cc = 2.303 λ); Rocscience ch. 8, §8.1 eq. (0.1) and §8.6 eq. (0.8); UTM notes slides 14, 23 and 26.",
-   "notes": "Dimensionless (natural logarithm). From an oedometer compression index Cc (base-10): λ ≈ Cc/2.303. Same key also exists in NorSand with a different meaning (CSL slope) - separate entry in that group."
+   "locator": "Schofield & Wroth 1968, §4.2 p. 50, eq. (5.23) p. 73, Table 6.1 p. 109, eq. (6.33) p. 107 (λ ≈ 0.585·PI, PI as a ratio), eq. (6.38) p. 110 (Cc = 2.303 λ); UTM notes slides 14, 23 and 26."
   },
   {
    "key": "initial_consolidation",
@@ -1204,11 +851,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Rocscience ch. 8, §8.5 (initial yield surface set by assigning the preconsolidation pressure or the OCR); UTM notes slide 23.",
-   "notes": "Software input option (RSData combo). The alternative OCR / p0 is stated in both sources; no scientific original needed for the choice itself."
+   "locator": "UTM lecture notes (CSSM), slide 23: OCR and preconsolidation pressure"
   },
   {
    "key": "ocr",
@@ -1222,11 +867,9 @@
    "range_es": "≥ 1 (1 = normalmente consolidado, > 1 = sobreconsolidado)",
    "sources": [
     "schofield_wroth_1968",
-    "rocscience_cam_clay",
     "utm_cssm_notes"
    ],
-   "locator": "Schofield & Wroth 1968, §7.10 p. 139, Fig. 7.25 and eqs. (7.16)-(7.18) ('overcompression ratio' N: compressed to N·p0 and swollen back to p0); Rocscience ch. 8, §8.5 and §8.7 (examples OCR = 2 lightly and OCR = 5 highly overconsolidated); UTM notes slide 23 (ratio of previous maximum mean stress to current mean stress).",
-   "notes": "Defined in terms of mean (isotropic) effective stress, not the oedometer vertical-stress OCR. The range is the definitional bound; no source read gives typical field values."
+   "locator": "Schofield & Wroth 1968, §7.10 p. 139, Fig. 7.25 and eqs. (7.16)-(7.18) ('overcompression ratio' N: compressed to N·p0 and swollen back to p0)"
   },
   {
    "key": "preconsolidation_stress",
@@ -1239,146 +882,9 @@
    "range_en": null,
    "range_es": null,
    "sources": [
-    "rocscience_cam_clay",
     "schofield_wroth_1968"
    ],
-   "locator": "Rocscience ch. 8, §8.3 eqs. (0.5)-(0.6), §8.5, §8.6 eq. (0.8); Schofield & Wroth 1968, §7.10 p. 139 (virgin compression to N·p0).",
-   "notes": "Site- and history-specific stress; no typical range applies. If initial stresses lie outside the surface, RS2/RS3 enlarge pc to fit them (Rocscience §8.5)."
-  },
-  {
-   "key": "cone_hardening_type",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Hardening law of the deviatoric cone. Hyperbolic: tan φ = tan φf·εq^p/(εq^p + A), a single extra parameter A; Tabular: user-given piecewise-linear friction angle and cohesion versus plastic deviatoric strain, which can also model softening.",
-   "definition_es": "Ley de endurecimiento del cono desviador. Hiperbólica: tan φ = tan φf·εq^p/(εq^p + A), con un único parámetro adicional A; Tabular: ángulo de rozamiento y cohesión lineales a tramos frente a la deformación desviadora plástica, que permite también reblandecimiento.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.1 eq. (0.4) and following paragraphs; §11.1 last paragraph (tabular softening, mesh-dependence warning).",
-   "notes": "The name 'Hyperbolic' is the RSData/RS2 option label (OGR-Data spec 013b); the manual describes the law by eq. (0.4) without that name. The manual warns that softening as a material law makes FE results mesh dependent."
-  },
-  {
-   "key": "hardening_property",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "A, positive constant of the hyperbolic cone hardening law tan φ = tan φf·εq^p/(εq^p + A): the plastic deviatoric strain at which tan φ reaches half of tan φf. Smaller A gives faster hardening.",
-   "definition_es": "A, constante positiva de la ley hiperbólica de endurecimiento del cono tan φ = tan φf·εq^p/(εq^p + A): la deformación desviadora plástica con la que tan φ alcanza la mitad de tan φf. Un A menor da un endurecimiento más rápido.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.1 eq. (0.4); calibrated examples A = 0.0038 (loose Hostun sand, Fig. 11.4) and A = 0.0036 (dense Hostun sand, Fig. 11.5).",
-   "notes": "Dimensionless (strain). The 'half of tan φf' reading follows directly from eq. (0.4) with εq^p = A. Only two calibrated example values exist in the manual, not a range. Used only when Cone Hardening Type = Hyperbolic."
-  },
-  {
-   "key": "cone_hardening_table",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Table for tabular cone hardening: plastic deviatoric strain εq^p with the mobilized friction angle and cohesion at that strain, interpolated linearly between rows. Decreasing values after a peak model softening.",
-   "definition_es": "Tabla del endurecimiento tabular del cono: deformación desviadora plástica εq^p con el ángulo de rozamiento y la cohesión movilizados a esa deformación, interpolados linealmente entre filas. Valores decrecientes tras un máximo modelan reblandecimiento.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.1 (tabular law with pairs (εq^p, φ) and (εq^p, c)); §11.4 (dense Hostun sand with a tabular function to capture softening).",
-   "notes": "Columns: Plastic Deviatoric Strain (dimensionless), Friction Angle (deg), Cohesion (stress). Used only when Cone Hardening Type = Tabular."
-  },
-  {
-   "key": "dilation_angle",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "With the Mohr-Coulomb cone dilation type it is ψf, the dilation angle at failure; the dilation used during hardening is ψf·φ/φf. With the Compaction-Dilation type it is the angle ψ that separates plastic compaction (mobilized φ < ψ) from dilation (φ > ψ).",
-   "definition_es": "Con el tipo de dilatancia Mohr-Coulomb es ψf, el ángulo de dilatancia en rotura; durante el endurecimiento se usa ψf·φ/φf. Con el tipo Compactación-Dilatancia es el ángulo ψ que separa la compactación plástica (φ movilizado < ψ) de la dilatancia (φ > ψ).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.1 eqs. (0.5)-(0.7); calibrated examples ψ = 33.5° with φf = 35° (loose Hostun sand, Fig. 11.4) and ψ = 30° with φf = 43.5° (dense Hostun sand, Fig. 11.5), both with the compaction-dilation option.",
-   "notes": "Meaning changes with cone_dilation_type; the tooltip should show the sentence for the active option. Only example values in the source."
-  },
-  {
-   "key": "cone_dilation_type",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Plastic potential of the deviatoric cone. Mohr-Coulomb: dilation grows with the mobilized friction up to ψf at failure; Compaction-Dilation: a Cam-Clay-like potential that compacts while the mobilized friction is below ψ and dilates above it.",
-   "definition_es": "Potencial plástico del cono desviador. Mohr-Coulomb: la dilatancia crece con el rozamiento movilizado hasta ψf en rotura; Compactación-Dilatancia: potencial tipo Cam-Clay que compacta mientras el rozamiento movilizado es menor que ψ y dilata por encima.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.1 eqs. (0.5)-(0.6) (first option) and eq. (0.7) (second option).",
-   "notes": "Software option. OGR-Data default is 'Mohr-Coulomb', but the RSData project export in Ejemplos\\RSData_analisis\\exportes\\verificacion_rutas_estados.rsdata shows <ConeIsCompactDilation>true</ConeIsCompactDilation> for the default Softening-Hardening material: the integrator may want to check the default."
-  },
-  {
-   "key": "cap_type",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Optional volumetric yield surface (cap) that closes the elastic region on the p' axis and models compaction. None: cone only; Vertical: a straight cap at p' = pc; Elliptical: a Modified-Cam-Clay-like ellipse offset by the cohesion, whose apex follows the ultimate shear surface.",
-   "definition_es": "Superficie de fluencia volumétrica opcional (capa o cap) que cierra la región elástica sobre el eje p' y modela la compactación. None: solo el cono; Vertical: capa recta en p' = pc; Elíptica: elipse similar a la de Cam-Clay Modificado desplazada por la cohesión, cuyo vértice sigue a la superficie de corte última.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.2 eqs. (0.8)-(0.9), Fig. 11.1.",
-   "notes": "Software option; the cap has an associated flow rule (§11.2)."
-  },
-  {
-   "key": "cap_hardening_type",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Hardening law of the cap pressure pc with plastic volumetric strain. Cam-Clay: built-in exponential law pc(n+1) = pc(n)·exp(Δεv^p/λ), with λ the Lambda Kappa input; Tabular: user-given piecewise-linear pc versus plastic volumetric strain.",
-   "definition_es": "Ley de endurecimiento de la presión de capa pc con la deformación volumétrica plástica. Cam-Clay: ley exponencial incorporada pc(n+1) = pc(n)·exp(Δεv^p/λ), con λ el dato Lambda Kappa; Tabular: pc lineal a tramos frente a la deformación volumétrica plástica.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.2 eq. (0.10) and following paragraph.",
-   "notes": "Software option; only meaningful when Cap Type is not None. The RSData export stores it as <CapIsExponential>."
-  },
-  {
-   "key": "lambda_kappa",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Parameter λ of the built-in (Cam-Clay) cap hardening law pc(n+1) = pc(n)·exp(Δεv^p/λ); the manual describes it as the difference between the slopes of the normal consolidation line and the swelling line (λ − κ). Larger values give slower growth of the cap.",
-   "definition_es": "Parámetro λ de la ley incorporada (Cam-Clay) de endurecimiento de la capa pc(n+1) = pc(n)·exp(Δεv^p/λ); el manual lo describe como la diferencia entre las pendientes de la línea de consolidación normal y de la línea de hinchamiento (λ − κ). Valores mayores hacen crecer la capa más despacio.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.2 eq. (0.10).",
-   "notes": "Unlike the Cam-Clay hardening law (Rocscience ch. 8, eq. (0.8): exp(v·Δεv^p/(λ − κ))), eq. (0.10) has no specific volume v, so the value the program expects may be (λ − κ)/v rather than (λ − κ); the manual does not say. This is the integrator's observation, not a sourced statement: keep the tooltip to the manual's wording. Used only with Cap Hardening Type = Cam-Clay and a cap active; default 0 would make eq. (0.10) undefined."
-  },
-  {
-   "key": "cap_hardening_table",
-   "criteria": [
-    "softening_hardening"
-   ],
-   "definition_en": "Table for tabular cap hardening: plastic volumetric strain εv^p with the cap pressure pc at that strain, interpolated linearly. Allows other cap laws, such as those of the Hardening Soil or CySoil models.",
-   "definition_es": "Tabla del endurecimiento tabular de la capa: deformación volumétrica plástica εv^p con la presión de capa pc a esa deformación, interpolada linealmente. Permite otras leyes de capa, como las de los modelos Hardening Soil o CySoil.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_softening_hardening"
-   ],
-   "locator": "Rocscience ch. 11, §11.2 (tabular law with pairs (εv^p, pc)).",
-   "notes": "Columns: Plastic Volumetric Strain (dimensionless), Cap Pressure pc (stress). Used only with Cap Hardening Type = Tabular."
+   "locator": "Schofield & Wroth 1968, §7.10 p. 139 (virgin compression to N·p0)."
   },
   {
    "key": "m_tc",
@@ -1392,8 +898,7 @@
    "sources": [
     "jefferies_shuttle_been_2015"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, symbol M) and Table 2 'NorSand soil properties with typical range for sands' (p. 78)",
-   "notes": "Fraser River sand value in Table 2: 1.45 (the RSData tutorial uses 1.47)."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, symbol M) and Table 2 'NorSand soil properties with typical range for sands' (p. 78)"
   },
   {
    "key": "lambda",
@@ -1407,8 +912,7 @@
    "sources": [
     "jefferies_shuttle_been_2015"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67: lambda_e, lambda_10, 'lambda_10 ~ 2.3 lambda_e'), Table 1 (p. 77, e_c = Gamma - lambda ln(p')), Table 2 (p. 78, lambda_10 range for sands). The natural-log range is the Table 2 range divided by 2.3 (conversion given in the same paper).",
-   "notes": "The source's typical range is base 10; the program's field is natural log, so the tooltip must show the converted range or say the base. Consistency check: Fraser River sand lambda_10 = 0.138 (Table 2) gives lambda_e = 0.06, the value of the RSData tutorial and the program default."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67: lambda_e, lambda_10, 'lambda_10 ~ 2.3 lambda_e'), Table 1 (p. 77, e_c = Gamma - lambda ln(p')), Table 2 (p. 78, lambda_10 range for sands). The natural-log range is the Table 2 range divided by 2.3 (conversion given in the same paper)."
   },
   {
    "key": "gamma",
@@ -1422,8 +926,7 @@
    "sources": [
     "jefferies_shuttle_been_2015"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, symbol Gamma: reference void ratio on CSL at p' = 1 kPa) and Table 2 (p. 78)",
-   "notes": "Dimensionless (a void ratio). The reference stress 1 kPa is part of the definition, consistent with the program's kPa units."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, symbol Gamma: reference void ratio on CSL at p' = 1 kPa) and Table 2 (p. 78)"
   },
   {
    "key": "h0",
@@ -1438,8 +941,7 @@
     "jefferies_shuttle_been_2015",
     "itasca_norsand_2025"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Table 2 (p. 78, H: 50-500) and eq. 14 (p. 85, H = H0 - Hy psi; Fraser River sand H0 = 60, Hy = 280); Itasca 2025, property hardening-0 ('plastic hardening modulus when psi = 0')",
-   "notes": "Table 2 gives the range for H, not for H0 separately; H0 is H at psi = 0, so the range is indicative."
+   "locator": "Jefferies, Shuttle & Been 2015, Table 2 (p. 78, H: 50-500) and eq. 14 (p. 85, H = H0 - Hy psi; Fraser River sand H0 = 60, Hy = 280); Itasca 2025, property hardening-0 ('plastic hardening modulus when psi = 0')"
   },
   {
    "key": "hy",
@@ -1454,8 +956,7 @@
     "jefferies_shuttle_been_2015",
     "itasca_norsand_2025"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, eq. 14 (p. 85; Fraser River sand Hy = 280) and Table 2 (p. 78, H '60-280 psi' for Fraser River sand); Itasca 2025, property hardening-y (default 0)",
-   "notes": "No typical range is published in the sources read; only the Fraser River sand value (280). The RSData tutorial uses Hy = 400."
+   "locator": "Jefferies, Shuttle & Been 2015, eq. 14 (p. 85; Fraser River sand Hy = 280) and Table 2 (p. 78, H '60-280 psi' for Fraser River sand); Itasca 2025, property hardening-y (default 0)"
   },
   {
    "key": "chi_tc",
@@ -1469,8 +970,7 @@
    "sources": [
     "jefferies_shuttle_been_2015"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, chi: state-dilatancy parameter), Table 1 (p. 77, eta_L = M_i (1 - chi_i psi_i / M_i,tc)) and Table 2 (p. 78)",
-   "notes": "Fraser River sand value: 3.40 (RSData tutorial: 3.2)."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, chi: state-dilatancy parameter), Table 1 (p. 77, eta_L = M_i (1 - chi_i psi_i / M_i,tc)) and Table 2 (p. 78)"
   },
   {
    "key": "n",
@@ -1484,8 +984,7 @@
    "sources": [
     "jefferies_shuttle_been_2015"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, N 'volumetric coupling parameter (from Nova's flow rule)'), text p. 76 ('N the volumetric coupling following Nova (1982)') and Table 2 (p. 78)",
-   "notes": "Paper p. 76: 'Two properties are associated with strength at peak dilatancy: N ... and chi'. The program default 0.05 is below the published typical range; the RSData tutorial uses 0.5 and Fraser River sand 0.43."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 67, N 'volumetric coupling parameter (from Nova's flow rule)'), text p. 76 ('N the volumetric coupling following Nova (1982)') and Table 2 (p. 78)"
   },
   {
    "key": "psi0",
@@ -1500,8 +999,7 @@
     "jefferies_shuttle_been_2015",
     "itasca_norsand_2025"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, psi = e - e_c; subscript 0 = initial condition); Itasca 2025, property state-parameter-initial",
-   "notes": "The sign reading follows directly from psi = e - e_c. No typical range is given in the sources read."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, psi = e - e_c; subscript 0 = initial condition); Itasca 2025, property state-parameter-initial"
   },
   {
    "key": "ocr",
@@ -1516,23 +1014,7 @@
     "jefferies_shuttle_been_2015",
     "itasca_norsand_2025"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, R 'scalar measure of overconsolidation'); Itasca 2025, section on initial state ('OCR ... defined as the ratio of the current p_i over the calculated p_i,OCR=1') and property over-consolidation-ratio (default 1)",
-   "notes": "Dimensionless ratio. RSData labels it 'OCR (kPa)' (tutorial page), which is a label error. The exact RSData definition is not published; the image-stress definition is Itasca's. RSData tutorial value: 1.1."
-  },
-  {
-   "key": "initial_consolidation_condition",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Selects how the initial consolidation state of the NorSand sample is given; the only option is OCR, entered in the next field.",
-   "definition_es": "Elige cómo se da el estado inicial de consolidación de la muestra NorSand; la única opción es OCR, que se introduce en el campo siguiente.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rsdata_norsand_tutorial"
-   ],
-   "locator": "RSData tutorial 'NorSand - Fraser River Sand' (Initial Consolidation Condition set to OCR)",
-   "notes": "Program (RSData) concept with no scientific original; the tutorial only shows the field, it does not define it. The definition describes the program's option list. See pending list."
+   "locator": "Jefferies, Shuttle & Been 2015, Notation (p. 66, R 'scalar measure of overconsolidation'); Itasca 2025, section on initial state ('OCR ... defined as the ratio of the current p_i over the calculated p_i,OCR=1') and property over-consolidation-ratio (default 1)"
   },
   {
    "key": "cap_softening",
@@ -1547,196 +1029,7 @@
     "jefferies_shuttle_been_2015",
     "itasca_norsand_2025"
    ],
-   "locator": "Jefferies, Shuttle & Been 2015, Table 1 (p. 77, hardening rule on outer yield surface, 'S = 0 or 1 (a Boolean switch)'); Itasca 2025, property index-softening ('additional cap softening term S T_S ... optional'; not recommended for drained loading)",
-   "notes": "The link between the RSData checkbox 'Cap Softening' and the switch S is an inference from Itasca's wording ('cap softening term'); RSData does not document it. Confirm with RSData if possible (see pending list). The RSData tutorial enables it for Fraser River sand."
-  },
-  {
-   "key": "fluid_bulk_modulus",
-   "criteria": [
-    "norsand"
-   ],
-   "definition_en": "Bulk modulus of the pore fluid: a measure of its compressibility, i.e. how much the fluid volume changes under a change of pressure.",
-   "definition_es": "Módulo de compresibilidad volumétrica del fluido intersticial: medida de su compresibilidad, es decir, de cuánto cambia el volumen del fluido ante un cambio de presión.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_hydraulic",
-    "rocscience_rsdata_norsand_tutorial"
-   ],
-   "locator": "RS2 help 'Define Hydraulic Properties', section Fluid Bulk Modulus (definition); RSData NorSand tutorial (Fluid Bulk Modulus 1e9 kPa)",
-   "notes": "Only a Rocscience manual defines it (generic physical property, software field); kind manual. Its role in the RSData NorSand test simulation is not documented in what was read. No range or value for water sourced (see pending)."
-  },
-  {
-   "key": "a",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Multiplier of the Power Curve shear strength envelope tau = a (sigma_n + d)^b + c (+ sigma_n tan theta_w), usually obtained by least-squares fitting of shear test data.",
-   "definition_es": "Coeficiente multiplicador de la envolvente de resistencia al corte Power Curve tau = a (sigma_n + d)^b + c (+ sigma_n tan theta_w), obtenido normalmente por ajuste de mínimos cuadrados a ensayos de corte.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20",
-    "rocdata_users_guide_2004"
-   ],
-   "locator": "RS2 Theory 20 'Slide-Isotropic Models', section 20.2, eq. 20.3; RocData User's Guide 2004, 'Power Curve Criterion' (pp. 6-7) and 'Power Curve Parameters' (p. 23)",
-   "notes": "Software criterion (RocData/Slide) with no single scientific original in the sources read; kind manual. Unit implied by the equation: stress^(1-b), so the value of a depends on the stress unit (kPa in the program) unless b = 1. RocData also gives the dimensionless form tau = A Pa ((sigma_n/Pa) + T)^n."
-  },
-  {
-   "key": "b",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Exponent of the Power Curve envelope tau = a (sigma_n + d)^b + c; b < 1 gives an envelope that curves down with normal stress and b = 1 a straight line.",
-   "definition_es": "Exponente de la envolvente Power Curve tau = a (sigma_n + d)^b + c; b < 1 da una envolvente que se curva hacia abajo con la tensión normal y b = 1 una recta.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20",
-    "rocdata_users_guide_2004"
-   ],
-   "locator": "RS2 Theory 20, eq. 20.3; RocData User's Guide 2004, 'Power Curve Criterion' (pp. 6-7, curved envelopes at low normal stress)",
-   "notes": "Dimensionless. The shape statement follows from the equation itself."
-  },
-  {
-   "key": "c",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Constant shear strength added to the power term in tau = a (sigma_n + d)^b + c, obtained, like a and b, by least-squares fitting of shear test data.",
-   "definition_es": "Resistencia al corte constante que se suma al término potencial en tau = a (sigma_n + d)^b + c; se obtiene, como a y b, por ajuste de mínimos cuadrados a ensayos de corte.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20",
-    "rocscience_slide3_power_curve"
-   ],
-   "locator": "RS2 Theory 20, section 20.2, eq. 20.3; Slide3 help 'Power Curve'",
-   "notes": "Stress unit (kPa). Not in the 2004 RocData form (tau = a (sigma_n + d)^b). OGR-Data's criteria_envelopes.py currently ignores c and waviness 'until their exact semantics are verified': eq. 20.3 now gives them."
-  },
-  {
-   "key": "d",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Shift of the normal-stress axis in tau = a (sigma_n + d)^b + c, which represents the tensile strength; if used it must be entered as a positive value.",
-   "definition_es": "Desplazamiento del eje de tensiones normales en tau = a (sigma_n + d)^b + c, que representa la resistencia a tracción; si se usa debe introducirse como valor positivo.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20",
-    "rocscience_slide3_power_curve",
-    "rocdata_users_guide_2004"
-   ],
-   "locator": "RS2 Theory 20, section 20.2 ('The d parameter represents the tensile strength ... positive value'); Slide3 help 'Power Curve'; RocData User's Guide 2004, p. 6",
-   "notes": "Stress unit (kPa). Not the GHB disturbance factor D. The RS2 doc also says the equivalent elastoplastic model has zero peak and residual tensile strength."
-  },
-  {
-   "key": "waviness",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Waviness angle of a joint, added to the strength as sigma_n tan(theta_w): the average dip of the failure plane minus its minimum dip, for undulations seen over about 1 to 10 m. A non-zero value always raises the shear strength; use 0 when not modelling a joint.",
-   "definition_es": "Ángulo de ondulación de la junta, que se suma a la resistencia como sigma_n tan(theta_w): buzamiento medio del plano de rotura menos su buzamiento mínimo, para ondulaciones observadas en distancias de 1 a 10 m aproximadamente. Un valor no nulo siempre aumenta la resistencia al corte; se deja en 0 si no se modeliza una junta.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20",
-    "rocscience_slide3_power_curve",
-    "rocscience_rocplane_strength"
-   ],
-   "locator": "RS2 Theory 20, eq. 20.3 (term sigma_n tan theta_W, 'waviness angle defined for joints (Miller 1988)'); Slide3 help 'Power Curve', waviness angle paragraph; RocPlane help 'Failure Shear Strength', waviness paragraph ('observed over distances on the order of 1 m to 10 m'; a non-zero angle always increases the shear strength)",
-   "notes": "The scientific original is Miller, S.M. (1988), Modeling shear strength at low normal stresses for enhanced rock slope engineering, Proc. 39th Highway Geology Symposium, 346-356 (cited by Rocscience, not read)."
-  },
-  {
-   "key": "residual_a",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Parameter a of the residual Power Curve envelope; the residual strength uses the same formulation as the peak, tau_r = a_r (sigma_n + d_r)^b_r + c_r (+ sigma_n tan theta_w,r).",
-   "definition_es": "Parámetro a de la envolvente residual Power Curve; la resistencia residual usa la misma formulación que la de pico, tau_r = a_r (sigma_n + d_r)^b_r + c_r (+ sigma_n tan theta_w,r).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2 ('The residual strength ... uses the same formulation as the peak strength')",
-   "notes": "Software concept (residual strength of the RS2/RSData elastoplastic equivalent). Same unit remark as a."
-  },
-  {
-   "key": "residual_b",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Exponent b of the residual Power Curve envelope (same formulation as the peak envelope).",
-   "definition_es": "Exponente b de la envolvente residual Power Curve (misma formulación que la envolvente de pico).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2",
-   "notes": "Software concept; see residual_a."
-  },
-  {
-   "key": "residual_c",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Constant shear strength c of the residual Power Curve envelope (same formulation as the peak envelope).",
-   "definition_es": "Resistencia al corte constante c de la envolvente residual Power Curve (misma formulación que la envolvente de pico).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2",
-   "notes": "Software concept; stress unit (kPa)."
-  },
-  {
-   "key": "residual_d",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Normal-stress shift d (tensile strength term) of the residual Power Curve envelope (same formulation as the peak envelope).",
-   "definition_es": "Desplazamiento d de tensiones normales (término de resistencia a tracción) de la envolvente residual Power Curve (misma formulación que la envolvente de pico).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2",
-   "notes": "Software concept; stress unit (kPa)."
-  },
-  {
-   "key": "residual_waviness",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Joint waviness angle used in the residual Power Curve envelope (same formulation as the peak envelope).",
-   "definition_es": "Ángulo de ondulación de la junta usado en la envolvente residual Power Curve (misma formulación que la envolvente de pico).",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2 and eq. 20.3",
-   "notes": "Software concept; see waviness."
-  },
-  {
-   "key": "dilation_ratio",
-   "criteria": [
-    "power_curve"
-   ],
-   "definition_en": "Constant ratio used to obtain the dilation angle of the plastic flow from the instantaneous friction angle of the Power Curve envelope at the current stress.",
-   "definition_es": "Razón constante con la que se obtiene el ángulo de dilatancia del flujo plástico a partir del ángulo de rozamiento instantáneo de la envolvente Power Curve en el estado tensional actual.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.2 ('a constant dilation ratio is considered to find the equivalent dilation angle based on the instantaneous friction angle')",
-   "notes": "Software concept (RS2/RSData elastoplastic equivalent), kind manual. The doc does not write the formula (presumably psi = ratio x phi_inst) nor a range; see pending."
+   "locator": "Jefferies, Shuttle & Been 2015, Table 1 (p. 77, hardening rule on outer yield surface, 'S = 0 or 1 (a Boolean switch)'); Itasca 2025, property index-softening ('additional cap softening term S T_S ... optional'; not recommended for drained loading)"
   },
   {
    "key": "phi_r",
@@ -1749,11 +1042,9 @@
    "range_es": "Del orden de 25-35° en paredes no alteradas, 25-30° ligeramente alteradas, 20-25° con recubrimientos limo-arcillosos o areno-arcillosos y 8-16° con recubrimientos arcillosos blandos; ángulos de rozamiento básicos de rocas comunes 23-40°",
    "sources": [
     "norsand_power_barton.hoek_pre_2023",
-    "fhwa_1989",
-    "rocscience_rs2_theory_20"
+    "fhwa_1989"
    ],
-   "locator": "Hoek 2023, ch. 4, eqs. 4-5 (PDF p. 82, after Barton & Choubey 1977); Hoek 2023, ch. 12, Table 6, joint alteration number Ja, column phi_r approx. (PDF pp. 252-253, after Barton et al. 1974); FHWA 1989, p. 5.18, margin table 'basic friction angle for different rocks' (after Barton); RS2 Theory 20, eq. 20.1",
-   "notes": "r = Schmidt rebound on wet weathered joint walls, R = on dry unweathered sawn surfaces. With r = R the formula gives phi_r = phi_b, which is why the program's pick table (basic_friction_angle.json, FHWA 1989) applies to unweathered joints. The original papers Barton & Choubey (1977) and Barton et al. (1974) were not read directly."
+   "locator": "Hoek 2023, ch. 4, eqs. 4-5 (PDF p. 82, after Barton & Choubey 1977); Hoek 2023, ch. 12, Table 6, joint alteration number Ja, column phi_r approx. (PDF pp. 252-253, after Barton et al. 1974); FHWA 1989, p. 5.18, margin table 'basic friction angle for different rocks' (after Barton)"
   },
   {
    "key": "jrc",
@@ -1768,8 +1059,7 @@
     "norsand_power_barton.hoek_pre_2023",
     "fhwa_1989"
    ],
-   "locator": "Hoek 2023, ch. 4, eq. 4 and Figure 5 (PDF pp. 82-83, profiles JRC 0-2 ... 18-20 after Barton & Choubey 1977), Figure 6 (Barton 1982), eq. 6 scale correction (PDF p. 85); FHWA 1989, Figure 5.2 (p. 5.8: rough undulating JRC = 20, smooth undulating 10, smooth nearly planar 5) and p. 5.19",
-   "notes": "Dimensionless. Laboratory-scale JRC0 refers to 100 mm samples."
+   "locator": "Hoek 2023, ch. 4, eq. 4 and Figure 5 (PDF pp. 82-83, profiles JRC 0-2 ... 18-20 after Barton & Choubey 1977), Figure 6 (Barton 1982), eq. 6 scale correction (PDF p. 85); FHWA 1989, Figure 5.2 (p. 5.8: rough undulating JRC = 20, smooth undulating 10, smooth nearly planar 5) and p. 5.19"
   },
   {
    "key": "jcs",
@@ -1784,23 +1074,7 @@
     "norsand_power_barton.hoek_pre_2023",
     "fhwa_1989"
    ],
-   "locator": "Hoek 2023, ch. 4, eq. 4 (PDF p. 82) and eq. 7 scale correction (PDF p. 85); FHWA 1989, p. 5.18 (weathering can reduce the near-surface strength to as low as one quarter of the intact uniaxial strength, after Barton)",
-   "notes": "Stress unit (kPa). Validity of Barton's equation: FHWA p. 5.7 recommends 0.01 < sigma_n/JCS < 0.3 and an upper limit of 70 deg for the bracketed angle; Hoek ch. 4, PDF pp. 88-89: not valid at sigma_n = 0, upper limit sigma_n = JCS. The program default 1e7 kPa (10 000 MPa) is far above any rock strength (RSData default)."
-  },
-  {
-   "key": "residual_dilation",
-   "criteria": [
-    "barton_bandis"
-   ],
-   "definition_en": "Dilation angle of the plastic potential of the elastoplastic Barton-Bandis model (the program label is 'Dilation Angle'); after failure the material is cohesionless with friction angle phi_r.",
-   "definition_es": "Ángulo de dilatancia del potencial plástico del modelo elastoplástico Barton-Bandis (la etiqueta del programa es 'Dilation Angle'); tras la rotura el material es friccional sin cohesión con ángulo de rozamiento phi_r.",
-   "range_en": null,
-   "range_es": null,
-   "sources": [
-    "rocscience_rs2_theory_20"
-   ],
-   "locator": "RS2 Theory 20, section 20.1 ('A dilation angle, psi, is defined for the plastic potential function'; residual strength cohesionless with phi_r) and eq. 20.2",
-   "notes": "Software concept (RS2/RSData elastoplastic equivalent of the Barton-Bandis criterion), kind manual. The registry key says 'residual_' but the RS2 doc defines a single dilation angle; no range sourced."
+   "locator": "Hoek 2023, ch. 4, eq. 4 (PDF p. 82) and eq. 7 scale correction (PDF p. 85); FHWA 1989, p. 5.18 (weathering can reduce the near-surface strength to as low as one quarter of the intact uniaxial strength, after Barton)"
   }
  ],
  "pending": [
@@ -1809,14 +1083,250 @@
    "criteria": [
     "softening_hardening"
    ],
-   "missing": "PENDING: not defined in the Rocscience Softening-Hardening theory manual (ch. 11) nor in any other document read; the RS2 online help and the Rocscience learning page checked do not describe the field. See pending_camclay_softening.md."
+   "missing": "no citable document read defines it (see fuentes-pendientes.md)"
   },
   {
    "key": "residual_strength",
    "criteria": [
     "barton_bandis"
    ],
-   "missing": "no entry from the research (see fuentes-pendientes.md)"
+   "missing": "no citable document read defines it (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "material_type",
+   "criteria": [
+    "mohr_coulomb",
+    "hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "set_residual_to_peak",
+   "criteria": [
+    "mohr_coulomb",
+    "drucker_prager",
+    "hoek_brown",
+    "generalized_hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_tensile",
+   "criteria": [
+    "mohr_coulomb",
+    "drucker_prager"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_k",
+   "criteria": [
+    "drucker_prager"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "dilation_parameter",
+   "criteria": [
+    "hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "g_min",
+   "criteria": [
+    "norsand"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_mb",
+   "criteria": [
+    "hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_s",
+   "criteria": [
+    "hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "gsi_residual",
+   "criteria": [
+    "generalized_hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "mi_residual",
+   "criteria": [
+    "generalized_hoek_brown"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cone_hardening_type",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "hardening_property",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cone_hardening_table",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "dilation_angle",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cone_dilation_type",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cap_type",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cap_hardening_type",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "lambda_kappa",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "cap_hardening_table",
+   "criteria": [
+    "softening_hardening"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "initial_consolidation_condition",
+   "criteria": [
+    "norsand"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "fluid_bulk_modulus",
+   "criteria": [
+    "norsand"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "a",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "b",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "c",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "d",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "waviness",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_a",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_b",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_c",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_d",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_waviness",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "dilation_ratio",
+   "criteria": [
+    "power_curve"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
+  },
+  {
+   "key": "residual_dilation",
+   "criteria": [
+    "barton_bandis"
+   ],
+   "missing": "only the manuals of the reference software document it, and they cannot be cited (owner's rule, 2026-11-24): a scientific source is needed (see fuentes-pendientes.md)"
   }
  ]
 }

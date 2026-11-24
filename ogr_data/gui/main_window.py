@@ -351,10 +351,10 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------------- menus
 
     def _create_menus(self) -> None:
-        """Eight menus (spec 025c), each action under its RSData name.
+        """Eight menus (spec 025c), each action under its established name.
 
-        RSData spreads Failure States, Tests, Stress Paths, Calibrate and
-        Compute over five one-entry menus; here they are one Tests menu in
+        Failure States, Tests, Stress Paths, Calibrate and Compute were five
+        one-entry menus; here they are one Tests menu in
         the order they are used (define, compute, calibrate). The actions
         the toolbar shares are attributes (spec 025b): one QAction, one
         enabled state.
@@ -450,7 +450,7 @@ class MainWindow(QMainWindow):
         materials_menu.addAction(tr("Soil classifier (USCS)…"), self._open_classifier)
         materials_menu.addAction(tr("Fit lab data…"), self._open_fit_dialog)
 
-        # specs 012, 013, 014: RSData's five one-entry menus, in the order of use
+        # specs 012, 013, 014: five former one-entry menus, in the order of use
         tests_menu = bar.addMenu(tr("Tests"))
         tests_menu.addAction(tr("Define Failure States…"), lambda: self._define_failure_states())
         tests_menu.addAction(tr("Define Stress Paths…"), lambda: self._define_stress_paths())
@@ -711,7 +711,7 @@ class MainWindow(QMainWindow):
 
         The rows are the report's (``report.computed_rows``): classic
         Hoek-Brown gives sigcm and the equivalent MC (Hoek 2002), Power Curve
-        and Barton-Bandis the best-fit MC over the range (RocData 2004);
+        and Barton-Bandis the best-fit MC over the range;
         one source for the panel and the report.
         """
 

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """File > Project Settings (spec 025b): the project title and the stress unit.
 
-Both left the sidebar, which now holds only the material. RSData keeps its
-units in a dialog of the same name.
+Both left the sidebar, which now holds only the material; a project
+settings dialog is where engineering programs usually keep them.
 """
 
 from __future__ import annotations

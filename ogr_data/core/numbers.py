@@ -4,8 +4,8 @@
 One place for the format of every value the window, the dialogs and the
 report show, so the panel and the report cannot disagree:
 
-- up to 6 significant figures, without padding zeros, as RSData 1.009
-  shows its fields (``100000``, ``40.5662``, ``0.000233284``); angles with
+- up to 6 significant figures, without padding zeros, as the reference
+  program shows its fields (``100000``, ``40.5662``, ``0.000233284``); angles with
   4 decimals; never scientific notation for the usual magnitudes, only
   below 1e-4 (``s`` of a very poor rock mass) and above 1e9;
 - the noise of a fit (|value| < 1e-12) is 0.

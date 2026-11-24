@@ -89,5 +89,12 @@ Siguientes (24-11-2026):
     accesibilidad y progreso (hechas todas; las fuentes que faltan para
     la ayuda de parámetros, en `025f-.../fuentes-pendientes.md`).
 
+16. **026 — Anomalías de los parámetros** (borrador, con dudas): valores
+    por defecto fuera de rango (N de NorSand, JCS), Power Curve que ignora
+    c y la ondulación, unidades de *a*, y 13 campos que ningún cálculo lee
+    (regla 7).
+17. **027 — Retirar las referencias al fabricante del programa de
+    referencia** (borrador, con dudas): regla 9 de `AGENTS.md`.
+
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.

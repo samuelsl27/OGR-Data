@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Numeric field that shows numbers as RSData does (spec 025e).
+"""Numeric field that shows numbers as the reference program does (spec 025e).
 
 A ``QDoubleSpinBox`` pads every value to its fixed decimals
 (``10.500000 kPa``) and rounds what is typed to them. This one shows the

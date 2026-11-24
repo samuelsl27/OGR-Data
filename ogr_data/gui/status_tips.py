@@ -23,7 +23,7 @@ TIPS = {
     _t("Recent Projects"): _t("Open one of the last projects opened or saved."),
     _t("Save"): _t("Save the project to its file, or choose one if it has none."),
     _t("Save As…"): _t("Save the project to a new file."),
-    _t("Import .roc…"): _t("Add the material of a RocData .roc file to the project."),
+    _t("Import .roc…"): _t("Add the material of a .roc file to the project."),
     _t("Project Settings…"): _t("Project title and display stress unit."),
     _t("Exit"): _t("Close OGR Data (asks to save unsaved changes)."),
     _t("Undo"): _t("Undo the last change to the project."),
