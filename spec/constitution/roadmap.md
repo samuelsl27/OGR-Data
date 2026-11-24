@@ -94,6 +94,9 @@ Siguientes (24-11-2026):
     (regla 7).
 17. **027 — Retirar las referencias al fabricante del programa de
     referencia** (hecha): regla 9 de `AGENTS.md`, con test.
+18. **028 — Hoek-Brown generalizado definido por mb, s y a** (borrador,
+    sin implementar por decisión de la propietaria): la opción aplazada de
+    la spec 026; dudas abiertas sobre Erm sin GSI y los límites de mb, s, a.
 
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.
