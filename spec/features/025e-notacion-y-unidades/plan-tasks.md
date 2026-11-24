@@ -57,6 +57,11 @@ Capturas de la ventana en [`capturas/`](capturas/) (inglés y español).
   nula de un ajuste como `7.48901e-13 kPa`; ahora `3686231 kPa` y `0 kPa`.
 - Los nombres de criterio de RSData van sin guion: RF-9 chocaba con la
   decisión de 025c y no se aplica.
+- El criterio de finalización pedía un test **estático** de que no queda
+  `sigma1`/`deg` visible; no se escribió: los textos se convierten al
+  mostrarse (las claves siguen en ASCII a propósito), así que un test sobre
+  el código no lo vería. Se comprueba en la ventana (ejes, resultados,
+  muestreador) con `test_screen_uses_symbols_and_the_format`.
 - Pendiente fuera de esta spec: los encabezados de las tablas de puntos de
   los diálogos de estados y trayectorias siguen como RSData («Sigma3»,
   «Sigma1»), porque son también los nombres de columna que se importan y
