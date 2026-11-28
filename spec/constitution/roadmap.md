@@ -94,9 +94,9 @@ Siguientes (24-11-2026):
     (regla 7).
 17. **027 — Retirar las referencias al fabricante del programa de
     referencia** (hecha): regla 9 de `AGENTS.md`, con test.
-18. **028 — Hoek-Brown generalizado definido por mb, s y a** (borrador,
-    sin implementar por decisión de la propietaria): la opción aplazada de
-    la spec 026; dudas abiertas sobre Erm sin GSI y los límites de mb, s, a.
+18. **028 — Hoek-Brown generalizado definido por mb, s y a** (aprobada el
+    2026-11-28, en curso): la opción aplazada de la spec 026; Erm a mano o
+    por GSI equivalente deducido, límites de Hoek et al. (2002).
 19. **029 — Panel lateral legible y adaptable** (hecha): campos
     numéricos aplastados, flechas que tapan el número y panel de ancho
     fijo; revisión de UX del 2026-11-28.
