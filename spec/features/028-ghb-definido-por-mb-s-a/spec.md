@@ -101,3 +101,13 @@ proyectos antiguos que abren igual; suite en verde.
 - [NECESITA ACLARACIÓN: límites de mb, s y a (RF-8)]
 - [NECESITA ACLARACIÓN: qué pasa con los valores manuales al volver a «GSI»]
 - [NECESITA ACLARACIÓN: un caso publicado con mb, s y a directos para validar]
+
+
+
+
+Cuando quieras implementarla, me hacen falta cuatro respuestas:
+
+Erm sin GSI: los métodos de Erm necesitan GSI y D. ¿Lo dejo sin calcular (con su motivo), te pido Erm directamente, o deduzco un GSI equivalente a partir de s con un D supuesto?
+Límites: propongo mb > 0, 0 ≤ s ≤ 1 y 0,5 ≤ a < 1, que salen de las ecuaciones de Hoek et al. (2002). ¿Te valen?
+Al volver a "GSI": ¿se pierden los valores que se escribieron a mano, o el programa pregunta antes?
+Caso para validar: ¿tienes algún caso publicado con mb, s y a directos?
