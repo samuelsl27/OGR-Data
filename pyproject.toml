@@ -28,4 +28,4 @@ ogr-data-mcp = "ogr_data.mcp_server.cli:main"
 include = ["ogr_data*"]
 
 [tool.setuptools.package-data]
-ogr_data = ["py.typed", "data/*.json", "data/db_sources/*.csv", "data/db_sources/*.md"]
+ogr_data = ["py.typed", "data/*.json", "data/db_sources/*.csv", "data/db_sources/*.md", "gui/icons/*.svg"]

@@ -8,7 +8,7 @@ import math
 import os
 
 import numpy as np
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -29,7 +29,6 @@ from PySide6.QtWidgets import (
     QMenuBar,
     QMessageBox,
     QPushButton,
-    QScrollArea,
     QSizePolicy,
     QSplitter,
     QStyle,
@@ -58,6 +57,7 @@ from ..core.models import CRITERIA, Criterion, defaults
 from . import i18n
 from . import accelerators
 from .i18n import tr
+from .forms import SidebarScroll, responsive_form
 from .number_spin import NumberSpinBox
 from .plots import EnvelopeCanvas, PathCanvas
 from .parameter_tooltip import parameter_tooltip
@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         self._app_depth.valueChanged.connect(self.refresh)
         self._app_depth.editingFinished.connect(self._close_history_group)
         self._app_fields = QWidget()
-        app_form = QFormLayout(self._app_fields)
+        app_form = responsive_form(QFormLayout(self._app_fields))
         app_form.setContentsMargins(0, 0, 0, 0)
         self._depth_label = QLabel(tr("Tunnel depth"))
         app_form.addRow(tr("Unit weight"), self._unit_weight)
@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
         self._app_fields.setVisible(False)
 
         self._form_box = QGroupBox(tr("Parameters"))
-        self._form_layout = QFormLayout(self._form_box)
+        self._form_layout = responsive_form(QFormLayout(self._form_box))
         self._widgets: dict[str, object] = {}
 
         # spec 013: Stiffness (tab of the reference program; rows per material model)
@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
         sidebar.addWidget(self._build_material_panel())
         material_box = QGroupBox("Material")  # i18n: ignore (same in Spanish)
         material_layout = QVBoxLayout(material_box)
-        material_form = QFormLayout()
+        material_form = responsive_form(QFormLayout())
         material_form.setContentsMargins(0, 0, 0, 0)
         self._name_edit = QLineEdit()
         self._name_edit.setPlaceholderText(tr("Material name"))
@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
         material_layout.addWidget(self._fit_button)
         sidebar.addWidget(material_box)
         range_box = QGroupBox(tr("Stress range"))
-        range_form = QFormLayout(range_box)
+        range_form = responsive_form(QFormLayout(range_box))
         range_form.addRow(symbols(tr("Application (sigma3max range)")), self._application_combo)
         self._sig3max_label = QLabel(symbols(tr("sig3max (envelope range)")))
         self._sig3max_label.setBuddy(self._sig3max)  # spec 025f RF-3
@@ -248,12 +248,11 @@ class MainWindow(QMainWindow):
 
         sidebar_widget = QWidget()
         sidebar_widget.setLayout(sidebar)
-        sidebar_widget.setMaximumWidth(360)
-        scroll = QScrollArea()
+        # spec 029: no fixed width; the splitter decides, down to what the content needs
+        scroll = SidebarScroll()
         scroll.setObjectName("sidebar")
         scroll.setWidget(sidebar_widget)
-        scroll.setWidgetResizable(True)
-        scroll.setMaximumWidth(380)
+        self._sidebar_scroll = scroll
 
         self._principal = EnvelopeCanvas(
             tr("Principal Stresses"), tr("sigma3 ({0})").format(self._stress_unit),
@@ -326,8 +325,9 @@ class MainWindow(QMainWindow):
         splitter.addWidget(scroll)
         splitter.addWidget(self._graph_tabs)
         splitter.setStretchFactor(1, 1)
-        # the sidebar opens at its full width (no clipped buttons)
-        splitter.setSizes([380, 770])
+        splitter.setCollapsible(0, False)  # spec 029 RF-5
+        splitter.setSizes([380, 770])  # until the first show measures the content
+        self._sidebar_sized = False
         self.setCentralWidget(splitter)
         self.statusBar()
         self._build_results_dock()
@@ -2076,6 +2076,27 @@ class MainWindow(QMainWindow):
         self.close()
         return window
 
+    def showEvent(self, event) -> None:  # noqa: N802 (Qt)
+        super().showEvent(event)
+        if not self._sidebar_sized:
+            self._sidebar_sized = True
+            # after this event the window has its final size, and so the splitter
+            QTimer.singleShot(0, self, self._open_sidebar_width)  # dropped if the window goes first
+
+    def _open_sidebar_width(self) -> None:
+        """Open the sidebar as wide as its rows need on one line (spec 029 RF-5).
+
+        Measured once shown and laid out: before that neither the style sheet
+        nor the window have given their sizes. At most 40 % of the splitter, so the graphs keep the rest;
+        below that the rows wrap (RF-4) instead of being cut.
+        """
+
+        splitter = self.centralWidget()
+        total = sum(splitter.sizes())
+        wanted = max(380, self._sidebar_scroll.sizeHint().width())
+        width = max(self._sidebar_scroll.minimumSizeHint().width(), min(wanted, int(total * 0.4)))
+        splitter.setSizes([width, total - width])
+
     def adopt(self, old: "MainWindow") -> None:
         """Take over the state of another window (language switch)."""
 
@@ -2174,6 +2195,8 @@ class MainWindow(QMainWindow):
             self._form_layout.addRow(label, editor)
         self._apply_range_tooltips()
         self._apply_tab_order()
+        if hasattr(self, "_sidebar_scroll"):
+            self._sidebar_scroll.updateGeometry()  # spec 029: new rows, new minimum width
 
     def _apply_range_tooltips(self) -> None:
         """Help of the stress-range fields for the current criterion (spec 025f RF-1)."""

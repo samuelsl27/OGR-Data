@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QComboBox, QDoubleSpinBox, QFormLayout, QGroupBox,
 
 from ..core import simulation as sm
 from .i18n import tr
+from .forms import responsive_form
 from .number_spin import NumberSpinBox
 
 
@@ -58,7 +59,7 @@ class StiffnessPanel(QGroupBox):
         self._scale = kpa_scale
         self._unit = unit
         self._kind = "linear"
-        self.form = QFormLayout(self)
+        self.form = responsive_form(QFormLayout(self))  # spec 029
         self.spins: dict[str, QDoubleSpinBox] = {}
         self.elastic_parameter = QComboBox()
         for option in sm.CAM_CLAY_ELASTIC:

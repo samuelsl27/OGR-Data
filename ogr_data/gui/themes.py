@@ -8,6 +8,8 @@ dark palettes, accent #4a90d9, selection #b9d7f7 (light).
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from PySide6.QtWidgets import QApplication
 
 _LIGHT = """
@@ -266,9 +268,52 @@ QToolTip {
 }
 """
 
+_ICONS = (Path(__file__).parent / "icons").as_posix()
+
+#: spin-box buttons: (border, button, hover, pressed) per theme
+_SPIN_COLORS = {
+    "light": ("#b0b0b0", "#f3f3f3", "#d7e8ff", "#b9d7f7"),
+    "dark": ("#555555", "#3f3f3f", "#505a70", "#4a5a75"),
+}
+
+SPIN_BUTTON_WIDTH = 18
+
+
+def _spin_rules(theme: str) -> str:
+    """Spin-box buttons and arrows drawn by the sheet (spec 029 RF-2).
+
+    A sheet that styles a spin box's frame but not its buttons leaves them to
+    the native style, which neither reserves their room (the arrows covered
+    the number under ``windows11``) nor, under Fusion, draws the arrows.
+    """
+
+    border, button, hover, pressed = _SPIN_COLORS[theme]
+    width = SPIN_BUTTON_WIDTH
+    rules = f"""
+QAbstractSpinBox {{ padding-right: {width + 2}px; }}
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {{
+    subcontrol-origin: border;
+    width: {width}px;
+    border-left: 1px solid {border};
+    background-color: {button};
+}}
+QAbstractSpinBox::up-button {{ subcontrol-position: top right; border-top-right-radius: 2px; }}
+QAbstractSpinBox::down-button {{ subcontrol-position: bottom right; border-bottom-right-radius: 2px; }}
+QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {{ background-color: {hover}; }}
+QAbstractSpinBox::up-button:pressed, QAbstractSpinBox::down-button:pressed {{ background-color: {pressed}; }}
+"""
+    for arrow in ("up", "down"):
+        rules += (
+            f"QAbstractSpinBox::{arrow}-arrow {{ image: url({_ICONS}/spin_{arrow}_{theme}.svg); width: 8px; height: 5px; }}\n"
+            f"QAbstractSpinBox::{arrow}-arrow:disabled, QAbstractSpinBox::{arrow}-arrow:off "
+            f"{{ image: url({_ICONS}/spin_{arrow}_{theme}_disabled.svg); }}\n"
+        )
+    return rules
+
+
 THEMES: dict[str, str] = {
-    "light": _LIGHT,
-    "dark": _DARK,
+    "light": _LIGHT + _spin_rules("light"),
+    "dark": _DARK + _spin_rules("dark"),
 }
 
 # Matplotlib series colors per theme (same family as the QSS tokens).

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- spec 029: spin-box arrow drawn by the theme's sheet -->
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="5" viewBox="0 0 8 5"><polygon points="0,5 8,5 4,0" fill="#404040"/></svg>

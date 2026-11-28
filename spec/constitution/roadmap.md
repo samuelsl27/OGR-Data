@@ -97,6 +97,9 @@ Siguientes (24-11-2026):
 18. **028 — Hoek-Brown generalizado definido por mb, s y a** (borrador,
     sin implementar por decisión de la propietaria): la opción aplazada de
     la spec 026; dudas abiertas sobre Erm sin GSI y los límites de mb, s, a.
+19. **029 — Panel lateral legible y adaptable** (hecha): campos
+    numéricos aplastados, flechas que tapan el número y panel de ancho
+    fijo; revisión de UX del 2026-11-28.
 
 Otras ideas registradas sin spec aún: export PDF nativo, unidades
 imperiales, σ3max "General" = σci/4 como opción más del selector.
