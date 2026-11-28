@@ -41,9 +41,11 @@ asociado. El criterio en esa forma es el de Hoek et al. (2002), ec. 2:
   mb, s y a, y mostrará deshabilitados, con su motivo, GSI, mi y D.
 - **RF-3**: MIENTRAS «Define by» sea «GSI», EL SISTEMA mostrará
   deshabilitados mb, s y a con los valores que resultan de GSI, mi y D.
-- **RF-4**: CUANDO «Define by» pase de «GSI» a «mb, s, a», EL SISTEMA
-  rellenará mb, s y a con los valores calculados en ese momento, para que
-  la envolvente no cambie.
+- **RF-4**: CUANDO «Define by» pase de «GSI» a «mb, s, a» y el material no
+  tenga todavía valores manuales, EL SISTEMA rellenará mb, s y a (y sus
+  residuales) con los valores calculados en ese momento, para que la
+  envolvente no cambie; si ya los tiene, manda RF-11 (aclarado en el plan,
+  2026-11-28).
 - **RF-5**: MIENTRAS «Define by» sea «mb, s, a», EL SISTEMA calculará la
   envolvente, σt, σc, σcm y el Mohr-Coulomb equivalente con las
   ecuaciones de Hoek et al. (2002) a partir de mb, s y a.
